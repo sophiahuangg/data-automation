@@ -51,9 +51,36 @@ Remember, it is only **required** that you create a branch when you are instruct
 
 #### American Community Survey (ACS)
 
+##### Signing Up for an API Key
+
+1. Go to http://www.census.gov/developers/
+2. Click on **REQUEST A KEY** on the left side of the page
+3. Fill out the pop-up window form
+4. You will get an email with your key code in the message and a link to register it. Enter the organization name as *Lowe Institute of Political Economy*.
+
+Now set up your API key as an environment variable. While this is tecnhically optional, we recommend this since this is a public repo and any code you push that explicitly mentions your API key will therefore make your API key open to the public. Setting it as an environment variable can be done as follows:
+
+```python
+import os
+
+os.environ["API_KEY_ACS"] = "<api key you received from the Census Bureau>"
+```
+
+In order to use this with our scripts, you'll want to import ```load_dotenv()``` from the ```dotenv``` package. Then, at the beginning of your script, type in
+
+```python
+from dotenv import load_dotenv
+load_dotenv()
+import os
+API_KEY = os.getenv("API_KEY_ACS")
+```
+##### Other Tips
+
 American Community Survey API documentation for 5-year estimates: https://www.census.gov/data/developers/data-sets/acs-5year.html
 
 Geographic codes for ACS: https://api.census.gov/data/2019/acs/acs5/subject/examples.html
+
+Check out the ```notes.md``` file for some more details and useful links!
 
 ## Learning Resources
 
@@ -68,7 +95,7 @@ Basics of using Git and GitHub together: https://www.youtube.com/watch?v=evgZPMW
 The first 5 videos on this playlist are probably all that you will need. There will be some redundant information. If you already know what Git is but don't know how to use it, then just start here!
 
 #### Python 
-If you've never coded in Python before, that's okay! Corey Schafer has a great introduction to it on this YouTube playlist. For our purposes, you'll need to know the contents of about the first 9 videos (basic data types and control flow that we'll work with a lot, as well as functions and modules). We'll teach you the basics of how to use the packages we'll be working with in workshops and all (I want to commit to recording a mini-lecture series, but no promises). Here's the link to the playlist: https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7
+Corey Schafer has a great introduction to Python on [this](https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7) YouTube playlist. For our purposes, you'll need to know the contents of about the first 9 videos (basic data types and control flow that we'll work with a lot, as well as functions and modules). We'll teach you the basics of how to use the packages we'll be working with in workshops and all (I want to commit to recording a mini-lecture series, but no promises). Here's the link to the playlist: https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7
 
 #### R
 
