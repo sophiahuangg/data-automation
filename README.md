@@ -58,15 +58,28 @@ Remember, it is only **required** that you create a branch when you are instruct
 3. Fill out the pop-up window form
 4. You will get an email with your key code in the message and a link to register it. Enter the organization name as *Lowe Institute of Political Economy*.
 
-Now set up your API key as an environment variable. While this is tecnhically optional, we recommend this since this is a public repo and any code you push that explicitly mentions your API key will therefore make your API key open to the public. Setting it as an environment variable can be done as follows:
+Now we need to use the API key in our Python code in order to make certain requests. While you could simply paste in the API key into your file as a variable, we do not recommend this since this is a public repo and any code you push that explicitly mentions your API key will therefore make your API key open to the public. 
 
-```python
-import os
+Let's make our code more secure by making a file named ".env" in this directory once you've cloned this repo onto your local machine. Because we've added ".env" into our ".gitignore" file, we can each maintain separate ".env" files holding our own API keys. This is useful for us because if we decide to use other API's later, we can use this same codebase and add any additional API keys to this same file. 
 
-os.environ["API_KEY_ACS"] = "<api key you received from the Census Bureau>"
+In the ".env" file you just created, you only need to add one line: 
+```API_KEY_ACS='<your-api-key-goes-here>'```
+You don't have to name it "API_KEY_ACS" exactly but if you change that, just make sure you change the reference in the code. 
+
+We can use this file later to add other API keys that we want to keep private. 
+In order to use our keys in our scripts, pip install the python-dotenv package then import ```load_dotenv()``` from the ```dotenv``` package. This package will be used in tandem with the ```os``` package to get your environment variable. Note that the dotenv package must be installed with
+
+```bash
+pip3 install python-dotenv
 ```
 
-In order to use this with our scripts, you'll want to import ```load_dotenv()``` from the ```dotenv``` package. Then, at the beginning of your script, type in
+or
+
+```bash
+pip install python-dotenv
+```
+
+Then, at the beginning of your script, type in
 
 ```python
 from dotenv import load_dotenv
@@ -74,6 +87,7 @@ load_dotenv()
 import os
 API_KEY = os.getenv("API_KEY_ACS")
 ```
+If you named your key something else in the .env file just make sure you use that string in the ```os.getenv(<keyname>)``` function. This method is preferred because there's no need to ever directly copy your API key into your code.
 ##### Other Tips
 
 American Community Survey API documentation for 5-year estimates: https://www.census.gov/data/developers/data-sets/acs-5year.html

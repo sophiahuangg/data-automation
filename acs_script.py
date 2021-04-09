@@ -31,5 +31,5 @@ def collect_group(city, group):
         print("Connection refused by the server..")
 
 #get_population_estimate(PALM_SPRINGS)
-
+# https://github.com/datamade/census
 collect_group(PALM_SPRINGS, pop_group)
