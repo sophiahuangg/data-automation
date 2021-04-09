@@ -47,6 +47,10 @@ When you are done working on this branch, create a pull request and we will revi
 
 Remember, it is only **required** that you create a branch when you are instructed to make **major changes** to an existing file, like ```README.md```. If not, you are still free to make your own branch, but it is not required and you can just push to ```master```. If all you are doing is adding stuff (like additional helper functions), and not modifying what already exists, there is no need to create a new branch. Just to minimize merge conflicts :)
 
+#### VSCode Live Share
+
+If you're working with someone concurrently on the same script, it's sometimes helpful to work together on it. Luckily, Visual Studio Code (the text editor / IDE you should use) has a Live Share extension pack. TO install it, search for extensions (there should be an icon on the left-had-side bar). Search "liveshare" and install the Live Share Extension Pack. 
+
 ## Helpful Information for Some APIs
 
 #### American Community Survey (ACS)
