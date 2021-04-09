@@ -1,3 +1,4 @@
 requests
 os
 python-dotenv
+beautifulsoup4
