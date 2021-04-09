@@ -66,7 +66,19 @@ import os
 os.environ["API_KEY_ACS"] = "<api key you received from the Census Bureau>"
 ```
 
-In order to use this with our scripts, you'll want to import ```load_dotenv()``` from the ```dotenv``` package. Then, at the beginning of your script, type in
+In order to use this with our scripts, you'll want to import ```load_dotenv()``` from the ```dotenv``` package. Note that the dotenv package must be installed with
+
+```bash
+pip3 install python-dotenv
+```
+
+or
+
+```bash
+pip install python-dotenv
+```
+
+Then, at the beginning of your script, type in
 
 ```python
 from dotenv import load_dotenv
