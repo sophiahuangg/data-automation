@@ -20,8 +20,30 @@ for row in rows[0:6]:
     Name.append(name)
 
     cols = row.find_all("td")
-    label = cols[1]
-    concept = cols[2]
+    label = cols[1].text
+    concept = cols[2].text
 
     Label.append(label)
     Concept.append(concept)
+
+# Initialize output dictionary
+out = {}
+
+for i in range(len(Name)):
+    out[Name[i]] = {"Concept": Concept[i], "Label": Label[i]}
+
+print(out)
+
+"""
+{
+    NAME: (CONCEPT, LABEL),
+    ...
+}
+
+{
+    NAME : {
+        CONCEPT: alkjhvcsuiofhso8iaf,
+        LABEL: aoihjfoiwhgo8isgigo
+    }
+}
+"""
