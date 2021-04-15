@@ -34,7 +34,7 @@ for row in rows:  # Loop over the rows of the table
 out = {}
 
 for i in range(len(Name)):
-    label[i] = re.sub("!!", " ", label[i])  # Replace the !! in label with a space
+    Label[i] = re.sub("!!", " ", Label[i])  # Replace the !! in label with a space
     out[Name[i]] = {
         "Concept": Concept[i],
         "Label": Label[i],
