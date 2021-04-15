@@ -10,6 +10,8 @@ STATE = "06"  # California state geoID
 PALM_SPRINGS = "55254"
 BASE_URL = "https://api.census.gov/data/2019/acs/acs5"
 
+# TODO: write docstrings
+# TODO: create a function for getting data for different years
 
 def get_population_estimate(city):
     pop_est = "B01001_001E"  # according to 2019 variable list
@@ -31,6 +33,7 @@ def collect_group(city, group):
     try:
         r = requests.get(temp)
         print(r.json())
+        return r.json()
         # [['NAME', 'B01001_001E', 'state', 'place'], ['Palm Springs city, California', '47897', '06', '55254']]
     except:
         print(temp)
@@ -41,14 +44,24 @@ def collect_group(city, group):
 # https://github.com/datamade/census
 collect_group(PALM_SPRINGS, pop_group)
 
-# def generate_csv(group):
-#     """
-#     This function allows us to pull any series we want and export it to a human-readable (i.e., column names are in English) dataframe + .csv files.
+def generate_csv(group):
+    """
+    This function allows us to pull any series we want and export it to a human-readable (i.e., column names are in English) dataframe + .csv files.
 
-#     Input group: One Series ID from acs  
-#     """
+    We want series IDs that only end in 'E'
+    Input group: One Series ID from acs  
+    """
 
-#     pass
 
+    LoL =  collect_group(PALM_SPRINGS, group)
+
+    seriesId = {}
+    
+    for i in range(len(LoL[0])):
+        if (LoL[0][i][-1]) == 'E':
+            seriesId[LoL[0][i]] = LoL[1][i]
+    
+    print(seriesId)
 
     
+generate_csv(pop_group)
