@@ -40,7 +40,7 @@ for i in range(len(Name)):
         "Label": Label[i],
     }  # Add items to output dictionary
 
-with open("acs_vars.json", "w") as outFile:
+with open("acs_vars_2019.json", "w") as outFile:
     json.dump(out, outFile)  # Write the output dictionary to a json file
 
 """
