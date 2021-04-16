@@ -100,6 +100,20 @@ Geographic codes for ACS: https://api.census.gov/data/2019/acs/acs5/subject/exam
 
 Check out the ```notes.md``` file for some more details and useful links!
 
+## Explanation of Files
+
+Whenever you create a new file, please add a description of what it does here!
+
+* **save_webpage.py**: This script allows you to save the html file for a website. It is currently configured to save the ACS variable list for 2019, but this can be changed to whatever you need at the time. This is useful for getting html files for screenscraping without having to use `requests` every time.
+
+* **acs_var_scrape.py**: This is the file that parses the ACS variables for 2019 into a `.json` file called `acs_vars_2019.json` for us to look up later. Note that you have to run `save_webpage.py` in order for this to work, since you need the html file of the site for it to work. If you want to rewrite this to work with `requests`, then go for it :)
+
+* **acs_script.py**: This is the script that scrapes data from ACS using their API, and cross references the `acs_vars_2019.json` file to rename the columns to something human-readable. 
+
+* **acs_vars_2019.json**: This file is essentially a massive dictionary. The keys are series IDs from ACS, and the values are dictionaries themselves, which contain the keys `Concept` and `Label`. The values corresponding to these two are enough to create an English name for any columns we want to pull.
+
+* **notes.md**: This file contains useful information on different APIs we are using
+
 ## Learning Resources
 
 If you are interested in learning how to use the prerequisite software, we provide some resources here.
