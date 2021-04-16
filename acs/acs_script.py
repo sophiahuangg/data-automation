@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 import pandas as pd
 import requests
 import json
-import censusgeocode as cg
 
 load_dotenv()
 
