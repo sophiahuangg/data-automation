@@ -51,6 +51,113 @@ Remember, it is only **required** that you create a branch when you are instruct
 
 If you're working with someone concurrently on the same script, it's sometimes helpful to work together on it. Luckily, Visual Studio Code (the text editor / IDE you should use) has a Live Share extension pack. TO install it, search for extensions (there should be an icon on the left-had-side bar). Search "liveshare" and install the Live Share Extension Pack. 
 
+## Coding Conventions
+
+Here we will define coding conventions to ensure proper documentation of our code. By following these conventions, it helps others (and maybe even your future self) understand the code you've written. 
+
+These conventions are highly detailed and specific. If some of these conventions do not work for the code you are writing feel free to use conventions that suit your code and coding style. However, we do ask that your code to be readable and consistent.
+
+### Docstrings and Function Definitions
+
+# Function Definitions
+
+Function names must be descriptive, i.e. names such as "function" or "do_something" can NOT be used. For example, if you want to write a function that gets a city name then your function can be named ```get_city_name()```.
+
+To guarantee that we pass in the correct argument type to a function, function parameters must include type hinting. With this method, if an argument with the wrong type is passed in, a type error will be given.
+
+An example of a function definition is 
+
+```python
+def get_city_name(geoid: str):
+```
+
+You can also use default arguments for your function parameters to guarantee that an argument is passed into the function even if no argument is given during the function call. For example
+
+```python
+def geoid_from_city(city: str = "Rancho Mirage, CA"):
+```
+
+will still run even if you call the function ```geoid_from_city()```.
+
+# Docstrings
+Docstrings are a convenient way of documenting the functions we write. Docstrings inclue a description of your function, the arguments it needs, and the output of the function. Docstrings appear right after the function definition and you can create one by using triple quotes ``` """ [docstring here] """ ``` or ``` ''' [docstring here] ''' ```. 
+
+Here is an example docstring from the ```acs_detail_table.py``` file.
+
+```Python
+def get_population_estimate(year: str, city: str)
+    """
+    Pulls the population estimate data from ACS for a city and year.
+    NOTE: Returns "Connection refused by the server.." if no connection to server
+
+    Argument(s) 
+    -----------------------
+        year: year of data needed to pull in string format. Example: 
+              "2021"
+        city: city id in string format. Example is Rancho Mirage: 
+              "59500"
+    
+    Output
+    -----------------------
+    Population estimate in List of List of strings format. Example:
+        [['NAME', 'B01001_001E', 'state', 'place'], ['Palm Springs city, California', '47897', '06', '55254']] 
+    """
+```
+For consistency, all arguments have a one tab indent and its description should align with the description of the other arguments. For the output, output descriptions are NOT indented but the example should have a one tab indent. Output examples should be given. However, if your output is too long or too difficult to type, ex. a dataframe, it can be omitted.
+
+If there is something important about the function that you want to convey to readers, use ```NOTE:``` to highlight the important information.
+
+We've provided a sample docstring and function definition for you to copy paste and fill in below:
+
+```python
+def func(param_1: type, param_2: type):
+    """
+    [Function Description]
+    (Optional for any important information) NOTE:
+    
+    Argument(s) 
+    -----------------------
+        param_1: [param_1 description] in [parameter type] format. Example (Optional Example Description): 
+                 [param_1 Example]
+                 (Optional) NOTE: 
+        param_2: [param_2 description] in [parameter type] format. Example (Optional Example Description): 
+                 [param_2 Example]
+                 (Optional) NOTE: 
+    
+    Output
+    -----------------------
+    [Output] in [output type] format. Example:
+        [Example] 
+        (Optional) NOTE: 
+    """
+```
+
+### Comments
+
+Besides docstrings, comments should be written throughout your functions for others to understand your code. Similar to a step-by-step guide you created a function. Addtionally, comments should be written on any code that can be ambiguous to readers. A good way to know when to comment is if you had to think for a while to write the code. However, you do not need to comment everything. For example, variable initialization does not need to be commented since it is pretty straightforward. You can add a comment by using the hash sign ```#```.
+
+If you have code that does not use functions, make sure you write a comment at the top of the code block of what it does. For example:
+
+``` python
+#--------
+# Script that cleans the geocode csv file to split the city geoid and the state geoid
+# And makes it to a new csv file.
+#--------
+```
+
+Furthermore, if you are unable to finish the code you are working on, make sure to write a ```#TODO:``` comment in the area you need to finish with a description of what needs to be done. This ensures that if other people work on the code, they know what still needs to be done with the code. If there are overall todos, you can leave the code block
+
+```python
+# ---------------------------
+# THINGS TO DO:
+# ---------------------------
+
+# TODO: [description]
+
+```
+at the top of the file with the descriptions of the things you need to do. 
+
+
 ## Helpful Information for Some APIs
 
 #### American Community Survey (ACS)

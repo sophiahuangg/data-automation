@@ -1,10 +1,10 @@
 import csv
 import pandas as pd
 
-# """
+#--------
 # Script that cleans the geocode csv file to split the city geoid and the state geoid
 # And makes it to a new csv file.
-# """
+#--------
 
 geoids = pd.read_csv("city_geoids.csv")
 
