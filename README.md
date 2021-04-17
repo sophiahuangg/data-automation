@@ -59,7 +59,7 @@ These conventions are highly detailed and specific. If some of these conventions
 
 ### Docstrings and Function Definitions
 
-# Function Definitions
+#### Function Definitions
 
 Function names must be descriptive, i.e. names such as "function" or "do_something" can NOT be used. For example, if you want to write a function that gets a city name then your function can be named ```get_city_name()```.
 
@@ -79,7 +79,7 @@ def geoid_from_city(city: str = "Rancho Mirage, CA"):
 
 will still run even if you call the function ```geoid_from_city()```.
 
-# Docstrings
+#### Docstrings
 Docstrings are a convenient way of documenting the functions we write. Docstrings inclue a description of your function, the arguments it needs, and the output of the function. Docstrings appear right after the function definition and you can create one by using triple quotes ``` """ [docstring here] """ ``` or ``` ''' [docstring here] ''' ```. 
 
 Here is an example docstring from the ```acs_detail_table.py``` file.
