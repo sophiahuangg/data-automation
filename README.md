@@ -85,7 +85,7 @@ Docstrings are a convenient way of documenting the functions we write. Docstring
 Here is an example docstring from the ```acs_detail_table.py``` file.
 
 ```Python
-def get_population_estimate(year: str, city: str)
+def get_population_estimate(year: str, city: str):
     """
     Pulls the population estimate data from ACS for a city and year.
     NOTE: Returns "Connection refused by the server.." if no connection to server
