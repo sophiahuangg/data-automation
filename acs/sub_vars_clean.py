@@ -12,4 +12,20 @@ for v in data.values():
         #print(val['label'])
 
 with open("acs_subjects_2019.json", "w") as output:
-    json.dump(data, output)
+    json.dump(data['variables'], output)
+
+"""
+Output file format:
+{
+    NAME : {
+        "label": "xx",
+        "concept": "xx",
+        "predicateType": "xx",
+        "group": "xx",
+        "limit": 2,
+        "attributes": "S0804_C04_068EA,S0804_C04_068M,S0804_C04_068MA"
+    }
+}
+
+filename: acs_subjects_2019.json
+"""
