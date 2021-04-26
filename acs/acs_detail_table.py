@@ -349,7 +349,7 @@ def collect_subject_table(subject: str, year: str, city_geoid: str):
 
     Argument(s)
     -----------------------
-        subject:     Series ID of group you want to pull from in string format Example for AGE AND SEX:
+        subject:     Subject ID of group you want to pull from in string format Example for AGE AND SEX:
                      "S0101"
         year:        year of data needed to pull in string format. Example:
                      "2021"
@@ -441,19 +441,71 @@ def year_df_subject(subject: str, year: str, city: str = PALM_SPRINGS):
 
 def generate_df_city_subject(subject: str, start_year: str = "2011", end_year: str = "2019", city: str = PALM_SPRINGS):
     """
-    Another placeholder
-    """
-    return None
+    Generates a dataframe for subject data for a given city, given the start and end year.
+    Argument(s)
+    -----------------------
+        group:      Subject ID of group you want to pull from in string format 
+                        i.e. "S0101"
+        start_year:  year of data needed to pull in string format. 
+                        i.e. "2011"
+                        NOTE: must be 2011 or later
+        end_year:    year of data needed to pull in string format.
+                        i.e. "2019"
+                        NOTE: must be 2019 or less
+        city:        city id in string format. 
+                        i.e. "59500"
 
-def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str = "2019", city: list = [PALM_SPRINGS], filename = None):
+    Output:
+    -----------------------
+    A dataframe with the following columns: year (index), city (str), and a separate column for each subgroup.
+    
     """
-    Another placeholder
+    dfs = []
+    for year in range(int(start_year), int(end_year)+1):
+        df = year_df_subject(subject, str(year), city)
+        dfs.append(df)
+    
+    final_df = pd.concat(dfs)
+    cityName = city_from_geoid(city)
+    final_df["City"] = cityName
+    return final_df
+
+def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str = "2019", cities: list = [PALM_SPRINGS], filename = None):
     """
-    return None
+    Uses generate_df_city_subject to create one large dataframe that encompasses all data for a particular ACS series.
+    If a filename is given, then csv is created
+
+    Argument(s)
+    -----------------------
+        group:       Subject ID of group you want to pull from in string format
+                        i.e. "S0101"
+        start_year:  year of data needed to pull in string format. 
+                        i.e."2011"
+                         NOTE: must be 2011 or later
+        end_year:    year of data needed to pull in string format.
+                        i.e. "2019"
+                         NOTE: must be 2019 or less
+        cities:      Geo IDs for cities you want to pull in List of strings format. 
+                         i.e. Palm Springs and Rancho Mirage =  ["55254", "59500"] 
+        filename:    Filename to name the output .csv file. Leave as None (or use default parameter) if you don't want to save a file. ex. "my_acs_data.csv"
+
+    Output
+    -----------------------
+    A datafame with the same format as generate_df_city, but contains multiple levels for the City variable rather than just one.
+    
+    """
+    dfs = []
+    for city in cities: 
+        df = generate_df_city_subject(subject, start_year, end_year, str(city))
+        dfs.append(df)
+    final_df = pd.concat(dfs)
+    if filename != None: 
+        final_df.to_csv(filename, index=True)
+    return final_df
 
 
 # ----------------------------
 # TESTING
 # ----------------------------
-year_df_subject("S0101", "2019", "59500")
+generate_csv_subject("S0101", "2011", "2012", cities=[PALM_SPRINGS, RANCHO_MIRAGE], filename="testSubject.csv")
 # print(generate_csv(pop_group, start_year="2011", end_year="2019", cities=[PALM_SPRINGS, RANCHO_MIRAGE], filename = "testSet.csv"))
