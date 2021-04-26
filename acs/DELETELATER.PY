@@ -37,7 +37,8 @@ def geoid_from_city(city: str):
         "59500"
     """
 
-    temp = geoids[geoids["City"] == city]  # Filter out all cities that are not targets
+    # Filter out all cities that are not targets
+    temp = geoids[geoids["City"] == city]
     geoid = list(temp["city_geoid"])[
         0
     ]  # Grab the first result of the corresponding geoID
@@ -64,7 +65,8 @@ def city_from_geoid(geoid: str):
     temp = geoids[
         geoids["city_geoid"] == int(geoid)
     ]  # Filter out all the geoids that are not tarfers
-    city = list(temp["City"])[0]  # Grab the first result of the corresponding City
+    # Grab the first result of the corresponding City
+    city = list(temp["City"])[0]
 
     return city
 
@@ -109,7 +111,8 @@ def get_population_estimate(year: str, city: str):
     """
     pop_est = "B01001_001E"  # according to 2019 variable list
     total_population = (
-        base_url(year) + f"?get=NAME,{pop_est}&for=place:{city}&in=state:{STATE}"
+        base_url(year) +
+        f"?get=NAME,{pop_est}&for=place:{city}&in=state:{STATE}"
     )
     try:
         r = requests.get(total_population)
@@ -317,143 +320,3 @@ def generate_csv(
         res.to_csv(filename, index=True)
 
     return res
-
-
-# ---------------------------------
-# ACS Subject Table API
-# ---------------------------------
-
-
-def base_url_subject(year: str):
-    """
-    Helper function. Returns the base URL for the ACS Subject Table API for a year
-
-    Argument(s)
-    -----------------------
-        year:  year of data needed to pull in string format. Example:
-                "2021"
-
-    Output
-    -----------------------
-    base url in string (f string) format. Example:
-        https://api.census.gov/data/2021/acs/acs5/subject
-    """
-
-    return f"https://api.census.gov/data/{year}/acs/acs5/subject"
-
-
-def collect_subject_table(subject: str, year: str, city_geoid: str):
-    """
-    Pulls data from the ACS Subject Table API with the specified subject ID, year, and city
-    NOTE: Returns "Connection refused by the server.." if no connection to server
-
-    Argument(s)
-    -----------------------
-        subject:     Series ID of group you want to pull from in string format Example for AGE AND SEX:
-                     "S0101"
-        year:        year of data needed to pull in string format. Example:
-                     "2021"
-        city_geoid:  city geoID id in string format. Example is Rancho Mirage:
-                     "59500"
-
-    Output:
-    -----------------------
-        List of lists of strings with the series ID in the first list and the value in the second list
-
-        Format of List of Lists:
-        list[0] = list of series ids
-            NOTE: at the end of the list it includes "'state', 'place'", and at the beginning it includes
-                  "'GEO_ID', 'NAME'"
-        list[1] = list of corresponding values
-            NOTE: at the beginning and end of the list it includes the corresponding values to the first list
-                  Example: ['1600000US0655254',  'Palm Springs city, California', '47897', ..., '06', '55254']
-
-        Example:
-        [['GEO_ID', 'NAME', 'S0101_C01_001E', ... , 'state', 'place'], ['1600000US0655254',  'Palm Springs city, California', '47897', ..., '06', '55254']]
-    """
-    temp = base_url_subject(year) + f"?get=group({subject})&for=place:{city_geoid}&in=state:{STATE}&key={API_KEY}"
-
-    try:
-        r = requests.get(temp)
-        return r.json()
-    except:
-        print(temp)
-        print("Connection refused by the server..")
-
-
-def year_df_subject(subject: str, year: str, city: str = PALM_SPRINGS):
-    """
-    Given a year and city, this function allows us to pull any subject table we want and export it as a dataframe.
-    We  use a try/catch block to only query "acs_subjects_2019.json" for fields that exist with a concept and label field.
-
-    Argument (s)
-    -----------------------------
-        subject:    Subject ID of the subject we want to pull in string format
-                        i.e. "S0101"
-        year:       Year of data we need in string format. 
-                        i.e. "2019"
-        city:       City ID in string format. 
-                        i.e. "59500"
-
-    Output: 
-    ------------------------------
-    A data frame with 2 rows. 
-    Each cell in the first row holds a "concept_label" which is string-concatenated concept + label of a subject ID.
-    The second row holds the corresponding value of each "concept + label". The dataframe is indexed by year.
-    """
-    # Opens the JSON file with subject tables info
-    with open("acs_subjects_2019.json") as subjects_json: 
-        subjectDict = json.load(subjects_json)
-
-    # Pulls data from ACS - return LoL (list of lists) 
-    LoL = collect_subject_table(subject, year, city)
-
-    # ids: list of subject ids
-    # vals: list of corresponding values
-    ids, vals = LoL[0], LoL[1]
-    concept_label = []
-    values = ([])
-
-    # Search for the subject ids in our JSON file 
-    for i in range(len(ids)):
-        subject = ids[i]
-        # try/catch so we only query query-able fields in the JSON
-        try: 
-            concept_label.append(
-                subjectDict[subject]["concept"] + " " + subjectDict[subject]["label"] 
-            )
-            values.append(vals[i])
-        except KeyError:
-            continue
-
-    # Final output df 
-    acs_subjects_df = pd.DataFrame({
-        "concept_label": concept_label,
-        "values": values,
-        "year": year,
-    })
-
-    # Pivot so we get each column as a "concept_label" and one row holding the corr. value
-    acs_subject_pivoted = acs_subjects_df.pivot(index="year", columns="concept_label", values="values")
-    
-    return acs_subject_pivoted
-
-
-def generate_df_city_subject(subject: str, start_year: str = "2011", end_year: str = "2019", city: str = PALM_SPRINGS):
-    """
-    Another placeholder
-    """
-    return None
-
-def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str = "2019", city: list = [PALM_SPRINGS], filename = None):
-    """
-    Another placeholder
-    """
-    return None
-
-
-# ----------------------------
-# TESTING
-# ----------------------------
-year_df_subject("S0101", "2019", "59500")
-# print(generate_csv(pop_group, start_year="2011", end_year="2019", cities=[PALM_SPRINGS, RANCHO_MIRAGE], filename = "testSet.csv"))
