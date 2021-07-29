@@ -1,0 +1,16 @@
+name: lowe
+dependencies:
+  - python=3.8.*
+  - pip
+  - pip:
+    - aiohttp
+    - aiolimiter
+    - asyncio
+    - backoff
+    - datetime
+    - matplotlib
+    - numpy
+    - pandas
+    - python-dotenv
+    - pytz
+    - ratelimit
