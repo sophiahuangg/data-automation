@@ -16,6 +16,24 @@ If you are unfamiliar with either Python or R (or both), you are welcome to lear
 
 If you don't learn how to use one of these languages, you won't be able to contribute for those particular tasks. But, there will still be plenty more you can do!
 
+## Conda Environment
+
+We use a conda environment called `lowe` in order to keep our Python version and packages consistent across all of our machines. To install this package, make sure you are in the `data-automation/` directory and use the following commands:
+
+```bash
+conda env create -f environment.yml
+```
+
+To activate this environment (must be done in any shell you use to run a script prior to running it), use `conda activate lowe`. To deactivate this environment to return to the `base` environment when you are done working, use `conda deactivate`. 
+
+If and when the `environment.yml` file needs to be updated to include more packages, edit the file accordingly (the format should be pretty simple from how it's already written, but there's plenty of good examples online if you need to do something intricate). Once the file is updated and saved, while in the `data-automation/` directory, do
+
+```bash
+conda env update --prefix ./env --file environment.yml  --prune
+```
+
+Make sure to commit and push any changes made to this file and let us know that you added stuff, that way everyone else can update their environments as well. If you need to update the environment after edits have been made and pushed to the repo, first `git pull` and then run the same command as above.
+
 ## Project Conventions
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
