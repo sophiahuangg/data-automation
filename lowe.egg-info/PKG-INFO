@@ -11,6 +11,8 @@ License: LICENSE.md
 Description: # Automation of Plots for Reports
         This is the main repository for the Lowe Institute's Automation of data processing and plot creation. The goal is to be able to pull data automatically, process it, and create plots at the beginning of each report-writing cycle. This will make our lives a lot easier and free up time to do fun stuff!
         
+        Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
+        
         ## Prerequisites
         
         - Late model Python 3
@@ -28,21 +30,53 @@ Description: # Automation of Plots for Reports
         
         ## Conda Environment
         
-        We use a conda environment called `lowe` in order to keep our Python version and packages consistent across all of our machines. To install this package, make sure you are in the `data-automation/` directory and use the following commands:
+        We use a conda environment called `lowe` in order to keep our Python version and packages consistent across all of our machines. This helps  (but doesn't completely) solve the "but it builds on my machine!" issue. We have turned the project into a module so we can access the data from anywhere in our repository. To install this environment, make sure you are in the `data-automation/` directory and use the following commands:
         
         ```bash
-        conda env create -f environment.yml
+        conda create -n lowe python=3.8
+        
+        conda activate lowe
+        
+        pip install -e .
         ```
         
         To activate this environment (must be done in any shell you use to run a script prior to running it), use `conda activate lowe`. To deactivate this environment to return to the `base` environment when you are done working, use `conda deactivate`. 
         
-        If and when the `environment.yml` file needs to be updated to include more packages, edit the file accordingly (the format should be pretty simple from how it's already written, but there's plenty of good examples online if you need to do something intricate). Once the file is updated and saved, while in the `data-automation/` directory, do
+        ## Upating the Conda environment
+        
+        NOTE: this may not work on Windows. Not sure if it will. Let a manager know if it doesn't
+        
+        Since the project is installed as a Python package, edits should be made to `setup.py`. Check the file and you should see where to add packages. Add any packages you want in alphabetical order and run the following commands to make sure the project can still build:
         
         ```bash
-        conda env update --prefix ./env --file environment.yml  --prune
+        # Nuke old conda environment
+        conda env remove -n lowe
+        
+        # Create clean conda environment
+        conda create -n lowe python=3.8
+        
+        # Add package in alphabetic order to setup.py
+        
+        # Install the package
+        pip install -e .
+        
+        # Assuming it builds, update requirements.txt
+        pip freeze > requirements.txt
+        
+        # Update environment.yml without the prefix line which has a path on your machine in it and isn't required
+        conda env export -n lowe | grep -v prefix > environment.yml
+        
+        # Manually inspect both requirements.txt and environment.yml to make sure nothing is broken
+        
+        git add setup.py requirements.txt environment.yml
+        
+        git commit -m "+<package-name-1> +<package-name-2> -<package-name-3>"
+        # Example: if you add pandas and numpy and remove pytest
+        # git commit -m "+pandas +numpy -pytest"
         ```
         
-        Make sure to commit and push any changes made to this file and let us know that you added stuff, that way everyone else can update their environments as well. If you need to update the environment after edits have been made and pushed to the repo, first `git pull` and then run the same command as above.
+        TODO: Write a shell script that does this in one sweep
+        TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the process way simpler
         
         ## Project Conventions
         We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)

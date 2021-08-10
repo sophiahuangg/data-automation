@@ -20,7 +20,6 @@ setup(
     install_requires=[
         "aiohttp",
         "aiolimiter",
-        "asyncio",
         "backoff",
         "black==21.5b1",
         "datetime",

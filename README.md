@@ -1,6 +1,8 @@
 # Automation of Plots for Reports
 This is the main repository for the Lowe Institute's Automation of data processing and plot creation. The goal is to be able to pull data automatically, process it, and create plots at the beginning of each report-writing cycle. This will make our lives a lot easier and free up time to do fun stuff!
 
+Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
+
 ## Prerequisites
 
 - Late model Python 3
@@ -18,21 +20,17 @@ If you don't learn how to use one of these languages, you won't be able to contr
 
 ## Conda Environment
 
-We use a conda environment called `lowe` in order to keep our Python version and packages consistent across all of our machines. To install this package, make sure you are in the `data-automation/` directory and use the following commands:
+We use a conda environment called `lowe` in order to keep our Python version and packages consistent across all of our machines. This helps  (but doesn't completely) solve the "but it builds on my machine!" issue. We have turned the project into a module so we can access the data from anywhere in our repository. To install this environment, make sure you are in the `data-automation/` directory and use the following commands:
 
 ```bash
-conda env create -f environment.yml
+conda create -n lowe python=3.8
+
+conda activate lowe
+
+pip install -e .
 ```
 
 To activate this environment (must be done in any shell you use to run a script prior to running it), use `conda activate lowe`. To deactivate this environment to return to the `base` environment when you are done working, use `conda deactivate`. 
-
-If and when the `environment.yml` file needs to be updated to include more packages, edit the file accordingly (the format should be pretty simple from how it's already written, but there's plenty of good examples online if you need to do something intricate). Once the file is updated and saved, while in the `data-automation/` directory, do
-
-```bash
-conda env update --prefix ./env --file environment.yml  --prune
-```
-
-Make sure to commit and push any changes made to this file and let us know that you added stuff, that way everyone else can update their environments as well. If you need to update the environment after edits have been made and pushed to the repo, first `git pull` and then run the same command as above.
 
 ## Upating the Conda environment
 
