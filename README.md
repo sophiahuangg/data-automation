@@ -34,6 +34,42 @@ conda env update --prefix ./env --file environment.yml  --prune
 
 Make sure to commit and push any changes made to this file and let us know that you added stuff, that way everyone else can update their environments as well. If you need to update the environment after edits have been made and pushed to the repo, first `git pull` and then run the same command as above.
 
+## Upating the Conda environment
+
+NOTE: this may not work on Windows. Not sure if it will. Let a manager know if it doesn't
+
+Since the project is installed as a Python package, edits should be made to `setup.py`. Check the file and you should see where to add packages. Add any packages you want in alphabetical order and run the following commands to make sure the project can still build:
+
+```bash
+# Nuke old conda environment
+conda env remove -n lowe
+
+# Create clean conda environment
+conda create -n lowe python=3.8
+
+# Add package in alphabetic order to setup.py
+
+# Install the package
+pip install -e .
+
+# Assuming it builds, update requirements.txt
+pip freeze > requirements.txt
+
+# Update environment.yml without the prefix line which has a path on your machine in it and isn't required
+conda env export -n lowe | grep -v prefix > environment.yml
+
+# Manually inspect both requirements.txt and environment.yml to make sure nothing is broken
+
+git add setup.py requirements.txt environment.yml
+
+git commit -m "+<package-name-1> +<package-name-2> -<package-name-3>"
+# Example: if you add pandas and numpy and remove pytest
+# git commit -m "+pandas +numpy -pytest"
+```
+
+TODO: Write a shell script that does this in one sweep
+TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the process way simpler
+
 ## Project Conventions
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
