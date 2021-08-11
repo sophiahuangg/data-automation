@@ -1,1 +1,4 @@
-
+[core]
+    remote = bucket
+['remote "bucket"']
+    url = gdrive://1YginFyGcEZu1MpRdmYVZiTAOhTWJV-bV
