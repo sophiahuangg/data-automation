@@ -3,6 +3,9 @@ This is the main repository for the Lowe Institute's Automation of data processi
 
 Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
 
+TODO: Add black and flake8 instructions to the README
+TODO: Add VS code docstring generator instructions to the README
+
 ## Prerequisites
 
 - Late model Python 3
