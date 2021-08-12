@@ -24,7 +24,7 @@ setup(
         "black==21.5b1",
         "datetime",
         "dvc[gdrive,gs]",
-        "flake8",
+        "flake8==3.9.2",
         "matplotlib",
         "nbclient",
         "nbdime",
