@@ -3,8 +3,8 @@ This is the main repository for the Lowe Institute's Automation of data processi
 
 Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
 
-TODO: Add black and flake8 instructions to the README
-TODO: Add VS code docstring generator instructions to the README
+TODO: Add [black](https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00) and flake8 instructions to the README
+TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) instructions to the README (search for @ext:njpwerner.autodocstring in settings)
 
 ## Prerequisites
 
