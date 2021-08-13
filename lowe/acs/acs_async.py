@@ -90,19 +90,57 @@ class ACSClient(object):
 
         async with self.session as sesh:
             resp = await sesh.get(base, params=params)
-            return await resp.json()
+        return await resp.json()
 
+    async def _process_request(
+        self,
+        tableid: str,
+        year: Union[int, str],
+        city_geoid: str,
+        state: str = "06",
+        is_subject: bool = True,
+        varfile: str = "acs_subjects_2019.json",
+    ):
+        # Pulls data from ACS
+        resp = await self._collect_subject_table(
+            tableid=tableid,
+            year=year,
+            city_geoid=city_geoid,
+            state=state,
+            is_subject=is_subject,
+        )
+        # Opens the JSON file with subject tables info
+        with open(varfile) as f:
+            subjectDict = json.load(f)
 
-API_KEY = os.environ.get("API_KEY_ACS", None)
-STATE = "06"  # California state geoID
-PALM_SPRINGS = "55254"
-RANCHO_MIRAGE = "59500"
-pop_group = "B01001"
-pop_subj = "S0101"
+        # ids: list of subject ids
+        # vals: list of corresponding values
+        ids, vals = resp[0], resp[1]
+        concept_label = []
+        values = []
 
-geoids = pd.read_csv("geoids_clean.csv")
+        for idx, id in enumerate(ids):
+            subject = id
+            # Search for the subject ids in our JSON file
+            # try/catch so we only query query-able fields in the JSON
+            try:
+                concept_label.append(
+                    subjectDict[subject][
+                        "concept" + " " + subjectDict[subject]["label"]
+                    ]
+                )
+                values.append(vals[idx])
+            except KeyError:
+                continue
 
+        # Intermediate output DF
+        subject_df = pd.DataFrame(
+            {"concept_label": concept_label, "values": values, "year": year}
+        )
 
-def _base_uri_subject(year: Union[str, int]):
-    """Create a base URL for a subject table API call"""
-    return f"https://api.census.gov/data/{year}/acs/acs5/subject"
+        # Final DF that can be merged
+        acs_subject_pivoted = subject_df.pivot(
+            index="year", columns="concept_label", values="values"
+        )
+
+        return acs_subject_pivoted
