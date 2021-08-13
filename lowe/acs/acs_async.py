@@ -27,7 +27,7 @@ class ACSClient(object):
             assert self.key is not None
         except AssertionError:
             print(
-                f"Error: please make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
+                f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
 
     async def initialize(self):
