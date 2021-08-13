@@ -13,6 +13,9 @@ Description: # Automation of Plots for Reports
         
         Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
         
+        TODO: Add [black](https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00) and flake8 instructions to the README
+        TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) instructions to the README (search for @ext:njpwerner.autodocstring in settings)
+        
         ## Prerequisites
         
         - Late model Python 3
@@ -78,6 +81,45 @@ Description: # Automation of Plots for Reports
         TODO: Write a shell script that does this in one sweep
         TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the process way simpler
         
+        ## Data Version Control (DVC)
+        
+        We want to be able to version our datasets and store them remotely (not in the git repository) so as to not violate any of github's file size limits. Luckily, this is what DVC allows us to do. First, install DVC using the instructions for your relevant OS [here](https://dvc.org/doc/install) -- install the version that integrates into your command line (i.e. not the pip one; that will already be installed when you set up your environment). On Mac OSX, this is as simple as running `brew install dvc`. On Ubuntu, use `snap install --classic dvc`. On Windows, if you have the `choco` package manager installed, just use `choco install dvc`. If you don't have it installed, install it
+        
+        **ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it.
+        
+        For more information on how DVC works and a basic tutorial, check out their [docs](https://dvc.org/doc/start/data-and-model-versioning) -- not necessary, but useful if knowing how things works helps you use them.
+        
+        To set up DVC with our remote storage bucket, you need to add our google drive folder as a remote:
+        
+        ```bash
+        dvc remote add --project -d bucket gdrive://1YginFyGcEZu1MpRdmYVZiTAOhTWJV-bV
+        ```
+        
+        To pull files from DVC, use
+        
+        ```bash
+        dvc pull
+        ```
+        
+        To add files to DVC, follow these steps:
+        
+        ```bash
+        # First make sure you have all the up to date files
+        dvc pull
+        
+        # now add the file you want
+        dvc add path/to/file/example.filetype
+        
+        # dvc will prompt you to run a command that looks something like
+        git add path/to/file/example.filetype.dvc path/to/file/.gitignore
+        
+        # Commit and push
+        git commit -m "add example dataset to DVC"
+        git push
+        
+        # Push to DVC
+        dvc push
+        ```
         ## Project Conventions
         We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
         
@@ -219,6 +261,17 @@ Description: # Automation of Plots for Reports
         ```
         at the top of the file with the descriptions of the things you need to do. 
         
+        ### Medallion Tables
+        
+        We refer to datasets in three tiers:
+        
+        - **Bronze Tables** (lowest tier): Raw data, pulled directly from APIs with no or minimal transformations applied. Essentially, the easiest but messiest possible dataframes we can construct from the API data.
+        
+        - **Silver Tables** (middle tier): Data that has been processed to a decent degree. This table is not ready for use in production but is significantly more usable than the bronze tables.
+        
+        - **Gold Tables** (highest tier): The data has been fully processed for some purpose and is ready to be imported and used. For example, a gold table could be the data we use (and perfectly formatted for) a plot that will go in our final reports.
+        
+        It is possible in some cases to go straight from bronze --> gold. Though I've personally never seen it happen, it might happen in our case since some of the plots will likely be very simple.
         
         ## Helpful Information for Some APIs
         
