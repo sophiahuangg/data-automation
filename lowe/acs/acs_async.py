@@ -4,7 +4,6 @@ import json
 import os
 import pandas as pd
 
-from aiolimiter import AsyncLimiter
 from dotenv import load_dotenv
 from typing import Union, List, Dict
 
@@ -57,26 +56,6 @@ class ACSClient(object):
         is_subject: bool = True,
         debug: bool = False,
     ):
-        """_collect_subject_table is a helper function that wraps a GET request to the ACS API
-
-        Parameters
-        ----------
-        tableid : str
-            [description]
-        year : Union[int, str]
-            [description]
-        city_geoid : str
-            [description]
-        state : str, optional
-            [description], by default "06"
-        is_subject : bool, optional
-            [description], by default True
-
-        Returns
-        -------
-        [type]
-            [description]
-        """
         # TODO: Add functionality to lookup state codes from 2-character state codes (i.e. CA <--> 06)
         # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
@@ -87,14 +66,12 @@ class ACSClient(object):
 
         base = self._base_uri(year=year, is_subject=is_subject)
 
-        state = location.pop("state")
-
         key_translations = {"msa": "geocomp", "city": "place", "county": "county"}
 
         # The 'for' part is a little more tricky. We need to append MSA, county, and city in that order, with %20 in between
         place = ""
         for k, v in location.items():
-            if v is not None:
+            if v is not None and k.lower() != "state":
                 place += (
                     f"%20{key_translations[k]}:{v}"
                     if len(place) > 0
@@ -104,18 +81,18 @@ class ACSClient(object):
         params = {
             "get": f"group({tableid})",
             "for": place,
-            "in": f"state:{state}",
+            "in": f"state:{location['state']}",
             "key": self.API_KEY,
         }
 
         if not is_subject:
             params["get"] = tableid + ","
 
-        async with self.session as sesh:
-            resp = await sesh.get(base, params=params, raise_for_status=True)
+        async with self.session.get(base, params=params, raise_for_status=True) as resp:
             if debug:
                 print(resp.url)
-        return await resp.json()
+                print(resp.status)
+            return await resp.json()
 
     async def _process_request(
         self,
@@ -127,7 +104,8 @@ class ACSClient(object):
         debug: bool = False,
     ):
         # Pulls data from ACS
-        print("making request...")
+        if debug:
+            print("making request...")
         resp = await self._collect_subject_table(
             tableid=tableid,
             year=year,
@@ -136,15 +114,16 @@ class ACSClient(object):
         )
 
         if debug:
-            print(resp.url)
+            print("opening JSON...")
         # Opens the JSON file with subject tables info
-        print("opening JSON...")
+
         with open(varfile) as f:
             subjectDict = json.load(f)
 
         # ids: list of subject ids
         # vals: list of corresponding values
-        print("post-processing....")
+        if debug:
+            print("post-processing....")
         ids, vals = resp[0], resp[1]
         concept_label = []
         values = []
@@ -155,9 +134,9 @@ class ACSClient(object):
             # try/catch so we only query query-able fields in the JSON
             try:
                 concept_label.append(
-                    subjectDict[subject][
-                        "concept" + " " + subjectDict[subject]["label"]
-                    ]
+                    subjectDict[subject]["concept"]
+                    + " "
+                    + subjectDict[subject]["label"]
                 )
                 values.append(vals[idx])
             except KeyError:
@@ -178,11 +157,11 @@ class ACSClient(object):
     async def _subject_tables_range(
         self,
         tableid: str,
-        city_geoid: str,
+        location: Dict[str, str],
         start_year: Union[int, str] = "2011",
         end_year: Union[int, str] = "2019",
-        state: str = "06",
         is_subject: bool = True,
+        debug: bool = False,
     ):
         """Helper function to get multiple years of ACS data for a single subject and return them as a single dataframe"""
         year_range = range(int(start_year), int(end_year) + 1)
@@ -191,9 +170,9 @@ class ACSClient(object):
                 self._process_request(
                     tableid=tableid,
                     year=year,
-                    city_geoid=city_geoid,
-                    state=state,
+                    location=location,
                     is_subject=is_subject,
+                    debug=debug,
                 )
                 for year in year_range
             ]
@@ -227,11 +206,9 @@ async def main():
 
     loc = {"state": STATE, "city": PALM_SPRINGS}
 
-    test_resp = await client._collect_subject_table(
-        tableid=pop_subj, year="2019", location=loc, debug=True
+    test_resp = await client._subject_tables_range(
+        tableid=pop_subj, start_year="2011", end_year="2019", location=loc, debug=True
     )
-
-    print(test_resp)
 
     await client.close()
 
