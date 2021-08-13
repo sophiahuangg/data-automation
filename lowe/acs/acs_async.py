@@ -70,6 +70,7 @@ class ACSClient(object):
             [description]
         """
         # TODO: Add functionality to lookup state codes from 2-character state codes (i.e. CA <--> 06)
+        # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
         try:
             assert self.session is not None
@@ -144,3 +145,35 @@ class ACSClient(object):
         )
 
         return acs_subject_pivoted
+
+    async def _subject_tables_range(
+        self,
+        tableid: str,
+        city_geoid: str,
+        start_year: Union[int, str] = "2011",
+        end_year: Union[int, str] = "2019",
+        state: str = "06",
+        is_subject: bool = True,
+    ):
+        """Helper function to get multiple years of ACS data for a single subject and return them as a single dataframe"""
+        year_range = range(int(start_year), int(end_year) + 1)
+        results = await asyncio.gather(
+            *[
+                self._process_request(
+                    tableid=tableid,
+                    year=year,
+                    city_geoid=city_geoid,
+                    state=state,
+                    is_subject=is_subject,
+                )
+                for year in year_range
+            ]
+        )
+
+        res = pd.concat(results)
+        # TODO: Figure out if we want to sort this dataframe or not -- depends on size (determine from testing)
+
+        return res
+
+    async def get_acs(vars: List[str], year_start: str, year_end: str, city_geoid: Union[int, str], state: str, is_subject: bool = True):
+        pass
