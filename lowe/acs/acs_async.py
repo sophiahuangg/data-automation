@@ -49,7 +49,9 @@ class ACSClient(object):
         base = f"https://api.census.gov/data/{str(year)}/acs/acs5"
         return base if not is_subject else base + "/subject"
 
-    @backoff.on_exception(backoff.expo, aiohttp.errors.ClientError, max_tries=8)
+    @backoff.on_exception(
+        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=8
+    )
     async def _collect_subject_table(
         self,
         tableid: str,
@@ -186,15 +188,75 @@ class ACSClient(object):
         return res
 
     async def get_acs(
+        self,
         vars: List[str],
-        year_start: str,
-        year_end: str,
-        city_geoid: Union[int, str],
-        state: str,
-        is_subject: bool = True,
+        year_start: Union[int, str],
+        year_end: Union[int, str],
+        location: Dict[str, str],
+        is_subject: Union[bool, List[bool]] = True,
+        join: bool = True,
     ):
+        """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
+
+        Parameters
+        ----------
+        vars : List[str]
+            List of tables we want to grab from ACS
+        year_start : Union[int, str]
+            Year we want to start collecting data from, earliest being "2011"
+        year_end : Union[int, str]
+            Last year we want to collect data from, latest being "2019". Must be >= year_start
+        location : Dict[str, str]
+            Dictionary with the following keys to specify location:
+            {
+                "state": str, FIPS code of the state,
+                "msa": str, code for the MSA,
+                "county": str, FIPS code for the county,
+                "
+            }
+        is_subject : Union[bool, List[bool]], optional
+            boolean value indiciating whether the tables are specified are subject tables or not, by default True
+            If some are subject tables and some are not, you can pass a list of length len(vars) indicating whether or not each table is a subject table
+        join: bool, optional
+            Whether or not to join all the results together into one large table, by default True
+        """
         # Split the vars into equal partitions
-        pass
+        if isinstance(is_subject, bool):
+            dfs = await asyncio.gather(
+                *[
+                    self._subject_tables_range(
+                        tableid=table,
+                        start_year=year_start,
+                        end_year=year_end,
+                        location=location,
+                        is_subject=is_subject,
+                    )
+                    for table in vars
+                ]
+            )
+        elif isinstance(is_subject, list):
+            dfs = await asyncio.gather(
+                *[
+                    self._subject_tables_range(
+                        tableid=table,
+                        start_year=year_start,
+                        end_year=year_end,
+                        location=location,
+                        is_subject=is_subject[i],
+                    )
+                    for i, table in enumerate(vars)
+                ]
+            )
+
+        if join:
+            # Iterate through the dfs and join them together on 'year'
+            base = dfs[0]
+            for df in dfs[1:]:
+                intermediate = base.join(df, how="left", on="year")
+            return intermediate
+
+        else:
+            return dfs
 
 
 async def main():
