@@ -1,5 +1,6 @@
 import asyncio
 import aiohttp
+import backoff
 import json
 import os
 import pandas as pd
@@ -48,6 +49,7 @@ class ACSClient(object):
         base = f"https://api.census.gov/data/{str(year)}/acs/acs5"
         return base if not is_subject else base + "/subject"
 
+    @backoff.on_exception(backoff.expo, aiohttp.errors.ClientError, max_tries=8)
     async def _collect_subject_table(
         self,
         tableid: str,
@@ -56,7 +58,7 @@ class ACSClient(object):
         is_subject: bool = True,
         debug: bool = False,
     ):
-        # TODO: Add functionality to lookup state codes from 2-character state codes (i.e. CA <--> 06)
+        # TODO: Add functionality to lookup state codes from 2-character state codes (i.e. CA <--> 06). This needs to be a new module
         # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
         try:
@@ -211,6 +213,8 @@ async def main():
     )
 
     await client.close()
+
+    print(test_resp)
 
     return test_resp
 
