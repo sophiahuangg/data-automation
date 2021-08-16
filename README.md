@@ -36,7 +36,7 @@ pip install -e .
 
 To activate this environment (must be done in any shell you use to run a script prior to running it), use `conda activate lowe`. To deactivate this environment to return to the `base` environment when you are done working, use `conda deactivate`. 
 
-## Upating the Conda environment
+## Updating the Conda environment
 
 NOTE: this may not work on Windows. Not sure if it will. Let a manager know if it doesn't
 
