@@ -16,7 +16,8 @@ from typing import Union, List, Dict
 # County -- where to find the codes???? (county, state)
 # Place (city) -- (geoid,state) "place="
 
-# TODO: Implement backoff for retries
+# TODO: Implement location encoding within responses (both FIPS and English)
+# Revisit after implementing lowe.locations
 
 
 class ACSClient(object):
@@ -151,10 +152,18 @@ class ACSClient(object):
             {"concept_label": concept_label, "values": values, "year": year}
         )
 
+        # Drop duplicates
+        subject_df.drop_duplicates(inplace=True)
+
         # Final DF that can be merged
         acs_subject_pivoted = subject_df.pivot(
             index="year", columns="concept_label", values="values"
         )
+
+        if len(acs_subject_pivoted.columns[0]) > 30:
+            acs_subject_pivoted.drop(
+                acs_subject_pivoted.columns[0], axis=1, inplace=True
+            )
 
         return acs_subject_pivoted
 
@@ -190,18 +199,19 @@ class ACSClient(object):
     async def get_acs(
         self,
         vars: List[str],
-        year_start: Union[int, str],
-        year_end: Union[int, str],
+        start_year: Union[int, str],
+        end_year: Union[int, str],
         location: Dict[str, str],
         is_subject: Union[bool, List[bool]] = True,
         join: bool = True,
+        debug: bool = True,
     ):
         """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
 
         Parameters
         ----------
         vars : List[str]
-            List of tables we want to grab from ACS
+            List of tables we want to grab from ACS, example ["S1001", "S1501"]
         year_start : Union[int, str]
             Year we want to start collecting data from, earliest being "2011"
         year_end : Union[int, str]
@@ -226,10 +236,11 @@ class ACSClient(object):
                 *[
                     self._subject_tables_range(
                         tableid=table,
-                        start_year=year_start,
-                        end_year=year_end,
+                        start_year=start_year,
+                        end_year=end_year,
                         location=location,
                         is_subject=is_subject,
+                        debug=debug,
                     )
                     for table in vars
                 ]
@@ -239,10 +250,11 @@ class ACSClient(object):
                 *[
                     self._subject_tables_range(
                         tableid=table,
-                        start_year=year_start,
-                        end_year=year_end,
+                        start_year=start_year,
+                        end_year=end_year,
                         location=location,
                         is_subject=is_subject[i],
+                        debug=debug,
                     )
                     for i, table in enumerate(vars)
                 ]
@@ -260,7 +272,7 @@ class ACSClient(object):
 
 
 async def main():
-    pop_subj = "S0101"
+    subjects = ["S1001", "S1501"]
     PALM_SPRINGS = "55254"
     RANCHO_MIRAGE = "59500"
     STATE = "06"
@@ -270,13 +282,17 @@ async def main():
 
     loc = {"state": STATE, "city": PALM_SPRINGS}
 
-    test_resp = await client._subject_tables_range(
-        tableid=pop_subj, start_year="2011", end_year="2019", location=loc, debug=True
+    test_resp = await client.get_acs(
+        vars=subjects,
+        start_year="2011",
+        end_year="2019",
+        location=loc,
+        is_subject=True,
+        join=False,
+        debug=False,
     )
 
     await client.close()
-
-    print(test_resp)
 
     return test_resp
 
