@@ -3,7 +3,6 @@ This is the main repository for the Lowe Institute's Automation of data processi
 
 Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
 
-TODO: Add [black](https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00) and flake8 instructions to the README
 TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) instructions to the README (search for @ext:njpwerner.autodocstring in settings)
 
 ## Prerequisites
@@ -152,6 +151,40 @@ Here we will define coding conventions to ensure proper documentation of our cod
 
 These conventions are highly detailed and specific. If some of these conventions do not work for the code you are writing feel free to use conventions that suit your code and coding style. However, we do ask that your code to be readable and consistent.
 
+### Linting
+
+To standardize our code styling and save a lot of time reviewing PRs, all code included in pull requests **must** pass an automated code styling check for two linters: `black` and `flake8`. Both of these are included in our python environment and are able to be run from the terminal. However, if you want to configure `black` to run whenever you save your file in VS Code, follow [these instructions](https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00).
+
+In order to run `black`, type in your terminal
+
+```bash
+black <path>
+```
+
+If you provide a folder, `black` will lint all `.py` files in the folder. `black` will automatically make changes. Provided that you had no staged files prior to running this, do
+
+```bash
+# Commit all of the linted files -- be careful if you already staged files earlier. Commit and push those first.
+git add .
+git commit -m "black compliance fix"
+git push
+```
+
+Now do the same for `flake8`:
+
+```bash
+flake8 <path>
+```
+
+Note that `flake8` will not automatically format anything for you. It will tell you the edits that need to be made, and you will have to make them. After you make all edits, run
+
+```bash
+git add . #once again, assuming you had no staged files prior to making flake8 edits
+git commit -m "flake8 compliance fix"
+git push
+```
+
+If done correctly, checks should pass on your pull requests now. If not, let an admin / manager know and we will help you fix the issues.
 ### Docstrings and Function Definitions
 
 #### Function Definitions

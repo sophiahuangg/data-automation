@@ -1,9 +1,10 @@
-import urllib.request, urllib.error, urllib.parse
+import urllib.request
 
 
 def getHTML(url: str, filename: str):
     """
-    Grabs the web data from a url creates a file in the working directory with the HTML code of that URL.
+    Grabs the web data from a url creates a file in the
+    working directory with the HTML code of that URL.
     """
     response = urllib.request.urlopen(url)
     webContent = response.read()

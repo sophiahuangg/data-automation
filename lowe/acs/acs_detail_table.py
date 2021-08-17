@@ -371,7 +371,10 @@ def collect_subject_table(subject: str, year: str, city_geoid: str):
         Example:
         [['GEO_ID', 'NAME', 'S0101_C01_001E', ... , 'state', 'place'], ['1600000US0655254',  'Palm Springs city, California', '47897', ..., '06', '55254']]
     """
-    temp = base_url_subject(year) + f"?get=group({subject})&for=place:{city_geoid}&in=state:{STATE}&key={API_KEY}"
+    temp = (
+        base_url_subject(year)
+        + f"?get=group({subject})&for=place:{city_geoid}&in=state:{STATE}&key={API_KEY}"
+    )
 
     try:
         r = requests.get(temp)
@@ -390,87 +393,103 @@ def year_df_subject(subject: str, year: str, city: str = PALM_SPRINGS):
     -----------------------------
         subject:    Subject ID of the subject we want to pull in string format
                         i.e. "S0101"
-        year:       Year of data we need in string format. 
+        year:       Year of data we need in string format.
                         i.e. "2019"
-        city:       City ID in string format. 
+        city:       City ID in string format.
                         i.e. "59500"
 
-    Output: 
+    Output:
     ------------------------------
-    A data frame with 2 rows. 
+    A data frame with 2 rows.
     Each cell in the first row holds a "concept_label" which is string-concatenated concept + label of a subject ID.
     The second row holds the corresponding value of each "concept + label". The dataframe is indexed by year.
     """
     # Opens the JSON file with subject tables info
-    with open("acs_subjects_2019.json") as subjects_json: 
+    with open("acs_subjects_2019.json") as subjects_json:
         subjectDict = json.load(subjects_json)
 
-    # Pulls data from ACS - return LoL (list of lists) 
+    # Pulls data from ACS - return LoL (list of lists)
     LoL = collect_subject_table(subject, year, city)
 
     # ids: list of subject ids
     # vals: list of corresponding values
     ids, vals = LoL[0], LoL[1]
     concept_label = []
-    values = ([])
+    values = []
 
-    # Search for the subject ids in our JSON file 
+    # Search for the subject ids in our JSON file
     for i in range(len(ids)):
         subject = ids[i]
         # try/catch so we only query query-able fields in the JSON
-        try: 
+        try:
             concept_label.append(
-                subjectDict[subject]["concept"] + " " + subjectDict[subject]["label"] 
+                subjectDict[subject]["concept"] + " " + subjectDict[subject]["label"]
             )
             values.append(vals[i])
         except KeyError:
             continue
 
-    # Final output df 
-    acs_subjects_df = pd.DataFrame({
-        "concept_label": concept_label,
-        "values": values,
-        "year": year,
-    })
+    # Final output df
+    acs_subjects_df = pd.DataFrame(
+        {
+            "concept_label": concept_label,
+            "values": values,
+            "year": year,
+        }
+    )
 
     # Pivot so we get each column as a "concept_label" and one row holding the corr. value
-    acs_subject_pivoted = acs_subjects_df.pivot(index="year", columns="concept_label", values="values")
-    
+    acs_subject_pivoted = acs_subjects_df.pivot(
+        index="year", columns="concept_label", values="values"
+    )
+
     return acs_subject_pivoted
 
 
-def generate_df_city_subject(subject: str, start_year: str = "2011", end_year: str = "2019", city: str = PALM_SPRINGS):
+def generate_df_city_subject(
+    subject: str,
+    start_year: str = "2011",
+    end_year: str = "2019",
+    city: str = PALM_SPRINGS,
+):
     """
     Generates a dataframe for subject data for a given city, given the start and end year.
     Argument(s)
     -----------------------
-        group:      Subject ID of group you want to pull from in string format 
+        group:      Subject ID of group you want to pull from in string format
                         i.e. "S0101"
-        start_year:  year of data needed to pull in string format. 
+        start_year:  year of data needed to pull in string format.
                         i.e. "2011"
                         NOTE: must be 2011 or later
         end_year:    year of data needed to pull in string format.
                         i.e. "2019"
                         NOTE: must be 2019 or less
-        city:        city id in string format. 
+        city:        city id in string format.
                         i.e. "59500"
 
     Output:
     -----------------------
     A dataframe with the following columns: year (index), city (str), and a separate column for each subgroup.
-    
+
     """
     dfs = []
-    for year in range(int(start_year), int(end_year)+1):
+    for year in range(int(start_year), int(end_year) + 1):
         df = year_df_subject(subject, str(year), city)
         dfs.append(df)
-    
+
     final_df = pd.concat(dfs)
     cityName = city_from_geoid(city)
     final_df["City"] = cityName
     return final_df
 
-def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str = "2019", cities: list = [PALM_SPRINGS], filename = None):
+
+def generate_csv_subject(
+    subject: str,
+    start_year: str = "2011",
+    end_year: str = "2019",
+    cities: list = [PALM_SPRINGS],
+    filename=None,
+):
     """
     Uses generate_df_city_subject to create one large dataframe that encompasses all data for a particular ACS series.
     If a filename is given, then csv is created
@@ -479,27 +498,27 @@ def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str =
     -----------------------
         group:       Subject ID of group you want to pull from in string format
                         i.e. "S0101"
-        start_year:  year of data needed to pull in string format. 
+        start_year:  year of data needed to pull in string format.
                         i.e."2011"
                          NOTE: must be 2011 or later
         end_year:    year of data needed to pull in string format.
                         i.e. "2019"
                          NOTE: must be 2019 or less
-        cities:      Geo IDs for cities you want to pull in List of strings format. 
-                         i.e. Palm Springs and Rancho Mirage =  ["55254", "59500"] 
+        cities:      Geo IDs for cities you want to pull in List of strings format.
+                         i.e. Palm Springs and Rancho Mirage =  ["55254", "59500"]
         filename:    Filename to name the output .csv file. Leave as None (or use default parameter) if you don't want to save a file. ex. "my_acs_data.csv"
 
     Output
     -----------------------
     A datafame with the same format as generate_df_city, but contains multiple levels for the City variable rather than just one.
-    
+
     """
     dfs = []
-    for city in cities: 
+    for city in cities:
         df = generate_df_city_subject(subject, start_year, end_year, str(city))
         dfs.append(df)
     final_df = pd.concat(dfs)
-    if filename != None: 
+    if filename != None:
         final_df.to_csv(filename, index=True)
     return final_df
 
@@ -507,5 +526,11 @@ def generate_csv_subject(subject: str, start_year: str = "2011", end_year: str =
 # ----------------------------
 # TESTING
 # ----------------------------
-generate_csv_subject("S0101", "2011", "2012", cities=[PALM_SPRINGS, RANCHO_MIRAGE], filename="testSubject.csv")
+generate_csv_subject(
+    "S0101",
+    "2011",
+    "2012",
+    cities=[PALM_SPRINGS, RANCHO_MIRAGE],
+    filename="testSubject.csv",
+)
 # print(generate_csv(pop_group, start_year="2011", end_year="2019", cities=[PALM_SPRINGS, RANCHO_MIRAGE], filename = "testSet.csv"))

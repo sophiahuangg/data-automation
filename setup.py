@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 
 setup(
     name="lowe",
@@ -8,20 +8,19 @@ setup(
     author_email="LoweLab@students.claremontmckenna.edu",
     maintainer="Abhinuv Uppal",
     maintainer_email="auppal22@students.claremontmckenna.edu",
-    keywords = "macroeconomics data analysis statistics macro economics microeconomics micro scraping acs econometrics statistics econ api wrapper automation",
-    license = "LICENSE.md",
-    description="Automating data collection and processing for the Lowe Institute of Political Economy",
+    keywords="macroeconomics data analysis statistics macro economics\
+        microeconomics micro scraping acs econometrics\
+        statistics econ api wrapper automation",
+    license="LICENSE.md",
+    description="Automating data collection and processing\
+        for the Lowe Institute of Political Economy",
     long_description=open("README.md").read(),
-    py_modules=[
-        "lowe",
-        "lowe.acs",
-        "lowe.fred"
-    ],
+    py_modules=["lowe", "lowe.acs", "lowe.fred"],
     install_requires=[
         "aiohttp",
         "aiolimiter",
         "backoff",
-        "black==21.5b1",
+        "black==21.7b0",
         "datetime",
         "dvc[gdrive,gs]",
         "flake8==3.9.2",
@@ -36,7 +35,6 @@ setup(
         "pandas",
         "python-dotenv",
         "pytz",
-        "ratelimit"
-    ]
-
+        "ratelimit",
+    ],
 )
