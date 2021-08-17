@@ -1,14 +1,14 @@
 Metadata-Version: 2.1
 Name: lowe
 Version: 0.0.1
-Summary: Automating data collection and processing for the Lowe Institute of Political Economy
+Summary: Automating data collection and processing        for the Lowe Institute of Political Economy
 Home-page: https://www.lowe-institute.org/
 Author: Lowe Institute Automation Team
 Author-email: LoweLab@students.claremontmckenna.edu
 Maintainer: Abhinuv Uppal
 Maintainer-email: auppal22@students.claremontmckenna.edu
 License: LICENSE.md
-Keywords: macroeconomics data analysis statistics macro economics microeconomics micro scraping acs econometrics statistics econ api wrapper automation
+Keywords: macroeconomics data analysis statistics macro economics        microeconomics micro scraping acs econometrics        statistics econ api wrapper automation
 Platform: UNKNOWN
 License-File: LICENSE
 

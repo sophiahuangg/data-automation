@@ -27,7 +27,8 @@ class ACSClient(object):
         Parameters
         ----------
         key_env_name : str, optional
-            name of the environment variable in your .env file corresponding to your ACS API key, by default "API_KEY_ACS"
+            name of the environment variable in your .env
+            file corresponding to your ACS API key, by default "API_KEY_ACS"
         """
         load_dotenv()
         self.API_KEY = os.environ.get(key_env_name, None)
@@ -35,7 +36,8 @@ class ACSClient(object):
             assert self.API_KEY is not None
         except AssertionError:
             print(
-                f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
+                f"Error: make sure you have your ACS API key loaded \
+                    as an environment variable under the name {key_env_name}."
             )
 
     async def initialize(self):
@@ -61,19 +63,24 @@ class ACSClient(object):
         is_subject: bool = True,
         debug: bool = False,
     ):
-        # TODO: Add functionality to lookup state codes from 2-character state codes (i.e. CA <--> 06). This needs to be a new module
+        # TODO: Add functionality to lookup state codes from 2-character
+        # state codes (i.e. CA <--> 06). This needs to be a new module
         # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
         try:
             assert self.session is not None
         except AssertionError:
-            print("Error: Please initialize client session with `client.initialize()`")
+            print(
+                "Error: Please initialize client \
+                   session with `client.initialize()`"
+            )
 
         base = self._base_uri(year=year, is_subject=is_subject)
 
         key_translations = {"msa": "geocomp", "city": "place", "county": "county"}
 
-        # The 'for' part is a little more tricky. We need to append MSA, county, and city in that order, with %20 in between
+        # The 'for' part is a little more tricky. We need to append
+        # MSA, county, and city in that order, with %20 in between
         place = ""
         for k, v in location.items():
             if v is not None and k.lower() != "state":
@@ -274,7 +281,7 @@ class ACSClient(object):
 async def main():
     subjects = ["S1001", "S1501"]
     PALM_SPRINGS = "55254"
-    RANCHO_MIRAGE = "59500"
+    # RANCHO_MIRAGE = "59500"
     STATE = "06"
 
     client = ACSClient()

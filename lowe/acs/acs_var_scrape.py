@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-import requests
 import json
 import re
 
@@ -34,7 +33,8 @@ for row in rows:  # Loop over the rows of the table
 out = {}
 
 for i in range(len(Name)):
-    Label[i] = re.sub("!!", " ", Label[i])  # Replace the !! in label with a space
+    # Replace the !! in label with a space
+    Label[i] = re.sub("!!", " ", Label[i])
     out[Name[i]] = {
         "Concept": Concept[i],
         "Label": Label[i],
