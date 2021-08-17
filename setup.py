@@ -17,7 +17,7 @@ setup(
         "aiohttp",
         "aiolimiter",
         "backoff",
-        "black==21.5b1",
+        "black==21.7b0",
         "datetime",
         "dvc[gdrive,gs]",
         "flake8==3.9.2",
