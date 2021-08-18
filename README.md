@@ -58,6 +58,7 @@ pip freeze > requirements.txt
 
 # Update environment.yml without the prefix line which has a path on your machine in it and isn't required
 conda env export -n lowe | grep -v prefix > environment.yml
+# If you are using Windows, you can just do: conda env export -n lowe > environment.yml 
 
 # Manually inspect both requirements.txt and environment.yml to make sure nothing is broken
 
