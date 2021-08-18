@@ -75,7 +75,7 @@ TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the pr
 
 We want to be able to version our datasets and store them remotely (not in the git repository) so as to not violate any of github's file size limits. Luckily, this is what DVC allows us to do. First, install DVC using the instructions for your relevant OS [here](https://dvc.org/doc/install) -- install the version that integrates into your command line (i.e. not the pip one; that will already be installed when you set up your environment). On Mac OSX, this is as simple as running `brew install dvc`. On Ubuntu, use `snap install --classic dvc`. On Windows, if you have the `choco` package manager installed, just use `choco install dvc` in `Cmder` (won't work in a non-elevated environment). You can download `Cmder` if you don't have it. If you don't have `choco` installed, install it.
 
-More Specific Directions for DVC Installation:
+More Specific Directions for DVC Installation with Windows:
 https://dvc.org/doc/user-guide/running-dvc-on-windows
 
 **ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it.
