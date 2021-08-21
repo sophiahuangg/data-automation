@@ -24,6 +24,7 @@ TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/ite
 - Late model Python 3
 - Late model R and RStudio
 - Git
+- Anaconda https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
 
 ## Which Prerequisites do I Care About?
 
@@ -48,7 +49,7 @@ pip install -e .
 
 To activate this environment (must be done in any shell you use to run a script prior to running it), use `conda activate lowe`. To deactivate this environment to return to the `base` environment when you are done working, use `conda deactivate`. 
 
-## Upating the Conda environment
+## Updating the Conda environment
 
 NOTE: this may not work on Windows. Not sure if it will. Let a manager know if it doesn't
 

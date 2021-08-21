@@ -1,6 +1,7 @@
 aiohttp
 aiolimiter
 backoff
+bidict
 black==21.7b0
 datetime
 dvc[gdrive,gs]
@@ -17,3 +18,4 @@ pandas
 python-dotenv
 pytz
 ratelimit
+us
