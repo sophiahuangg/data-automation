@@ -4,7 +4,9 @@ import backoff
 import json
 import os
 import pandas as pd
+import us
 
+from bidict import bidict
 from dotenv import load_dotenv
 from typing import Union, List, Dict
 
@@ -140,6 +142,8 @@ class ACSClient(object):
         concept_label = []
         values = []
 
+        state_decoding = bidict({k.fips: k.abbr for k in us.states.STATES})
+
         for idx, id in enumerate(ids):
             subject = id
             # Search for the subject ids in our JSON file
@@ -171,6 +175,8 @@ class ACSClient(object):
             acs_subject_pivoted.drop(
                 acs_subject_pivoted.columns[0], axis=1, inplace=True
             )
+
+        acs_subject_pivoted["state"] = state_decoding[location["state"]]
 
         return acs_subject_pivoted
 
@@ -296,7 +302,7 @@ async def main():
         location=loc,
         is_subject=True,
         join=False,
-        debug=False,
+        debug=True,
     )
 
     await client.close()
