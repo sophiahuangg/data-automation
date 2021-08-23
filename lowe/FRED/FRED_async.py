@@ -21,8 +21,8 @@ class FREDClient(object):
             name of the environment variable in your .env
             file corresponding to your FRED API key, by default "FRED_KEY_FRED"
         """
-        # load_dotenv()
-        # self.API_KEY = os.environ.get(key_env_name, None)
+        load_dotenv()
+        self.API_KEY = os.environ.get(key_env_name, None)
         # print(self.API_KEY)
         self.limiter = AsyncLimiter(120, 60)
         self.API_KEY = key_env_name
