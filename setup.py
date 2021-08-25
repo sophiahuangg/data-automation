@@ -15,7 +15,7 @@ setup(
     description="Automating data collection and processing\
         for the Lowe Institute of Political Economy",
     long_description=open("README.md").read(),
-    py_modules=["lowe", "lowe.acs", "lowe.fred"],
+    py_modules=["lowe", "lowe.acs", "lowe.fred", "lowe.edd"],
     install_requires=[
         "aiohttp",
         "aiolimiter",
