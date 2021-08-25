@@ -2,7 +2,6 @@ import datetime as dt
 import pandas as pd
 
 from bidict import bidict
-from pandas.core.reshape.melt import melt
 from typing import Union
 
 
@@ -298,16 +297,6 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     print("")
 
     return UNEMPL_CURRENT
-
-
-""" 
- The unemployment rate for the Inland Empire fell from x.x% in April to y.y% in May but was up 
- significantly from a year ago when the rate was z.z%. Since peaking at w.w% in April/May of 
- last year, the unemployment rate has been cut by (more than) half. Improvements in unemployment 
- rate were due to an increase in the number of employed, which more than offset/fell short of the 
- number of persons who entered the labor force. If the labor force had been constant, the unemployment 
- rate would have been.
-"""
 
 
 if __name__ == "__main__":
