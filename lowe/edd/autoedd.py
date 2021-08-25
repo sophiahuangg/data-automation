@@ -1,13 +1,9 @@
 import datetime as dt
-import numpy as np
 import pandas as pd
-import re
 
 from bidict import bidict
 from pandas.core.reshape.melt import melt
 from typing import Union
-
-pysqldf = lambda q: sqldf(q, globals())
 
 
 def _load_msa(fname: str = "data/RIVE$HWS.xlsx", melted: bool = True):
@@ -167,16 +163,19 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     return df
 
 
-def _numbers_of_interest(fname: str = "data/RIVE$HWS.xlsx"):
-    """[summary]
+def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int = 10):
+    """news_release_numbers calculates all of the numbers we typically use in the IEEP monthly news releases
 
     Parameters
     ----------
     fname : str, optional
-        [description], by default "data/RIVE$HWS.xlsx"
+        Path to the EDD data we want to process, by default "data/RIVE$HWS.xlsx"
+    num_top_results: int, optional
+        Number of top industry gains/losses to display in the output
     """
-    # First, load the dataframes
-    df_melted = _load_msa(fname=fname, melted=True)
+    if pd.options.display.max_rows < num_top_results:
+        pd.options.display.max_rows = num_top_results
+    # First, load the dataframe
     df_processed = _kleinhenz_process(fname=fname)
 
     # Now get the easy-to-compute statistics
@@ -204,36 +203,99 @@ def _numbers_of_interest(fname: str = "data/RIVE$HWS.xlsx"):
     UNEMPL_CURRENT = float(unempl[current])
     UNEMPL_PREV = float(unempl[prev_month])
     UNEMPL_LAST_YEAR = float(unempl[last_year_colname])
-    MAX_UNEMP = (maxmonth, maxrate)
+    MAX_UNEMP = (maxmonth, str(maxrate * 100) + "%")
 
     # Industry (CES) statistics
+    # Additional industries to exclude beyond just the "00-" codes
+    EXCLUDED_INDUSTRIES = [
+        "Service Providing",
+        "Private Service Providing",
+        "Total, All Industries",
+        "Total Farm",
+        "Total Private",
+        "Goods Producing",
+    ]
+
+    # Clean the TITLE column
+    df_processed["TITLE"] = df_processed["TITLE"].str.strip()
 
     total_nonfarm = df_processed[df_processed["TITLE"] == "Total Nonfarm"]
-
-    print(total_nonfarm[current])
 
     TOTAL_NONFARM_CURRENT = float(total_nonfarm[current])
     TOTAL_NONFARM_LAST_MONTH = float(total_nonfarm[prev_month])
     TOTAL_NONFARM_LAST_YEAR = float(total_nonfarm[last_year_colname])
+    TOTAL_NONFARM_FEB_2020_PERC = float(total_nonfarm["now minus feb 2020%"])
+    TOTAL_NONFARM_CHANGE = TOTAL_NONFARM_CURRENT - TOTAL_NONFARM_LAST_MONTH
+    RECOVERY_PERCENTAGE = round(float(total_nonfarm["recovery%"]), 2)
+
+    # Calculate the max drawdown for each industry
+    pre_recession_to_present = df_processed.loc[:, "Feb-20":current]
+    pre_recession_to_present["Max Drawdown"] = pre_recession_to_present.min(
+        axis=1
+    ) - pre_recession_to_present.max(axis=1)
+
+    df_processed["Max Drawdown"] = pre_recession_to_present["Max Drawdown"]
+
+    # Sort the dataframe in descending order by the best performing industries MTM
+    # Then get rid of aggregates, which all begin their NAICS codes with "00-"
+    # Finally, get rid of industries we want to exclude from our summary
+
+    df_sorted = df_processed.sort_values(by="MTM", ascending=False)
+    df_sorted = df_sorted[~df_sorted["SS-NAICS"].str.contains("00-")]
+    df_sorted = df_sorted[~df_sorted["TITLE"].isin(EXCLUDED_INDUSTRIES)]
+
+    NUM_INDUSTRIES_INCREASED = sum(df_sorted["MTM"] > 0)
+    NUM_INDUSTRIES_DECREASED = sum(df_sorted["MTM"] < 0)
+
+    TOP_GAINS = df_sorted.head(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
+    TOP_LOSSES = df_sorted.tail(num_top_results)[
+        ["TITLE", "MTM", "Max Drawdown"]
+    ].sort_values(by="MTM")
 
     # Print all of the outputs
 
-    print("CPS STATISTICS")
-    print("---------------------------")
+    print("")
+    print("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED")
+    print("---------------------------------------")
     print("")
 
-    print(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT}")
-    print(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV}")
-    print(f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR}")
+    print(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}%")
+    print(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}%")
+    print(f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}%")
     print(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP}")
 
-    print("CES STATISTICS")
-    print("---------------------------")
+    print("")
+    print("CES STATISTICS - ALL NOT SEASONALY ADJUSTED")
+    print("---------------------------------------")
     print("")
 
-    print(f"TOTAL NONFARM FOR f{current}: {TOTAL_NONFARM_CURRENT}")
-    print(f"TOTAL NONFARM FOR f{prev_month}: {TOTAL_NONFARM_LAST_MONTH}")
-    print(f"TOTAL NONFARM FOR f{last_year_colname}: {TOTAL_NONFARM_LAST_YEAR}")
+    print(f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT)}")
+    print(f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH)}")
+    print(f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR)}")
+    print(
+        f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2)}%"
+    )
+    print(f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)}")
+    print(
+        f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round(TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1, 2) * 100}%"
+    )
+    print(f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}%")
+
+    print("")
+
+    print(
+        f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED}"
+    )
+    print(
+        f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED}"
+    )
+
+    print("")
+    print(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS}")
+    print("")
+    print(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES}")
+
+    print("")
 
     return UNEMPL_CURRENT
 
@@ -249,4 +311,4 @@ def _numbers_of_interest(fname: str = "data/RIVE$HWS.xlsx"):
 
 
 if __name__ == "__main__":
-    res = _numbers_of_interest()
+    res = news_release_numbers()
