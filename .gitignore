@@ -130,3 +130,4 @@ dmypy.json
 
 # misc files
 acs_var_list_5_year_2019.html
+*.DS_Store
