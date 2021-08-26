@@ -39,6 +39,6 @@ setup(
         "python-dotenv",
         "pytz",
         "ratelimit",
-        "us",
+        "us==2.0.2",
     ],
 )
