@@ -7,7 +7,7 @@ import pandas as pd
 import us
 
 from bidict import bidict
-from dotenv import load_dotenv
+from dotenv import load_dotenv, find_dotenv
 from typing import Union, List, Dict
 
 # @ext:njpwerner.autodocstring
@@ -32,14 +32,13 @@ class ACSClient(object):
             name of the environment variable in your .env
             file corresponding to your ACS API key, by default "API_KEY_ACS"
         """
-        load_dotenv()
+        load_dotenv(find_dotenv())
         self.API_KEY = os.environ.get(key_env_name, None)
         try:
             assert self.API_KEY is not None
         except AssertionError:
             print(
-                f"Error: make sure you have your ACS API key loaded \
-                    as an environment variable under the name {key_env_name}."
+                f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
 
     async def initialize(self):
@@ -49,13 +48,64 @@ class ACSClient(object):
         if not self.session.closed:
             await self.session.close()
 
-    def _base_uri(self, year: Union[int, str], is_subject: bool = True):
+    def _base_uri(
+        self,
+        year: Union[int, str],
+        tabletype: str = "detail",
+        estimate: Union[int, str] = "5",
+    ):
+        """_base_uri generates the base URI for the ACS API for each type of table and the 1, 3, and 5 year estimate tables
+
+        Parameters
+        ----------
+        year : Union[int, str]
+            Year we want to pull the data for
+        tabletype : str, optional
+            Type of table we want to pull, by default "detail"
+            Options are:
+            - "detail" <--> ACS Detail tables,
+            - "subject" <--> Subject Tables,
+            - ["profile", "data profile", or "dprofile"] <--> Data Profile Tables,
+            - ["comparison profile", "comp profile", "cprofile"] for ACS comparison profiles
+        estimate : Union[int,str], optional
+            [description], by default "5"
+
+        NOTE: 1 year estimate URLs will almost definitely not work, but 3- and 5-year estimates will
+
+        Returns
+        -------
+        str
+            Base URL for querying ACS API
+        """
         # TODO: Add functionality for other kinds of estimates (non 5-year)
-        base = f"https://api.census.gov/data/{str(year)}/acs/acs5"
-        return base if not is_subject else base + "/subject"
+        # 1 year: acsse
+        # 3 year: acs3
+
+        surveys = {"1": "acsse", "3": "acs3", "5": "acs5"}
+
+        tabletypes = {
+            "detail": "", # Default table type
+            "subject": "/subject",
+            "profile": "/profile",
+            "data profile": "/profile",
+            "dprofile": "/profile",
+            "comparison profile": "/cprofile",
+            "comp profile": "/cprofile",
+            "cprofile": "/cprofile"
+        }
+
+        survey = surveys[int(estimate)]
+        try:
+            table = tabletypes[tabletype.lower()]
+        except KeyError:
+            print("ERROR: Please provide valid table type")
+
+        base = f"https://api.census.gov/data/{str(year)}/acs/{survey}"
+        
+        return base + table
 
     @backoff.on_exception(
-        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=8
+        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=1
     )
     async def _collect_subject_table(
         self,
@@ -92,12 +142,21 @@ class ACSClient(object):
                     else f"{key_translations[k]}:{v}"
                 )
 
-        params = {
-            "get": f"group({tableid})",
-            "for": place,
-            "in": f"state:{location['state']}",
-            "key": self.API_KEY,
-        }
+        keyz = list(location.keys())
+
+        if len(keyz) == 1 and "state" in keyz:
+            params = {
+                "get": f"group({tableid})",
+                "for": f"state:{location['state']}",
+                "key": self.API_KEY,
+            }
+        else:
+            params = {
+                "get": f"group({tableid})",
+                "for": place,
+                "in": f"state:{location['state']}",
+                "key": self.API_KEY,
+            }
 
         if not is_subject:
             params["get"] = tableid + ","
@@ -117,6 +176,7 @@ class ACSClient(object):
         varfile: str = "acs_subjects_2019.json",
         debug: bool = False,
     ):
+        print(year)
         # Pulls data from ACS
         if debug:
             print("making request...")
@@ -164,17 +224,14 @@ class ACSClient(object):
         )
 
         # Drop duplicates
-        subject_df.drop_duplicates(inplace=True)
+        subject_df.drop_duplicates(inplace=True, subset=["concept_label"])
 
         # Final DF that can be merged
         acs_subject_pivoted = subject_df.pivot(
             index="year", columns="concept_label", values="values"
         )
 
-        if len(acs_subject_pivoted.columns[0]) > 30:
-            acs_subject_pivoted.drop(
-                acs_subject_pivoted.columns[0], axis=1, inplace=True
-            )
+        acs_subject_pivoted.drop(acs_subject_pivoted.columns[0], axis=1, inplace=True)
 
         acs_subject_pivoted["state"] = state_decoding[location["state"]]
 
@@ -293,7 +350,8 @@ async def main():
     client = ACSClient()
     await client.initialize()
 
-    loc = {"state": STATE, "city": PALM_SPRINGS}
+    # loc = {"state": STATE, "city": PALM_SPRINGS}
+    loc = {"state": STATE}
 
     test_resp = await client.get_acs(
         vars=subjects,
@@ -306,6 +364,8 @@ async def main():
     )
 
     await client.close()
+
+    print(test_resp[1]["state"])
 
     return test_resp
 
