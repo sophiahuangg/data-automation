@@ -4,11 +4,17 @@ import backoff
 import json
 import os
 import pandas as pd
+import requests
 import us
 
 from bidict import bidict
 from dotenv import load_dotenv, find_dotenv
 from typing import Union, List, Dict
+
+# TODO: GET A DATA PROFILE VARIABLE LIST JSON
+# https://api.census.gov/data/2019/acs/acs5/profile/variables.json
+# Basically: base url + /variables.json
+# We need to save one of these for each type
 
 # @ext:njpwerner.autodocstring
 # https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00
@@ -40,6 +46,19 @@ class ACSClient(object):
             print(
                 f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
+
+        self.surveys = {"1": "acsse", "3": "acs3", "5": "acs5"}
+
+        self.tabletypes = {
+            "detail": "",  # Default table type
+            "subject": "/subject",
+            "profile": "/profile",
+            "data profile": "/profile",
+            "dprofile": "/profile",
+            "comparison profile": "/cprofile",
+            "comp profile": "/cprofile",
+            "cprofile": "/cprofile",
+        }
 
     async def initialize(self):
         self.session = aiohttp.ClientSession()
@@ -78,41 +97,47 @@ class ACSClient(object):
             Base URL for querying ACS API
         """
         # TODO: Add functionality for other kinds of estimates (non 5-year)
-        # 1 year: acsse
-        # 3 year: acs3
-
-        surveys = {"1": "acsse", "3": "acs3", "5": "acs5"}
-
-        tabletypes = {
-            "detail": "", # Default table type
-            "subject": "/subject",
-            "profile": "/profile",
-            "data profile": "/profile",
-            "dprofile": "/profile",
-            "comparison profile": "/cprofile",
-            "comp profile": "/cprofile",
-            "cprofile": "/cprofile"
-        }
-
-        survey = surveys[int(estimate)]
+        survey = self.surveys[str(estimate)]
         try:
-            table = tabletypes[tabletype.lower()]
+            table = self.tabletypes[tabletype.lower()]
         except KeyError:
             print("ERROR: Please provide valid table type")
 
         base = f"https://api.census.gov/data/{str(year)}/acs/{survey}"
-        
+
         return base + table
 
+    def _get_var_defs(
+        self,
+        fname: str,
+        year: Union[int, str] = "2019",
+        tabletype: str = "detail",
+        estimate: Union[int, str] = "5",
+    ):
+        """Checks to see if the variable decoding JSON is included in the tableids/ folder, and if not, downloads it"""
+        # First, get the base url
+        base = self._base_uri(
+            year=str(year), tabletype=tabletype, estimate=str(estimate)
+        )
+        req_uri = base + f"/variables.json"
+        vars = requests.get(req_uri)
+        js = vars.json()
+
+        with open(fname, "w", encoding="utf-8") as f:
+            json.dump(js, f, ensure_ascii=False, indent=4)
+
+        return js
+
     @backoff.on_exception(
-        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=1
+        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=4
     )
     async def _collect_subject_table(
         self,
         tableid: str,
         year: Union[int, str],
         location: Dict[str, str],
-        is_subject: bool = True,
+        tabletype: str = "detail",
+        estimate: Union[int, str] = "5",
         debug: bool = False,
     ):
         # TODO: Add functionality to lookup state codes from 2-character
@@ -127,7 +152,7 @@ class ACSClient(object):
                    session with `client.initialize()`"
             )
 
-        base = self._base_uri(year=year, is_subject=is_subject)
+        base = self._base_uri(year=year, tabletype=tabletype, estimate=estimate)
 
         key_translations = {"msa": "geocomp", "city": "place", "county": "county"}
 
@@ -158,7 +183,7 @@ class ACSClient(object):
                 "key": self.API_KEY,
             }
 
-        if not is_subject:
+        if tabletype == "detail" or tabletype == "":
             params["get"] = tableid + ","
 
         async with self.session.get(base, params=params, raise_for_status=True) as resp:
@@ -172,7 +197,8 @@ class ACSClient(object):
         tableid: str,
         year: Union[int, str],
         location: Dict[str, str],
-        is_subject: bool = True,
+        tabletype: str = "detail",
+        estimate: Union[int, str] = "5",
         varfile: str = "acs_subjects_2019.json",
         debug: bool = False,
     ):
@@ -184,7 +210,9 @@ class ACSClient(object):
             tableid=tableid,
             year=year,
             location=location,
-            is_subject=is_subject,
+            tabletype=tabletype,
+            estimate=estimate,
+            debug=debug,
         )
 
         if debug:
@@ -243,7 +271,8 @@ class ACSClient(object):
         location: Dict[str, str],
         start_year: Union[int, str] = "2011",
         end_year: Union[int, str] = "2019",
-        is_subject: bool = True,
+        tabletype: str = "detail",
+        estimate: Union[int, str] = "5",
         debug: bool = False,
     ):
         """Helper function to get multiple years of ACS data for a single subject and return them as a single dataframe"""
@@ -254,7 +283,8 @@ class ACSClient(object):
                     tableid=tableid,
                     year=year,
                     location=location,
-                    is_subject=is_subject,
+                    tabletype=tabletype,
+                    estimate=estimate,
                     debug=debug,
                 )
                 for year in year_range
@@ -272,7 +302,8 @@ class ACSClient(object):
         start_year: Union[int, str],
         end_year: Union[int, str],
         location: Dict[str, str],
-        is_subject: Union[bool, List[bool]] = True,
+        tabletype: Union[str, List[str]] = True,
+        estimate: Union[int, str] = "5",
         join: bool = True,
         debug: bool = True,
     ):
@@ -294,6 +325,7 @@ class ACSClient(object):
                 "county": str, FIPS code for the county,
                 "
             }
+        TODO: UPDATE THIS PART OF THE DOCSTRING
         is_subject : Union[bool, List[bool]], optional
             boolean value indiciating whether the tables are specified are subject tables or not, by default True
             If some are subject tables and some are not, you can pass a list of length len(vars) indicating whether or not each table is a subject table
@@ -301,7 +333,7 @@ class ACSClient(object):
             Whether or not to join all the results together into one large table, by default True
         """
         # Split the vars into equal partitions
-        if isinstance(is_subject, bool):
+        if isinstance(tabletype, str):
             dfs = await asyncio.gather(
                 *[
                     self._subject_tables_range(
@@ -309,13 +341,14 @@ class ACSClient(object):
                         start_year=start_year,
                         end_year=end_year,
                         location=location,
-                        is_subject=is_subject,
+                        tabletype=tabletype,
+                        estimate=estimate,
                         debug=debug,
                     )
                     for table in vars
                 ]
             )
-        elif isinstance(is_subject, list):
+        elif isinstance(tabletype, list):
             dfs = await asyncio.gather(
                 *[
                     self._subject_tables_range(
@@ -323,7 +356,8 @@ class ACSClient(object):
                         start_year=start_year,
                         end_year=end_year,
                         location=location,
-                        is_subject=is_subject[i],
+                        tabletype=tabletype[i],
+                        estimate=estimate,
                         debug=debug,
                     )
                     for i, table in enumerate(vars)
@@ -341,8 +375,19 @@ class ACSClient(object):
             return dfs
 
 
+"""
+%pop 85+ -- DPO05
+%pop 75-85 -- DP05
+%pop black -- DP05
+%pop hispanic -- DP05
+%pop Indian native -- DP05
+%poverty -- S1701
+"""
+
+
 async def main():
-    subjects = ["S1001", "S1501"]
+    subjects = ["S1701"]
+    dp = "DP05"
     PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
     STATE = "06"
@@ -350,22 +395,30 @@ async def main():
     client = ACSClient()
     await client.initialize()
 
+    client._get_var_defs(
+        tabletype="detail", year="2019", fname="detail_vars_2019.json"
+    )
+    client._get_var_defs(
+        tabletype="subject", year="2019", fname="subject_vars_2019.json"
+    )
+
     # loc = {"state": STATE, "city": PALM_SPRINGS}
     loc = {"state": STATE}
 
     test_resp = await client.get_acs(
-        vars=subjects,
-        start_year="2011",
+        vars=[dp],
+        start_year="2018",
         end_year="2019",
         location=loc,
-        is_subject=True,
+        tabletype="dprofile",
+        estimate="5",
         join=False,
         debug=True,
     )
 
     await client.close()
 
-    print(test_resp[1]["state"])
+    print(test_resp[0])
 
     return test_resp
 
