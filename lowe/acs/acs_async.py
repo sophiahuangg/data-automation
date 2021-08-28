@@ -113,7 +113,7 @@ class ACSClient(object):
         base = self._base_uri(
             year=str(year), tabletype=tabletype, estimate=str(estimate)
         )
-        req_uri = base + f"/variables.json"
+        req_uri = base + "/variables.json"
         vars = requests.get(req_uri)
         js = vars.json()
 
@@ -248,9 +248,11 @@ class ACSClient(object):
             # try/catch so we only query query-able fields in the JSON
             try:
                 concept_label.append(
-                    (subjectDict[subject]["concept"]
-                    + " "
-                    + subjectDict[subject]["label"]).replace("!!", " ")
+                    (
+                        subjectDict[subject]["concept"]
+                        + " "
+                        + subjectDict[subject]["label"]
+                    ).replace("!!", " ")
                 )
                 values.append(vals[idx])
             except KeyError:
@@ -420,7 +422,7 @@ class ACSClient(object):
 async def main():
     subjects = ["S1701"]
     dp = "DP05"
-    PALM_SPRINGS = "55254"
+    # PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
     STATE = "06"
 
