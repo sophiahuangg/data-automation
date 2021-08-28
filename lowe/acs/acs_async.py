@@ -211,7 +211,6 @@ class ACSClient(object):
         varfile: str = "subject_vars_2019.json",
         debug: bool = False,
     ):
-        print(year)
         # Pulls data from ACS
         if debug:
             print("making request...")
@@ -276,7 +275,7 @@ class ACSClient(object):
 
         return acs_subject_pivoted
 
-    async def _subject_tables_range(
+    async def _tables_range(
         self,
         tableid: str,
         location: Dict[str, str],
@@ -367,7 +366,7 @@ class ACSClient(object):
         if isinstance(varfile, str):
             dfs = await asyncio.gather(
                 *[
-                    self._subject_tables_range(
+                    self._tables_range(
                         tableid=table,
                         start_year=start_year,
                         end_year=end_year,
@@ -383,7 +382,7 @@ class ACSClient(object):
         elif isinstance(varfile, list):
             dfs = await asyncio.gather(
                 *[
-                    self._subject_tables_range(
+                    self._tables_range(
                         tableid=table,
                         start_year=start_year,
                         end_year=end_year,
@@ -401,7 +400,7 @@ class ACSClient(object):
             # Iterate through the dfs and join them together on 'year'
             base = dfs[0]
             for df in dfs[1:]:
-                intermediate = base.join(df, how="left", on="year")
+                intermediate = base.join(df, how="left", on=["year", "state"])
             return intermediate
 
         else:
@@ -440,7 +439,7 @@ async def main():
         infer_type=True,
         estimate="5",
         join=False,
-        debug=True,
+        debug=False,
     )
 
     await client.close()
