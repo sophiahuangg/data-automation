@@ -12,7 +12,7 @@ from typing import Union, List, Dict
 from aiolimiter import AsyncLimiter
 
 class FREDClient(object):
-    def __init__(self, key_env_name: str = "c40f3024dd6d518feaf4fc4cbb9ff3fa"):
+    def __init__(self, key_env_name: str = "API_KEY_FRED"):
         """the FRED Client class provides methods for wrapping around the FRED client
 
         Parameters
@@ -23,16 +23,14 @@ class FREDClient(object):
         """
         load_dotenv()
         self.API_KEY = os.environ.get(key_env_name, None)
-        # print(self.API_KEY)
         self.limiter = AsyncLimiter(120, 60)
-        self.API_KEY = key_env_name
-        # try:
-        #     assert self.API_KEY is not None
-        # except AssertionError:
-        #     print(
-        #         f"Error: make sure you have your FRED API key loaded \
-        #             as an environment variable under the name {key_env_name}."
-        #     )
+        try:
+            assert self.API_KEY is not None
+        except AssertionError:
+            print(
+                f"Error: make sure you have your FRED API key loaded \
+                    as an environment variable under the name {key_env_name}."
+            )
 
     async def initialize(self):
         self.session = aiohttp.ClientSession()
@@ -103,7 +101,13 @@ class FREDClient(object):
         result = []
         req = await self._scrape_fred_json(seriesid, startDate, endDate, file_type, frequency)
         seriesid1 = seriesid
-        series = req["observations"]
+        try:
+            series = req["observations"]
+        except KeyError:
+            print(
+                f"Error: make sure you check the conditions for the value of frequency\n {req}."
+            )
+        #print("series = ", series)
 
         df = self._parse_fred_series(series)
         result.append([seriesid1, df])
@@ -113,7 +117,7 @@ class FREDClient(object):
                 name = res[0] + ".csv"
                 res[1].to_csv(name, index=False)
         
-        print(export)
+        # print(export)
 
         return result
 
@@ -126,33 +130,36 @@ class FREDClient(object):
         frequency: str,
         export: bool,
     ):
-        """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
+        """get_FRED queries the FRED API and gathers data for any subject or data table into pandas dataframes
 
         Parameters
         ----------
         vars : List[str]
-            List of tables we want to grab from ACS, example ["S1001", "S1501"]
-        year_start : Union[int, str]
-            Year we want to start collecting data from, earliest being "2011"
-        year_end : Union[int, str]
-            Last year we want to collect data from, latest being "2019". Must be >= year_start
-        location : Dict[str, str]
-            Dictionary with the following keys to specify location:
-            {
-                "state": str, FIPS code of the state,
-                "msa": str, code for the MSA,
-                "county": str, FIPS code for the county,
-                "
-            }
-        is_subject : Union[bool, List[bool]], optional
-            boolean value indiciating whether the tables are specified are subject tables or not, by default True
-            If some are subject tables and some are not, you can pass a list of length len(vars) indicating whether or not each table is a subject table
-        join: bool, optional
-            Whether or not to join all the results together into one large table, by default True
+            List of tables we want to grab from FRED, example ["GNPCA", "GDP"]
+        startDate : str
+            The first date we want to collect data at
+        endDate : str
+            The last date we want to collect data at. Must be >= startDate
+        file_type: str
+            The file type you want to return. File types must be in xml, json, txt, xls
+        frequency: str
+            The frequency of the data you want to grab: m (monthly), a (annual), q (quarterly), etc
+        export: bool
+            Allows you to decide whether you want to export the file as a csv
         """
         async with self.limiter:
             resp = await asyncio.gather(
-                *[self._full_fred_scrape(seriesid=table, startDate=startDate, endDate=endDate, file_type=file_type, frequency=frequency, export=export) for table in vars]
+                *[
+                    self._full_fred_scrape(
+                        seriesid=table, 
+                        startDate=startDate, 
+                        endDate=endDate, 
+                        file_type=file_type, 
+                        frequency=frequency, 
+                        export=export
+                        ) 
+                    for table in vars
+                ]
             )
         
         return resp
@@ -169,7 +176,7 @@ class FREDClient(object):
     # )
 
 async def main():
-    subjects = ["CPIAUCSL"]
+    subjects = ["GNPCA", "GDP"]
 
     client = FREDClient()
     await client.initialize()
@@ -178,10 +185,10 @@ async def main():
     test_resp = await client.get_FRED(
         vars=subjects,
         startDate="2009-01-01",
-        endDate="2010-12-01",
+        endDate="2010-01-01",
         file_type="json",
-        frequency="m",
-        export=True,
+        frequency="a",
+        export=False,
     )
 
     await client.close()
