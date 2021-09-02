@@ -1,15 +1,14 @@
-from dotenv.main import find_dotenv
-import requests
-import json
 import pandas as pd
 import asyncio
 import aiohttp
 import backoff
 import os
+import sys
 
-from dotenv import load_dotenv, find_dotenv
-from typing import Union, List, Dict
+from dotenv import load_dotenv
+from typing import List
 from aiolimiter import AsyncLimiter
+
 
 class FREDClient(object):
     def __init__(self, key_env_name: str = "API_KEY_FRED"):
@@ -45,14 +44,15 @@ class FREDClient(object):
 
     @backoff.on_exception(
         backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=3
-    )    
+    )
     async def _scrape_fred_json(
         self,
-        seriesid,
-        startDate="2009-01-01",
-        endDate="2010-12-01",
-        file_type="json",
-        frequency="m",
+        seriesid: str,
+        startDate: str = "2009-01-01",
+        endDate: str = "2010-12-01",
+        file_type: str = "json",
+        frequency: str = "m",
+        debug: bool = False,
     ):
         try:
             assert self.session is not None
@@ -71,17 +71,18 @@ class FREDClient(object):
             "observation_end": endDate,
             "frequency": frequency,
             "api_key": api_key,
-            "file_type": file_type
+            "file_type": file_type,
         }
 
-        async with self.session.get(base_url, params = params) as resp:
+        async with self.session.get(
+            base_url, params=params, raise_for_status=True
+        ) as resp:
+            if debug:
+                print(resp.url)
+                print(resp.status)
             return await resp.json()
 
-
-    # test = scrape_fred_json("CPIAUCSL")
-
-
-    def _parse_fred_series(self, series):
+    def _parse_fred_series(self, series: str):
         observation_date = []
         value = []
 
@@ -94,12 +95,20 @@ class FREDClient(object):
         df = pd.DataFrame({"observation_date": observation_date, "value": value})
         return df
 
-
     async def _full_fred_scrape(
-        self, seriesid, startDate, endDate, file_type, frequency, export=False
+        self,
+        seriesid: str,
+        startDate: str,
+        endDate: str,
+        file_type: str,
+        frequency: str,
+        export: bool = False,
+        debug: bool = False,
     ):
         result = []
-        req = await self._scrape_fred_json(seriesid, startDate, endDate, file_type, frequency)
+        req = await self._scrape_fred_json(
+            seriesid, startDate, endDate, file_type, frequency
+        )
         seriesid1 = seriesid
         try:
             series = req["observations"]
@@ -107,7 +116,8 @@ class FREDClient(object):
             print(
                 f"Error: make sure you check the conditions for the value of frequency\n {req}."
             )
-        #print("series = ", series)
+        if debug:
+            print("series = ", series)
 
         df = self._parse_fred_series(series)
         result.append([seriesid1, df])
@@ -116,12 +126,10 @@ class FREDClient(object):
             for res in result:
                 name = res[0] + ".csv"
                 res[1].to_csv(name, index=False)
-        
-        # print(export)
 
         return result
 
-    async def get_FRED(
+    async def get_fred(
         self,
         vars: List[str],
         startDate: str,
@@ -129,6 +137,7 @@ class FREDClient(object):
         file_type: str,
         frequency: str,
         export: bool,
+        debug: bool,
     ):
         """get_FRED queries the FRED API and gathers data for any subject or data table into pandas dataframes
 
@@ -151,29 +160,20 @@ class FREDClient(object):
             resp = await asyncio.gather(
                 *[
                     self._full_fred_scrape(
-                        seriesid=table, 
-                        startDate=startDate, 
-                        endDate=endDate, 
-                        file_type=file_type, 
-                        frequency=frequency, 
-                        export=export
-                        ) 
+                        seriesid=table,
+                        startDate=startDate,
+                        endDate=endDate,
+                        file_type=file_type,
+                        frequency=frequency,
+                        export=export,
+                        debug=debug,
+                    )
                     for table in vars
                 ]
             )
-        
-        return resp
-    
 
-    # test = full_fred_scrape(
-    #     "CPIAUCSL",
-    #     startDate="2009-01-01",
-    #     endDate="2010-12-01",
-    #     file_type="json",
-    #     api_key="c40f3024dd6d518feaf4fc4cbb9ff3fa",
-    #     frequency="m",
-    #     export=True,
-    # )
+        return resp
+
 
 async def main():
     subjects = ["GNPCA", "GDP"]
@@ -181,14 +181,14 @@ async def main():
     client = FREDClient()
     await client.initialize()
 
-
-    test_resp = await client.get_FRED(
+    test_resp = await client.get_fred(
         vars=subjects,
         startDate="2009-01-01",
         endDate="2010-01-01",
         file_type="json",
         frequency="a",
         export=False,
+        debug=True,
     )
 
     await client.close()
@@ -197,6 +197,7 @@ async def main():
     return test_resp
 
 
+if sys.platform == "win32":
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 asyncio.run(main())
