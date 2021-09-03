@@ -15,11 +15,12 @@ setup(
     description="Automating data collection and processing\
         for the Lowe Institute of Political Economy",
     long_description=open("README.md").read(),
-    py_modules=["lowe", "lowe.acs", "lowe.fred"],
+    py_modules=["lowe", "lowe.acs", "lowe.fred", "lowe.edd"],
     install_requires=[
         "aiohttp",
         "aiolimiter",
         "backoff",
+        "bidict",
         "black==21.7b0",
         "datetime",
         "dvc[gdrive,gs]",
@@ -32,9 +33,12 @@ setup(
         "nbformat",
         "notebook",
         "numpy",
+        "openpyxl",
         "pandas",
+        "pandasql",
         "python-dotenv",
         "pytz",
         "ratelimit",
+        "us==2.0.2",
     ],
 )
