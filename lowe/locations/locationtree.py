@@ -1,5 +1,6 @@
 # This idea is discontinued for the time being
 # We are using simple lookups for location encoding now
+# This should probably be removed from production
 
 import json
 import multiprocessing as mp
