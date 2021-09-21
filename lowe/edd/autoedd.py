@@ -1,4 +1,5 @@
 import datetime as dt
+import numpy as np
 import pandas as pd
 
 from bidict import bidict
@@ -82,6 +83,24 @@ def _year_avg(
     return cols.sum(axis=1) / len(cols)
 
 
+def _naics_level(code: str) -> int:
+    """_naics_level is a helper that allows us to determine what level the employment sector is talking about
+
+    Parameters
+    ----------
+    code : str
+        NAICS Sector as a string in the format xx-xxxxxx
+
+    Returns
+    -------
+    int: The number corresponding to the level of the NAICS sector
+    """
+    codestr = code.split("-")[-1]  # Get the part of the string we care about
+    return (
+        len(codestr) - (codestr.count("0")) + 2
+    )  # The first two digits will always be counted
+
+
 def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     """_kleinhenz_process produces the variables Dr. Kleinhenz has us use for the EDD news releases
 
@@ -139,6 +158,7 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     DIFF_AVG = AVG_2020 - AVG_2019
     DIFF_AVG_PERC = (AVG_2020 / AVG_2019) - 1
 
+    df["Industry Level"] = df["SS-NAICS"].apply(_naics_level)
     df["MTM"] = MTM
     df["MTM%"] = MTM_PERC
     df["YTY"] = YTY
@@ -177,15 +197,18 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     # First, load the dataframe
     df_processed = _kleinhenz_process(fname=fname)
 
+    # Get the DF for jus tthe 2-digit NAICS Sectors
+    twodigit = df_processed[df_processed["Industry Level"] == 2]
+
     # Now get the easy-to-compute statistics
     unempl = df_processed[df_processed["TITLE"] == "Civilian Unemployment Rate"]
 
     # Get current and previous month's unemployment unempl, and last year's
     current = (
-        unempl.loc[:, :"MTM"].iloc[:, -2].name
+        unempl.loc[:, :"MTM"].iloc[:, -3].name
     )  # Most recent month wil be right behind MTM based on construction
     prev_month = (
-        unempl.loc[:, :"MTM"].iloc[:, -3].name
+        unempl.loc[:, :"MTM"].iloc[:, -4].name
     )  # Previous month will be right behind
     split_current = current.split("-")
     month, year = split_current[0], split_current[1]
@@ -228,20 +251,24 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     RECOVERY_PERCENTAGE = round(float(total_nonfarm["recovery%"]), 2)
 
     # Calculate the max drawdown for each industry
-    pre_recession_to_present = df_processed.loc[:, "Feb-20":current]
+    pre_recession_to_present = twodigit.loc[:, "Feb-20":current]
     pre_recession_to_present["Max Drawdown"] = pre_recession_to_present.min(
         axis=1
     ) - pre_recession_to_present.max(axis=1)
 
-    df_processed["Max Drawdown"] = pre_recession_to_present["Max Drawdown"]
+    twodigit["Max Drawdown"] = pre_recession_to_present.loc[:, "Max Drawdown"]
 
     # Sort the dataframe in descending order by the best performing industries MTM
     # Then get rid of aggregates, which all begin their NAICS codes with "00-"
     # Finally, get rid of industries we want to exclude from our summary
 
-    df_sorted = df_processed.sort_values(by="MTM", ascending=False)
+    df_sorted = twodigit.sort_values(by="MTM", ascending=False)
     df_sorted = df_sorted[~df_sorted["SS-NAICS"].str.contains("00-")]
     df_sorted = df_sorted[~df_sorted["TITLE"].isin(EXCLUDED_INDUSTRIES)]
+
+    slow_movers = df_sorted.copy()
+    slow_movers["Absolute MTM"] = slow_movers["MTM"].apply(np.abs)
+    slow_movers.sort_values(by="Absolute MTM", ascending=False)
 
     NUM_INDUSTRIES_INCREASED = sum(df_sorted["MTM"] > 0)
     NUM_INDUSTRIES_DECREASED = sum(df_sorted["MTM"] < 0)
@@ -250,6 +277,7 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     TOP_LOSSES = df_sorted.tail(num_top_results)[
         ["TITLE", "MTM", "Max Drawdown"]
     ].sort_values(by="MTM")
+    SLOW_MOVERS = slow_movers.tail(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
 
     # Print all of the outputs
 
@@ -276,7 +304,7 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     )
     print(f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)}")
     print(
-        f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round(TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1, 2) * 100}%"
+        f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2)}%"
     )
     print(f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}%")
 
@@ -293,6 +321,8 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     print(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS}")
     print("")
     print(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES}")
+    print("")
+    print(f"TOP {num_top_results} SMALLEST MOVEMENTS: \n {SLOW_MOVERS}")
 
     print("")
 
@@ -300,4 +330,4 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
 
 
 if __name__ == "__main__":
-    res = news_release_numbers()
+    res = news_release_numbers(fname="data/RIVE$HWS.xlsx")
