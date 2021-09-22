@@ -10,7 +10,8 @@ TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/ite
 - Late model Python 3
 - Late model R and RStudio
 - Git
-- Anaconda https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
+- [Anaconda](https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe)
+- Late model [Docker](https://www.docker.com/get-started)
 
 ## Which Prerequisites do I Care About?
 
