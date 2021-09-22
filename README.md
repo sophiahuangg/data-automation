@@ -3,14 +3,13 @@ This is the main repository for the Lowe Institute's Automation of data processi
 
 Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
 
-TODO: Add [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) instructions to the README (search for @ext:njpwerner.autodocstring in settings)
-
 ## Prerequisites
 
 - Late model Python 3
 - Late model R and RStudio
 - Git
-- Anaconda https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe
+- [Anaconda](https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe)
+- Late model [Docker](https://www.docker.com/get-started)
 
 ## Which Prerequisites do I Care About?
 
@@ -74,7 +73,7 @@ TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the pr
 
 ## Docker
 
-Docker is a software that allows developers to create a lightweight virtual machine through something called an image, which is a snapshot of a operating system and its constitutent files. You can build and run this image and when this image is running, it's called a container. The container allows you to develop software in the environment of the image instead of your local machine. 
+Docker is a software that allows developers to create a lightweight virtual machine (but not really a virtual machine) called an **image**, which is a snapshot of a operating system and its constitutent files. You can build and run this image on your local machine, during which it is called a **container**. The container allows you to develop software in the environment of the image instead of your local machine. This allows you to avoid any problems of the project building on one operating system and not another. 
 
 We will be using docker as an alternative to the conda environment in the case that your code doesn't build on the conda environment, or if you have any other issues.
 
@@ -82,14 +81,15 @@ If you want to learn more about docker, you can look at the documentation [here]
 
 ### Installing Docker
 
-You can download docker from [this](https://docs.docker.com/get-docker/) website. It may ask you to create a free account just make one with whatever email you prefer.
+You can download docker from [this](https://docs.docker.com/get-docker/) website. It may ask you to create a free account -- just make one with whatever email you prefer.
 
 ### Using Docker Container with Visual Studio Code
 
 We'll be running the containers through VScode's remote container extension. To do this, you can use the VScode "Remote Container" extension from the VScode extensions.
 
-Once installed, you will see the remote container icon on the left sidecar of of your VSCode. After clicking it, it will say containers. Make sure you have docker running for this to work. Then click the + sign and click open folder in container. The folder you open in this container is our github repo that you have on your local machine. It will build a local container for you with the environment we need.
+Once installed, you will see the remote explorer icon on the left sidecar of of your VSCode. After clicking it, a sidebar will appear, at the top of which the word `containers` will be displayed. (Note that you must have docker running for this to work.) Then click the + sign and click open folder in container. The folder you open in this container is our github repo that you have on your local machine. It will build a local container for you with our development environment and filesystem built. Any terminal you open while in this session will be run through the container, not your host OS.
 
+In essence, a Docker container is a lot like a lightweight virtual machine. They are very different (as you can see in [this thread](https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine)). If you're curious for rigorous definitions and the actual differences between containers and VMs, check out the thread :)
 
 ## Data Version Control (DVC)
 
@@ -99,11 +99,11 @@ More Specific Directions for DVC Installation with Windows:
 - https://dvc.org/doc/install/windows
 - https://dvc.org/doc/user-guide/running-dvc-on-windows
 
-**ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it.
+**ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it, except for those directly relevant to our packages.
 
 For more information on how DVC works and a basic tutorial, check out their [docs](https://dvc.org/doc/start/data-and-model-versioning) -- not necessary, but useful if knowing how things works helps you use them.
 
-To set up DVC with our remote storage bucket, you need to add our google drive folder as a remote:
+To set up DVC with our remote storage bucket, you need to add our google drive folder as a remote. **IMPORTANT NOTE** -- when you do this next step, you **need** to be in contact with Abhi. You have to log in to the Lowe Institute Google Drive, which currently only he has Duo access to. If that is the case, then you can do the following:
 
 ```bash
 dvc remote add --project -d bucket gdrive://1YginFyGcEZu1MpRdmYVZiTAOhTWJV-bV
@@ -139,10 +139,10 @@ dvc push
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
 #### Main Branch
-The main branch for this repository is called ```master```. This is where we will do most of our work. However, if you are making changes to an **existing** code file, then create a new branch for it. More details on branches blow.
+The main branch for this repository is called ```master```. This is where we will store our files after they have been developed and tested on different branches.
 
 #### Work Tickets and Branches
-We will be using GitHub Issues (the issues tab on the repository) to track work and give assignments. If the assignment requires you to heavily modify existing code, make a new branch for working on this issue. If not, you can push directly to the ```master``` branch. 
+We will be using GitHub Issues (the issues tab on the repository) to track work and give assignments. All work must be done on branches (commits to `master` are blocked).
 
 We will keep track of branches with a systematic way of titling them. They should be titled as
 
@@ -162,9 +162,9 @@ For example, if my assignment were to fix this README file, and this assignment 
 git checkout -b 5-readme-fix
 ```
 
-When you are done working on this branch, create a pull request and we will review it before merging it to the ```master``` branch.
+When you are done working on this branch, create a pull request and we will review it before merging it to the ```master``` branch. Pull requests must pass the linting checks (and any other checks we add), and must undergo a review by at least one manager.
 
-Remember, it is only **required** that you create a branch when you are instructed to make **major changes** to an existing file, like ```README.md```. If not, you are still free to make your own branch, but it is not required and you can just push to ```master```. If all you are doing is adding stuff (like additional helper functions), and not modifying what already exists, there is no need to create a new branch. Just to minimize merge conflicts :)
+Note that a branch will **not** be visible to others until you make a commit and push to it.
 
 #### VSCode Live Share
 
@@ -216,80 +216,99 @@ If done correctly, checks should pass on your pull requests now. If not, let an 
 
 Function names must be descriptive, i.e. names such as "function" or "do_something" can NOT be used. For example, if you want to write a function that gets a city name then your function can be named ```get_city_name()```.
 
-To guarantee that we pass in the correct argument type to a function, function parameters must include type hinting. With this method, if an argument with the wrong type is passed in, a type error will be given.
+To guarantee that we pass in the correct argument type to a function, function parameters should include type hinting. With this method, if an argument with the wrong type is passed in, a type error will be given.
 
 An example of a function definition is 
 
 ```python
-def get_city_name(geoid: str):
+def get_city_name(geoid: str) -> str:
 ```
 
 You can also use default arguments for your function parameters to guarantee that an argument is passed into the function even if no argument is given during the function call. For example
 
 ```python
-def geoid_from_city(city: str = "Rancho Mirage, CA"):
+def geoid_from_city(city: str = "Rancho Mirage, CA") -> str:
 ```
 
 will still run even if you call the function ```geoid_from_city()```.
 
+If a function can take multiple arguments, then you can use `typing.Union`:
+
+```python
+from typing import Union
+
+def descriptive_function_name(descriptive_arg_name: Union[str, int]) -> float:
+    '''Function that does something'''
+    pass
+```
+
+There are many ways to be specific with the `typing` package. For example, if you want to include a type hint for a list of strings, you can do
+
+```python
+from typing import List
+
+def get_nicknames(name: str) -> List[str]:
+    '''returns all nicknames for a given name'''
+    pass
+```
+
 #### Docstrings
 Docstrings are a convenient way of documenting the functions we write. Docstrings inclue a description of your function, the arguments it needs, and the output of the function. Docstrings appear right after the function definition and you can create one by using triple quotes ``` """ [docstring here] """ ``` or ``` ''' [docstring here] ''' ```. 
 
-Here is an example docstring from the ```acs_detail_table.py``` file.
+Here is an example docstring from the ```lowe/acs/acs_async.py``` file.
 
 ```Python
-def get_population_estimate(year: str, city: str):
-    """
-    Pulls the population estimate data from ACS for a city and year.
-    NOTE: Returns "Connection refused by the server.." if no connection to server
+def _base_uri(
+    self,
+    year: Union[int, str],
+    tabletype: str = "detail",
+    estimate: Union[int, str] = "5",
+) -> str:
+    """_base_uri generates the base URI for the ACS API for each type of table and the 1, 3, and 5 year estimate tables
 
-    Argument(s) 
-    -----------------------
-        year: year of data needed to pull in string format. Example: 
-              "2021"
-        city: city id in string format. Example is Rancho Mirage: 
-              "59500"
-    
-    Output
-    -----------------------
-    Population estimate in List of List of strings format. Example:
-        [['NAME', 'B01001_001E', 'state', 'place'], ['Palm Springs city, California', '47897', '06', '55254']] 
+    Parameters
+    ----------
+    year : Union[int, str]
+        Year we want to pull the data for
+    tabletype : str, optional
+        Type of table we want to pull, by default "detail"
+        Options are:
+        - "detail" <--> ACS Detail tables,
+        - "subject" <--> Subject Tables,
+        - ["profile", "data profile", or "dprofile"] <--> Data Profile Tables,
+        - ["comparison profile", "comp profile", "cprofile"] for ACS comparison profiles
+    estimate : Union[int,str], optional
+        Type of ACS estimate tables we want to pull, by default "5"
+        Options are "5", "3", and "1". We typically use 5-year estimates when available.
+
+    NOTE: 1 year estimate URLs will almost definitely not work, but 3- and 5-year estimates will
+
+    Returns
+    -------
+    str
+        Base URL for querying ACS API
     """
 ```
-For consistency, all arguments have a one tab indent and its description should align with the description of the other arguments. For the output, output descriptions are NOT indented but the example should have a one tab indent. Output examples should be given. However, if your output is too long or too difficult to type, ex. a dataframe, it can be omitted.
+Docstrings are **required** for all major functions that will be used by others. This is currently our only way of documenting how to use different parts of our packages, and so we have to be as detailed as possible.
+
+In order to generate docstrings in this format, we use the [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring). Once you install the extension, you will need to tweak the settings to use the `numpy` format. To access your settings, use the VS code extensions tab and type `@ext:autodocstring` in the search bar. Click on the extension, and near the top there will be a settings button (you can also click the wheel in the search results and navigate to `Extension Settings`). Here are the complete settings you will need:
+
+- Docstring format: `numpy`
+- Generate docstring on enter: `on`
+- Guess types: `on`
+- Include extended summary: `off`
+- Include name: `on`
+- Log level: `info`
+- Quote style: `"""`
+- Start on new line: `off`
 
 If there is something important about the function that you want to convey to readers, use ```NOTE:``` to highlight the important information.
-
-We've provided a sample docstring and function definition for you to copy paste and fill in below:
-
-```python
-def func(param_1: type, param_2: type):
-    """
-    [Function Description]
-    (Optional for any important information) NOTE:
-    
-    Argument(s) 
-    -----------------------
-        param_1: [param_1 description] in [parameter type] format. Example (Optional Example Description): 
-                 [param_1 Example]
-                 (Optional) NOTE: 
-        param_2: [param_2 description] in [parameter type] format. Example (Optional Example Description): 
-                 [param_2 Example]
-                 (Optional) NOTE: 
-    
-    Output
-    -----------------------
-    [Output] in [output type] format. Example:
-        [Example] 
-        (Optional) NOTE: 
-    """
-```
 
 ### Comments
 
 Besides docstrings, comments should be written throughout your functions for others to understand your code. Similar to a step-by-step guide you created a function. Addtionally, comments should be written on any code that can be ambiguous to readers. A good way to know when to comment is if you had to think for a while to write the code. However, you do not need to comment everything. For example, variable initialization does not need to be commented since it is pretty straightforward. You can add a comment by using the hash sign ```#```.
 
-If you have code that does not use functions, make sure you write a comment at the top of the code block of what it does. For example:
+If you write code that does not define functions, make sure you write a comment at the top of the code block of what it does. For example:
 
 ``` python
 #--------
@@ -309,6 +328,29 @@ Furthermore, if you are unable to finish the code you are working on, make sure 
 
 ```
 at the top of the file with the descriptions of the things you need to do. 
+
+Also, if your code can be partitioned into different sections, please leave comment blocks that describe what each section does. For example,
+
+``` python
+
+# ---------------------------
+# Utilities
+# ---------------------------
+
+# Utility functions that are used as helpers throughout the script
+
+# [insert code here]
+# ...
+
+# ---------------------------
+# Filtering and Querying
+# ---------------------------
+
+# Functions to filter and query datasets
+
+# [insert code here]
+# ...
+```
 
 ### Medallion Tables
 
@@ -363,6 +405,7 @@ import os
 API_KEY = os.getenv("API_KEY_ACS")
 ```
 If you named your key something else in the .env file just make sure you use that string in the ```os.getenv(<keyname>)``` function. This method is preferred because there's no need to ever directly copy your API key into your code.
+
 ##### Other Tips
 
 American Community Survey API documentation for 5-year estimates: https://www.census.gov/data/developers/data-sets/acs-5year.html
@@ -370,20 +413,6 @@ American Community Survey API documentation for 5-year estimates: https://www.ce
 Geographic codes for ACS: https://api.census.gov/data/2019/acs/acs5/subject/examples.html
 
 Check out the ```notes.md``` file for some more details and useful links!
-
-## Explanation of Files
-
-Whenever you create a new file, please add a description of what it does here!
-
-* **save_webpage.py**: This script allows you to save the html file for a website. It is currently configured to save the ACS variable list for 2019, but this can be changed to whatever you need at the time. This is useful for getting html files for screenscraping without having to use `requests` every time.
-
-* **acs_var_scrape.py**: This is the file that parses the ACS variables for 2019 into a `.json` file called `acs_vars_2019.json` for us to look up later. Note that you have to run `save_webpage.py` in order for this to work, since you need the html file of the site for it to work. If you want to rewrite this to work with `requests`, then go for it :)
-
-* **acs_script.py**: This is the script that scrapes data from ACS using their API, and cross references the `acs_vars_2019.json` file to rename the columns to something human-readable. 
-
-* **acs_vars_2019.json**: This file is essentially a massive dictionary. The keys are series IDs from ACS, and the values are dictionaries themselves, which contain the keys `Concept` and `Label`. The values corresponding to these two are enough to create an English name for any columns we want to pull.
-
-* **notes.md**: This file contains useful information on different APIs we are using
 
 ## Learning Resources
 
@@ -398,7 +427,7 @@ Basics of using Git and GitHub together: https://www.youtube.com/watch?v=evgZPMW
 The first 5 videos on this playlist are probably all that you will need. There will be some redundant information. If you already know what Git is but don't know how to use it, then just start here!
 
 #### Python 
-Corey Schafer has a great introduction to Python on [this](https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7) YouTube playlist. For our purposes, you'll need to know the contents of about the first 9 videos (basic data types and control flow that we'll work with a lot, as well as functions and modules). We'll teach you the basics of how to use the packages we'll be working with in workshops and all (I want to commit to recording a mini-lecture series, but no promises). Here's the link to the playlist: https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7
+Corey Schafer has a great introduction to Python on [this](https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7) YouTube playlist. For our purposes, you'll need to know the contents of about the first 9 videos (basic data types and control flow that we'll work with a lot, as well as functions and modules). We'll teach you the basics of how to use the packages we'll be working with in workshops and all (I want to eventually commit to recording a mini-lecture series, but no promises). Here's the link to the playlist: https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7
 
 #### R
 
