@@ -4,6 +4,12 @@ import pandas as pd
 from typing import Dict
 import us
 
+# -------------------------------
+# Utility Functions
+# -------------------------------
+
+# Functions for generating relevant datasets
+
 
 def generate_lookup_tables() -> dict:
     # Load datasets
@@ -82,7 +88,7 @@ def generate_lookup_tables() -> dict:
     return decoder_cities, decoder_counties, decoder_msas, decoder_states
 
 
-def load_decoder_tables() -> dict:
+def load_decoder_tables(convert_to_bidict: bool = True):
     # Load the files
     with open("lookuptables/cities.json", "r", encoding="utf-8") as f:
         cities = json.load(f)
@@ -93,33 +99,44 @@ def load_decoder_tables() -> dict:
     with open("lookuptables/states.json", "r", encoding="utf-8") as f:
         states = json.load(f)
 
-    cities = bidict(cities)
-    counties = bidict(counties)
-    msas = bidict(msas)
-    states = bidict(states)
+    if convert_to_bidict:
+        cities = bidict(cities)
+        counties = bidict(counties)
+        msas = bidict(msas)
+        states = bidict(states)
 
     return cities, counties, msas, states
 
 
-# TODO: Insert function to clean / pad county codes appropriately
+# -------------------------------
+# Conversion Functions
+# -------------------------------
+
+# Functions to convert dictionaries from FIPS values to name values and vice versa
 
 
 def fips2name(loc: Dict[str, str]) -> Dict[str, str]:
-    """fips2name converts a location dict to a dict of names
+    """fips2name converts a dictionary with keys corresponding to geography types ("state", "msa", "county", "city")
+    and values being FIPS codes to a dictionary with the same keys but the values being the corresponding names in English
 
     Parameters
     ----------
-    loc : dict
-        [description]
+    loc : Dict[str, str]
+        Location dictionary where the keys are strictly contained in the set {"state", "msa", "county", "city"}
+        Values are FIPS codes:
+            state: 2-digit code (padded with "0" on the left if < 10: that is, "9" --> "09")
+            msa: 5-digit code for MSA
+            county: Code for county in the format [statecode]_[countycode]. Can just pass countycode if state is passed as well
+            city: 5-digit city code or 7-digit code if state is not passed. Make sure state is left-padded as mentioned above
 
     Returns
     -------
     Dict[str, str]
-        [description]
+        Dictionary with the same keys, but the values correspond to English names
     """
     # Quirks:
     # County FIPS codes are in the format state[2]_county[1-4]
-    # City FIPS codes are all unique
+    # City FIPS codes are all unique (they include state codes as first 2 characters)
     # MSA FIPS codes are all unique
 
     loc_city = loc.get("city", None)
@@ -164,20 +181,23 @@ def fips2name(loc: Dict[str, str]) -> Dict[str, str]:
 
 
 def _name2fips_helper(name: str, codetype: str = None) -> Dict[str, str]:
-    """[summary]
+    """_name2fips_helper converts the name of one region to its corresponding FIPS code
 
     Parameters
     ----------
     name : str
-        [description]
+        Name of the region to translate
     codetype : str, optional
-        [description], by default None
+        The type of region to pass, by default None
+        Example: if I pass in "ca", I should set codetype="state".
+        Possible values are "state", "msa", "county", and "city"
 
     Returns
     -------
     Dict[str, str]
         [description]
     """
+    name = name.lower()
     codetype = codetype.lower()
     cities, counties, msas, states = load_decoder_tables()
 
@@ -196,12 +216,21 @@ def _name2fips_helper(name: str, codetype: str = None) -> Dict[str, str]:
 
 
 def name2fips(loc: Dict[str, str]) -> Dict[str, str]:
-    """[summary]
+    """name2fips converts a dictionary with keys corresponding to geography types ("state", "msa", "county", "city").
+    Values are english names of locations. Note that the state must be included in each geography.
+    It's annoying, but necessary to guarantee uniqueness (msas, counties, and cities in different states can and do have the same name)
+    Example:
+        loc = {'city': 'palm springs, ca',
+            'county': 'riverside county, ca',
+            'msa': 'riverside-san bernardino-ontario, ca',
+            'state': 'ca'}
+        name2fips(loc) -->
+            {'city': '0655254', 'county': '06_65', 'msa': '40140', 'state': '06'}
 
     Parameters
     ----------
     loc : dict
-        [description]
+        A dictionary with the same keys, but values corresponding to FIPS codes
     """
     res = dict({})
     for key, value in loc.items():
@@ -209,8 +238,84 @@ def name2fips(loc: Dict[str, str]) -> Dict[str, str]:
     return res
 
 
+# -------------------------------
+# Search Functions
+# -------------------------------
+
+# Utilities to search for FIPS codes based on names
+# or search for names based on FIPS codes
+
+
+def generate_df_json(codetype: str):
+    """Generates a dataframe from a decoder JSON file
+
+    Parameters
+    ----------
+    codetype : str
+        Type of file to read. Possible values are "city", "county", "msa", "states"
+    """
+    cities, counties, msas, states = load_decoder_tables(convert_to_bidict=False)
+
+    if codetype.lower() in ["state", "states"]:
+        df = pd.DataFrame.from_dict(states, orient="index", columns=["name"])
+        df["fips"] = df.index
+        df.reset_index(inplace=True, drop=True)
+        return df
+
+    if codetype.lower() in ["msa", "msas"]:
+        df = pd.DataFrame.from_dict(msas, orient="index", columns=["name"])
+        df["fips"] = df.index
+        df.reset_index(inplace=True, drop=True)
+        return df
+
+    if codetype.lower() in ["county", "counties"]:
+        df = pd.DataFrame.from_dict(counties, orient="index", columns=["name"])
+        df["fips"] = df.index
+        df.reset_index(inplace=True, drop=True)
+        return df
+
+    if codetype.lower() in ["city", "cities"]:
+        df = pd.DataFrame.from_dict(cities, orient="index", columns=["name"])
+        df["fips"] = df.index
+        df.reset_index(inplace=True, drop=True)
+        return df
+
+    return None
+
+
+# TODO: Consolidate both search functions
+
+
+def search(query: str, codetype: str, search_on: str = "name") -> pd.DataFrame:
+    """search searches the relevant dataset specified by codetype for all entries matching the fips code or name provided
+
+    Parameters
+    ----------
+    query : str
+        Search query to run on the dataset
+    codetype : str
+        Dataset to look into. Possible values are "state", "msa", "county", "city"
+    search_on : str, optional
+        Search by "fips" or by "name", by default "name"
+        If "name", pass in the name of the geography you want to find the FIPS code for
+
+    Returns
+    -------
+    None. Prints the first 25 search results in dataframe format
+    """
+    df = generate_df_json(codetype=codetype)
+    df = df.astype(str)  # Convert all cols to string
+    # df[df['A'].str.contains("hello")]
+    df = df[df[search_on].str.contains(query)]
+    pd.options.display.max_rows = len(df) if len(df) < 25 else 25
+    print(df)
+    return None
+
+
 if __name__ == "__main__":
     PALM_SPRINGS = "55254"
     STATE = "06"
     loc = {"state": "06", "city": "55254", "county": "65", "msa": "40140"}
     english = fips2name(loc)
+    # print(name2fips(english))
+    search(query="palm", codetype="city", search_on="name")
