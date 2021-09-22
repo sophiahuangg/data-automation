@@ -330,4 +330,4 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
 
 
 if __name__ == "__main__":
-    res = news_release_numbers(fname="data/CAL$SHWS.xlsx")
+    res = news_release_numbers(fname="data/RIVE$HWS.xlsx")
