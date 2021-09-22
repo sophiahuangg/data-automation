@@ -72,6 +72,25 @@ git commit -m "+<package-name-1> +<package-name-2> -<package-name-3>"
 TODO: Write a shell script that does this in one sweep
 TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the process way simpler
 
+## Docker
+
+Docker is a software that allows developers to create a lightweight virtual machine through something called an image, which is a snapshot of a operating system and its constitutent files. You can build and run this image and when this image is running, it's called a container. The container allows you to develop software in the environment of the image instead of your local machine. 
+
+We will be using docker as an alternative to the conda environment in the case that your code doesn't build on the conda environment, or if you have any other issues.
+
+If you want to learn more about docker, you can look at the documentation [here](https://www.docker.com/resources/what-container).
+
+### Installing Docker
+
+You can download docker from [this](https://docs.docker.com/get-docker/) website. It may ask you to create a free account just make one with whatever email you prefer.
+
+### Using Docker Container with Visual Studio Code
+
+We'll be running the containers through VScode's remote container extension. To do this, you can use the VScode "Remote Container" extension from the VScode extensions.
+
+Once installed, you will see the remote container icon on the left sidecar of of your VSCode. After clicking it, it will say containers. Make sure you have docker running for this to work. Then click the + sign and click open folder in container. The folder you open in this container is our github repo that you have on your local machine. It will build a local container for you with the environment we need.
+
+
 ## Data Version Control (DVC)
 
 We want to be able to version our datasets and store them remotely (not in the git repository) so as to not violate any of github's file size limits. Luckily, this is what DVC allows us to do. First, install DVC using the instructions for your relevant OS [here](https://dvc.org/doc/install) -- install the version that integrates into your command line (i.e. not the pip one; that will already be installed when you set up your environment). On Mac OSX, this is as simple as running `brew install dvc`. On Ubuntu, use `snap install --classic dvc`. On Windows, if you have the `choco` package manager installed, just use `choco install dvc` in `Cmder` (won't work in a non-elevated environment). You can download `Cmder` if you don't have it. If you don't have `choco` installed, install it.
@@ -115,6 +134,7 @@ git push
 # Push to DVC
 dvc push
 ```
+
 ## Project Conventions
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
