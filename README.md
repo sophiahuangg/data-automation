@@ -73,7 +73,7 @@ TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the pr
 
 ## Docker
 
-Docker is a software that allows developers to create a lightweight virtual machine through something called an image, which is a snapshot of a operating system and its constitutent files. You can build and run this image and when this image is running, it's called a container. The container allows you to develop software in the environment of the image instead of your local machine. 
+Docker is a software that allows developers to create a lightweight virtual machine (but not really a virtual machine) called an **image**, which is a snapshot of a operating system and its constitutent files. You can build and run this image on your local machine, during which it is called a **container**. The container allows you to develop software in the environment of the image instead of your local machine. This allows you to avoid any problems of the project building on one operating system and not another. 
 
 We will be using docker as an alternative to the conda environment in the case that your code doesn't build on the conda environment, or if you have any other issues.
 
@@ -81,14 +81,15 @@ If you want to learn more about docker, you can look at the documentation [here]
 
 ### Installing Docker
 
-You can download docker from [this](https://docs.docker.com/get-docker/) website. It may ask you to create a free account just make one with whatever email you prefer.
+You can download docker from [this](https://docs.docker.com/get-docker/) website. It may ask you to create a free account -- just make one with whatever email you prefer.
 
 ### Using Docker Container with Visual Studio Code
 
 We'll be running the containers through VScode's remote container extension. To do this, you can use the VScode "Remote Container" extension from the VScode extensions.
 
-Once installed, you will see the remote container icon on the left sidecar of of your VSCode. After clicking it, it will say containers. Make sure you have docker running for this to work. Then click the + sign and click open folder in container. The folder you open in this container is our github repo that you have on your local machine. It will build a local container for you with the environment we need.
+Once installed, you will see the remote explorer icon on the left sidecar of of your VSCode. After clicking it, a sidebar will appear, at the top of which the word `containers` will be displayed. (Note that you must have docker running for this to work.) Then click the + sign and click open folder in container. The folder you open in this container is our github repo that you have on your local machine. It will build a local container for you with our development environment and filesystem built. Any terminal you open while in this session will be run through the container, not your host OS.
 
+In essence, a Docker container is a lot like a lightweight virtual machine. They are very different (as you can see in [this thread](https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine)). If you're curious for rigorous definitions and the actual differences between containers and VMs, check out the thread :)
 
 ## Data Version Control (DVC)
 
