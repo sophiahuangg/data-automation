@@ -99,11 +99,11 @@ More Specific Directions for DVC Installation with Windows:
 - https://dvc.org/doc/install/windows
 - https://dvc.org/doc/user-guide/running-dvc-on-windows
 
-**ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it.
+**ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it, except for those directly relevant to our packages.
 
 For more information on how DVC works and a basic tutorial, check out their [docs](https://dvc.org/doc/start/data-and-model-versioning) -- not necessary, but useful if knowing how things works helps you use them.
 
-To set up DVC with our remote storage bucket, you need to add our google drive folder as a remote:
+To set up DVC with our remote storage bucket, you need to add our google drive folder as a remote. **IMPORTANT NOTE** -- when you do this next step, you **need** to be in contact with Abhi. You have to log in to the Lowe Institute Google Drive, which currently only he has Duo access to. If that is the case, then you can do the following:
 
 ```bash
 dvc remote add --project -d bucket gdrive://1YginFyGcEZu1MpRdmYVZiTAOhTWJV-bV
@@ -139,7 +139,7 @@ dvc push
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
 #### Main Branch
-The main branch for this repository is called ```master```. This is where we will do most of our work. However, if you are making changes to an **existing** code file, then create a new branch for it. More details on branches blow.
+The main branch for this repository is called ```master```. This is where we will store our files after they have been developed and tested on different branches.
 
 #### Work Tickets and Branches
 We will be using GitHub Issues (the issues tab on the repository) to track work and give assignments. All work must be done on branches (commits to `master` are blocked).
@@ -163,6 +163,8 @@ git checkout -b 5-readme-fix
 ```
 
 When you are done working on this branch, create a pull request and we will review it before merging it to the ```master``` branch. Pull requests must pass the linting checks (and any other checks we add), and must undergo a review by at least one manager.
+
+Note that a branch will **not** be visible to others until you make a commit and push to it.
 
 #### VSCode Live Share
 
@@ -403,6 +405,7 @@ import os
 API_KEY = os.getenv("API_KEY_ACS")
 ```
 If you named your key something else in the .env file just make sure you use that string in the ```os.getenv(<keyname>)``` function. This method is preferred because there's no need to ever directly copy your API key into your code.
+
 ##### Other Tips
 
 American Community Survey API documentation for 5-year estimates: https://www.census.gov/data/developers/data-sets/acs-5year.html
