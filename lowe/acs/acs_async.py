@@ -5,9 +5,7 @@ import json
 import os
 import pandas as pd
 import requests
-import us
 
-from bidict import bidict
 from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict

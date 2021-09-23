@@ -104,13 +104,13 @@ def load_decoder_tables(convert_to_bidict: bool = True):
         msas = json.load(f)
     with pkg_resources.open_text("lowe.locations.lookuptables", "states.json") as f:
         states = json.load(f)
-    #with open("lookuptables/cities.json", "r", encoding="utf-8") as f:
+    # with open("lookuptables/cities.json", "r", encoding="utf-8") as f:
     #    cities = json.load(f)
-    #with open("lookuptables/counties.json", "r", encoding="utf-8") as f:
+    # with open("lookuptables/counties.json", "r", encoding="utf-8") as f:
     #    counties = json.load(f)
-    #with open("lookuptables/msas.json", "r", encoding="utf-8") as f:
+    # with open("lookuptables/msas.json", "r", encoding="utf-8") as f:
     #    msas = json.load(f)
-    #with open("lookuptables/states.json", "r", encoding="utf-8") as f:
+    # with open("lookuptables/states.json", "r", encoding="utf-8") as f:
     #    states = json.load(f)
 
     if convert_to_bidict:
