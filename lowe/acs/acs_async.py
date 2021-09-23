@@ -275,12 +275,17 @@ class ACSClient(object):
 
         acs_subject_pivoted.drop(acs_subject_pivoted.columns[0], axis=1, inplace=True)
 
+        location_str = ""
+
         for key, value in location_names.items():
             if key.lower() != "state":
                 value = value.split(",")[0]
             acs_subject_pivoted[key.lower()] = value.lower()
+            location_str += (
+                value.lower() if len(location_str) == 0 else " " + value.lower()
+            )
 
-        # acs_subject_pivoted["state"] = state_decoding[location["state"]]
+        acs_subject_pivoted["location_key"] = location_str
 
         return acs_subject_pivoted
 
@@ -322,6 +327,7 @@ class ACSClient(object):
         start_year: Union[int, str],
         end_year: Union[int, str],
         location: Dict[str, str],
+        translate_location: bool = False,
         tabletype: Union[str, List[str]] = None,
         infer_type: bool = True,
         varfile: Union[str, List[str]] = "subject_vars_2019.json",
@@ -347,6 +353,12 @@ class ACSClient(object):
                 "county": str, FIPS code for the county,
                 "city": str, FIPS code for the city of interest
             }
+        translate_location: bool
+            Whether or not we want to convert the location dictionary to FIPS codes. This essentially does
+                location = lowe.locations.lookups.name2fips(location)
+            Note that when passing in a dictionary with name vakues instead of FIPS values, all non-state values must have
+            the state attached to it. That is, if I want to query for Palm Springs, I would do {city: "palm springs, ca"}
+            For safety, always pass strings in as lowercase. Checks are in place for this but they may not be comprehensive
         tabletype : Union[str, List[str]], optional
             Table type to collect, must be one of ["detail", "subject", "dprofile", "cprofile"]
             Respectively, these are Detailed Tables, Subject Tables, Data Profiles, and Comparison Profiles
@@ -429,15 +441,15 @@ class ACSClient(object):
 async def main():
     subjects = ["S1701"]
     dp = "DP05"
-    # PALM_SPRINGS = "55254"
+    PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
     STATE = "06"
 
     client = ACSClient()
     await client.initialize()
 
-    # loc = {"state": STATE, "city": PALM_SPRINGS}
-    loc = {"state": STATE}
+    loc = {"state": STATE, "city": PALM_SPRINGS}
+    # loc = {"state": STATE}
 
     test_resp = await client.get_acs(
         vars=subjects + [dp],
@@ -453,7 +465,7 @@ async def main():
 
     await client.close()
 
-    print(test_resp[0])
+    print(list(test_resp[0]["location_key"]))
 
     return test_resp
 
