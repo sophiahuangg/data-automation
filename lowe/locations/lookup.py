@@ -144,13 +144,14 @@ def fips2name(loc: Dict[str, str]) -> Dict[str, str]:
     loc_msa = loc.get("msa", None)
     loc_state = loc.get("state", None)
 
-    if "_" not in loc_county:
-        try:
-            loc_county = loc_state + "_" + loc_county
-        except TypeError:
-            print(
-                "ERROR: Make sure to either pass in county FIPS as [state]_[county] or include state as well"
-            )
+    if loc_county is not None:
+        if "_" not in loc_county:
+            try:
+                loc_county = loc_state + "_" + loc_county
+            except TypeError:
+                print(
+                    "ERROR: Make sure to either pass in county FIPS as [state]_[county] or include state as well"
+                )
 
     cities, counties, msas, states = load_decoder_tables()
 
