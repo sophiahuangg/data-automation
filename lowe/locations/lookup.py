@@ -1,8 +1,14 @@
-from bidict import bidict
 import json
 import pandas as pd
-from typing import Dict
 import us
+
+from bidict import bidict
+from typing import Dict
+
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 # -------------------------------
 # Utility Functions
@@ -90,14 +96,22 @@ def generate_lookup_tables() -> dict:
 
 def load_decoder_tables(convert_to_bidict: bool = True):
     # Load the files
-    with open("lookuptables/cities.json", "r", encoding="utf-8") as f:
+    with pkg_resources.open_text("lowe.locations.lookuptables", "cities.json") as f:
         cities = json.load(f)
-    with open("lookuptables/counties.json", "r", encoding="utf-8") as f:
+    with pkg_resources.open_text("lowe.locations.lookuptables", "counties.json") as f:
         counties = json.load(f)
-    with open("lookuptables/msas.json", "r", encoding="utf-8") as f:
+    with pkg_resources.open_text("lowe.locations.lookuptables", "msas.json") as f:
         msas = json.load(f)
-    with open("lookuptables/states.json", "r", encoding="utf-8") as f:
+    with pkg_resources.open_text("lowe.locations.lookuptables", "states.json") as f:
         states = json.load(f)
+    # with open("lookuptables/cities.json", "r", encoding="utf-8") as f:
+    #    cities = json.load(f)
+    # with open("lookuptables/counties.json", "r", encoding="utf-8") as f:
+    #    counties = json.load(f)
+    # with open("lookuptables/msas.json", "r", encoding="utf-8") as f:
+    #    msas = json.load(f)
+    # with open("lookuptables/states.json", "r", encoding="utf-8") as f:
+    #    states = json.load(f)
 
     if convert_to_bidict:
         cities = bidict(cities)
@@ -144,13 +158,14 @@ def fips2name(loc: Dict[str, str]) -> Dict[str, str]:
     loc_msa = loc.get("msa", None)
     loc_state = loc.get("state", None)
 
-    if "_" not in loc_county:
-        try:
-            loc_county = loc_state + "_" + loc_county
-        except TypeError:
-            print(
-                "ERROR: Make sure to either pass in county FIPS as [state]_[county] or include state as well"
-            )
+    if loc_county is not None:
+        if "_" not in loc_county:
+            try:
+                loc_county = loc_state + "_" + loc_county
+            except TypeError:
+                print(
+                    "ERROR: Make sure to either pass in county FIPS as [state]_[county] or include state as well"
+                )
 
     cities, counties, msas, states = load_decoder_tables()
 
