@@ -9,7 +9,7 @@ import us
 
 from bidict import bidict
 from dotenv import load_dotenv, find_dotenv
-from lowe.locations.lookup import name2fips, fips2name, search
+from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict
 
 # @ext:njpwerner.autodocstring
@@ -383,6 +383,10 @@ class ACSClient(object):
                 print(tabletypes)
             if len(tabletypes) == 1:
                 tabletype = tabletypes[0]
+
+        # Translate the dictionary to FIPS values if necessary
+        if translate_location:
+            location = name2fips(location)
 
         if isinstance(varfile, str):
             dfs = await asyncio.gather(
