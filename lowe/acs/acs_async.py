@@ -9,6 +9,7 @@ import us
 
 from bidict import bidict
 from dotenv import load_dotenv, find_dotenv
+from lowe.locations.lookup import name2fips, fips2name, search
 from typing import Union, List, Dict
 
 # @ext:njpwerner.autodocstring
@@ -238,7 +239,8 @@ class ACSClient(object):
         concept_label = []
         values = []
 
-        state_decoding = bidict({k.fips: k.abbr for k in us.states.STATES})
+        # state_decoding = bidict({k.fips: k.abbr for k in us.states.STATES})
+        location_names = fips2name(location)
 
         subjectDict = subjectDict["variables"]
 
@@ -273,7 +275,12 @@ class ACSClient(object):
 
         acs_subject_pivoted.drop(acs_subject_pivoted.columns[0], axis=1, inplace=True)
 
-        acs_subject_pivoted["state"] = state_decoding[location["state"]]
+        for key, value in location_names.items():
+            if key.lower() != "state":
+                value = value.split(",")[0]
+            acs_subject_pivoted[key.lower()] = value.lower()
+
+        # acs_subject_pivoted["state"] = state_decoding[location["state"]]
 
         return acs_subject_pivoted
 
@@ -446,8 +453,9 @@ async def main():
 
     await client.close()
 
+    print(test_resp[0])
+
     return test_resp
 
 
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
+asyncio.run(main())
