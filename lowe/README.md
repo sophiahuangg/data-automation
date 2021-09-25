@@ -9,6 +9,9 @@ This is an importable Python package we have developed with the goal of making a
 
 Since we install this package as an editable module (through `setup.py` in the root directory, which is activated in the setup step `pip install -e .`), you can import these packages within **any** script so long as you are using a conda environment that has it installed.
 
+## lowe.acs
+`lowe.acs` contains an asynchronous API wrapper for the American Community Survey API.
+
 ## lowe.locations
 
 The core of this subpackage is effectively working with **Location Dictionaries**. These are dictionaries where the keys are strictly contained in `{"state", "msa", "county", "city"}`, which are used to specify geographies within the United States. Location dictionaries are heavily used in the ACS API wrapper since this is how we let ACS know what geography we are looking for. Values can either be the actual names (lowercase), or **FIPS (Federal Information Processing Standards)** Codes.
@@ -47,6 +50,8 @@ These functions can be imported with
 ```python
 from lowe.locations.lookups import name2fips, fips2name, search
 ```
+
+There are a **lot** of wrinkles to iron out with this package, so please keep in contact with the managers as development continues and we will add new features and bug fixes as we go.
 
 ## Features to Come
 
