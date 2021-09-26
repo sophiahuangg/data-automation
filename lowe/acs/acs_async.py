@@ -468,7 +468,7 @@ async def main():
 
     responses = await client.get_acs(
         vars=subjects,
-        start_year="2019",
+        start_year="2012",
         end_year="2019",
         location=locs,
         varfile=[
