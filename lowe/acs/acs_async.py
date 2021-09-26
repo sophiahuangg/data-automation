@@ -11,17 +11,10 @@ from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict
 
-# @ext:njpwerner.autodocstring
-# https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00
-
 # State -- first two digits of city geoid (state=*)
 # MSA - geocomp (MSA code, state)
 # County -- where to find the codes???? (county, state)
 # Place (city) -- (geoid,state) "place="
-
-# TODO: Implement location encoding within responses (both FIPS and English)
-# Revisit after implementing lowe.locations
-
 
 class ACSClient(object):
     def __init__(self, key_env_name: str = "API_KEY_ACS"):
@@ -151,7 +144,6 @@ class ACSClient(object):
         estimate: Union[int, str] = "5",
         debug: bool = False,
     ):
-        # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
         try:
             assert self.session is not None
