@@ -119,30 +119,36 @@ Note that `client.get_acs` is an asynchronous function (coroutine), so you must 
 Putting it all together, we have
 
 ```python
+import asyncio
 from lowe.acs.acs_async import ACSClient
-client = ACSClient() # Make sure your .env file has a variable named API_KEY_ACS
 
-client.initialize() # Initialize the aiohttp session
+async def main():
+    client = ACSClient() # Make sure your .env file has a variable named API_KEY_ACS
 
-locs = [{"state": str(st.fips)} for st in us.states.STATES]
+    client.initialize() # Initialize the aiohttp session
 
-responses = await client.get_acs(
-        vars=subjects,
-        start_year="2012",
-        end_year="2019",
-        location=locs,
-        varfile=[
-            "tableids/subject_vars_2019.json",
-        ],
-        infer_type=True,
-        estimate="5",
-        join=False,
-        debug=False,
-    )
+    locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
-await client.close() # Close the aiohttp client session
+    responses = await client.get_acs(
+            vars=subjects,
+            start_year="2012",
+            end_year="2019",
+            location=locs,
+            varfile=[
+                "tableids/subject_vars_2019.json",
+            ],
+            infer_type=True,
+            estimate="5",
+            join=False,
+            debug=False,
+        )
 
-# [do any data processing here]
+    await client.close() # Close the aiohttp client session
+
+    # [do any data processing here]
+    return final_product
+
+asyncio.run(main())
 ```
 
 The column names are a bit messy and may take a bit of tweaking to get right for filtering and renaming. For that reason, we recommend developing in a notebook or ipython until you know what you want to do, and then migrating over to a `.py` script afterwards.
@@ -171,6 +177,7 @@ resp = await client.get_fred(
 
 await client.close()
 ```
+
 ## lowe.locations
 
 The core of this subpackage is effectively working with **Location Dictionaries**. These are dictionaries where the keys are strictly contained in `{"state", "msa", "county", "city"}`, which are used to specify geographies within the United States. Location dictionaries are heavily used in the ACS API wrapper since this is how we let ACS know what geography we are looking for. Values can either be the actual names (lowercase), or **FIPS (Federal Information Processing Standards)** Codes.
@@ -212,9 +219,13 @@ from lowe.locations.lookups import name2fips, fips2name, search
 
 There are a **lot** of wrinkles to iron out with this package, so please keep in contact with the managers as development continues and we will add new features and bug fixes as we go.
 
+## lowe.edd
+
+This package contains utilities for automating EDD news release analysis. As we continue, we will add automated employment graphs to this package as well.
+
 ## Features to Come
 
-We want to eventually add a `lowe.cli` package that contains command line utilities. An example of a useful function would be an integration of `lowe.locations.lookups.search` so that we can quickly search for FIPS codes of different geographies. This can be done quite easily through [`Click`](https://click.palletsprojects.com/en/8.0.x/), and will likely be assigned to someone 
+We want to eventually add a `lowe.cli` package that contains command line utilities. An example of a useful function would be an integration of `lowe.locations.lookups.search` so that we can quickly search for FIPS codes of different geographies. This can be done easily through [`Click`](https://click.palletsprojects.com/en/8.0.x/), and will likely be assigned to someone 
 
 ```bash
 $ search fips city palm
@@ -232,3 +243,5 @@ $ search fips city palm
 31606      palma sola, pr  7258613
 31607          palmer, pr  7258666
 ```
+
+We also want to add a `lowe.utils` package that includes small utilities that we can use. These don't have to be complicated, just convenient things we may want to use a lot
