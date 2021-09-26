@@ -5,6 +5,7 @@ import json
 import os
 import pandas as pd
 import requests
+import us
 
 from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
@@ -41,7 +42,7 @@ class ACSClient(object):
                 f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
 
-        self.surveys = {"1": "acsse", "3": "acs3", "5": "acs5"}
+        self.surveys = {"1": "acs1", "3": "acs3", "5": "acs5"}
 
         self.tabletypes = {
             "detail": "",  # Default table type
@@ -442,34 +443,62 @@ class ACSClient(object):
 
 async def main():
     subjects = ["S1701"]
-    dp = "DP05"
-    PALM_SPRINGS = "55254"
+    # dp = "DP05"
+    # PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
-    STATE = "06"
+    # STATE = "06"
 
     client = ACSClient()
     await client.initialize()
 
-    loc = {"state": STATE, "city": PALM_SPRINGS}
-    # loc = {"state": STATE}
+    locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
-    test_resp = await client.get_acs(
-        vars=subjects + [dp],
-        start_year="2012",
-        end_year="2019",
-        location=loc,
-        varfile=["tableids/subject_vars_2019.json", "tableids/dprofile_vars_2019.json"],
-        infer_type=True,
-        estimate="5",
-        join=False,
-        debug=False,
-    )
+    # locs = [{"state": "06"}, {"state": "04"}]
+
+    print(locs)
+
+    responses = [
+        await client.get_acs(
+            vars=subjects,
+            start_year="2019",
+            end_year="2019",
+            location=loc,
+            varfile=[
+                "tableids/subject_vars_2019.json",
+            ],
+            infer_type=True,
+            estimate="5",
+            join=False,
+            debug=False,
+        )
+        for loc in locs
+    ]
+
+    for resp in responses:
+        resp[0] = resp[0][
+            [
+                "state",
+                "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined",
+            ]
+        ]
+        resp[0] = resp[0].rename(
+            mapper={
+                "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"
+            }
+        )
+
+    finalresp = []
+
+    for resp in responses:
+        finalresp.append(resp[0])
+
+    final = pd.concat(finalresp)
+
+    final.to_csv("outputs/povertyrates_1year.csv")
 
     await client.close()
 
-    print(list(test_resp[0]["location_key"]))
-
-    return test_resp
+    return final
 
 
 asyncio.run(main())
