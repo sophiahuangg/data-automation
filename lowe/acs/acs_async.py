@@ -385,6 +385,11 @@ class ACSClient(object):
             Whether or not to join all the results together into one large table, by default True
         debug: bool, optional
             If True, prints out extra information useful for debugging
+        
+        Returns
+        -------
+        pd.DataFrame, List[pd.DataFrame]
+            If only one table is called, then returns the dataframe. Else, return a list of dataframes
         """
         # Split the vars into equal partitions
         if infer_type:
