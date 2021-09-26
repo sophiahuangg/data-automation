@@ -443,10 +443,10 @@ class ACSClient(object):
 
 async def main():
     subjects = ["S1701"]
-    dp = "DP05"
-    PALM_SPRINGS = "55254"
+    # dp = "DP05"
+    # PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
-    STATE = "06"
+    # STATE = "06"
 
     client = ACSClient()
     await client.initialize()
@@ -457,23 +457,35 @@ async def main():
 
     print(locs)
 
-    responses = [await client.get_acs(
-                vars=subjects,
-                start_year="2019",
-                end_year="2019",
-                location = loc,
-                varfile=[
+    responses = [
+        await client.get_acs(
+            vars=subjects,
+            start_year="2019",
+            end_year="2019",
+            location=loc,
+            varfile=[
                 "tableids/subject_vars_2019.json",
-                ],
-                infer_type=True,
-                estimate="5",
-                join=False,
-                debug=False) for loc in locs]
+            ],
+            infer_type=True,
+            estimate="5",
+            join=False,
+            debug=False,
+        )
+        for loc in locs
+    ]
 
     for resp in responses:
-        resp[0] = resp[0][["state",
-        "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined"]]
-        resp[0] = resp[0].rename(mapper = {"POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"})
+        resp[0] = resp[0][
+            [
+                "state",
+                "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined",
+            ]
+        ]
+        resp[0] = resp[0].rename(
+            mapper={
+                "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"
+            }
+        )
 
     finalresp = []
 
