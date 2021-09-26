@@ -5,21 +5,16 @@ import json
 import os
 import pandas as pd
 import requests
+import us
 
 from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict
 
-# @ext:njpwerner.autodocstring
-# https://marcobelo.medium.com/setting-up-python-black-on-visual-studio-code-5318eba4cd00
-
 # State -- first two digits of city geoid (state=*)
 # MSA - geocomp (MSA code, state)
 # County -- where to find the codes???? (county, state)
 # Place (city) -- (geoid,state) "place="
-
-# TODO: Implement location encoding within responses (both FIPS and English)
-# Revisit after implementing lowe.locations
 
 
 class ACSClient(object):
@@ -41,7 +36,7 @@ class ACSClient(object):
                 f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
 
-        self.surveys = {"1": "acsse", "3": "acs3", "5": "acs5"}
+        self.surveys = {"1": "acs1", "3": "acs3", "5": "acs5"}
 
         self.tabletypes = {
             "detail": "",  # Default table type
@@ -150,7 +145,6 @@ class ACSClient(object):
         estimate: Union[int, str] = "5",
         debug: bool = False,
     ):
-        # TODO: Check that the process works for non-subject tables as well
         # Check to see if the client session exists
         try:
             assert self.session is not None
@@ -300,20 +294,37 @@ class ACSClient(object):
     ):
         """Helper function to get multiple years of ACS data for a single subject and return them as a single dataframe"""
         year_range = range(int(start_year), int(end_year) + 1)
-        results = await asyncio.gather(
-            *[
-                self._process_request(
-                    tableid=tableid,
-                    year=year,
-                    location=location,
-                    tabletype=tabletype,
-                    estimate=estimate,
-                    varfile=varfile,
-                    debug=debug,
-                )
-                for year in year_range
-            ]
-        )
+        if isinstance(location, dict):  # If there is only one location passed
+            results = await asyncio.gather(
+                *[
+                    self._process_request(
+                        tableid=tableid,
+                        year=year,
+                        location=location,
+                        tabletype=tabletype,
+                        estimate=estimate,
+                        varfile=varfile,
+                        debug=debug,
+                    )
+                    for year in year_range
+                ]
+            )
+        elif isinstance(location, list):  # If there is more than one location passed in
+            results = await asyncio.gather(
+                *[
+                    self._process_request(
+                        tableid=tableid,
+                        year=year,
+                        location=loc,
+                        tabletype=tabletype,
+                        estimate=estimate,
+                        varfile=varfile,
+                        debug=debug,
+                    )
+                    for year in year_range
+                    for loc in location
+                ]
+            )
 
         res = pd.concat(results)
 
@@ -324,7 +335,7 @@ class ACSClient(object):
         vars: List[str],
         start_year: Union[int, str],
         end_year: Union[int, str],
-        location: Dict[str, str],
+        location: Union[Dict[str, str], List[Dict[str, str]]],
         translate_location: bool = False,
         tabletype: Union[str, List[str]] = None,
         infer_type: bool = True,
@@ -343,7 +354,7 @@ class ACSClient(object):
             Year we want to start collecting data from, earliest being "2011"
         year_end : Union[int, str]
             Last year we want to collect data from, latest being "2019". Must be >= year_start
-        location : Dict[str, str]
+        location : Union[Dict[str, str], List[Dict[str, str]]]
             Dictionary with the following keys to specify location:
             {
                 "state": str, FIPS code of the state,
@@ -351,6 +362,7 @@ class ACSClient(object):
                 "county": str, FIPS code for the county,
                 "city": str, FIPS code for the city of interest
             }
+            NOTE: You may also pass a list of location dictionaries -- this is the preferred method, since it will parallelize easily
         translate_location: bool
             Whether or not we want to convert the location dictionary to FIPS codes. This essentially does
                 location = lowe.locations.lookups.name2fips(location)
@@ -427,7 +439,7 @@ class ACSClient(object):
             return intermediate
 
         else:
-            return dfs
+            return dfs[0] if len(dfs) == 1 else dfs
 
 
 """
@@ -442,34 +454,49 @@ class ACSClient(object):
 
 async def main():
     subjects = ["S1701"]
-    dp = "DP05"
-    PALM_SPRINGS = "55254"
+    # dp = "DP05"
+    # PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
-    STATE = "06"
+    # STATE = "06"
 
     client = ACSClient()
     await client.initialize()
 
-    loc = {"state": STATE, "city": PALM_SPRINGS}
-    # loc = {"state": STATE}
+    locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
-    test_resp = await client.get_acs(
-        vars=subjects + [dp],
+    # locs = [{"state": "06"}, {"state": "04"}]
+
+    responses = await client.get_acs(
+        vars=subjects,
         start_year="2012",
         end_year="2019",
-        location=loc,
-        varfile=["tableids/subject_vars_2019.json", "tableids/dprofile_vars_2019.json"],
+        location=locs,
+        varfile=[
+            "tableids/subject_vars_2019.json",
+        ],
         infer_type=True,
         estimate="5",
         join=False,
         debug=False,
     )
 
+    responses = responses[
+        [
+            "state",
+            "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined",
+        ]
+    ]
+    responses = responses.rename(
+        columns={
+            "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"
+        }
+    )
+
+    # final.to_csv("outputs/povertyrates_1year.csv")
+
     await client.close()
 
-    print(list(test_resp[0]["location_key"]))
-
-    return test_resp
+    return responses
 
 
 asyncio.run(main())
