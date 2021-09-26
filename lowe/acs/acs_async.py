@@ -5,7 +5,6 @@ import json
 import os
 import pandas as pd
 import requests
-import time
 import us
 
 from dotenv import load_dotenv, find_dotenv
@@ -467,8 +466,6 @@ async def main():
 
     # locs = [{"state": "06"}, {"state": "04"}]
 
-    t0 = time.time()
-
     responses = await client.get_acs(
         vars=subjects,
         start_year="2019",
@@ -493,7 +490,7 @@ async def main():
         columns={
             "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"
         }
-        )
+    )
 
     # final.to_csv("outputs/povertyrates_1year.csv")
 
