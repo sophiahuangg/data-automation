@@ -38,7 +38,7 @@ async def get_acs(
         translate_location: bool = False,
         tabletype: Union[str, List[str]] = None,
         infer_type: bool = True,
-        varfile: Union[str, List[str]] = "subject_vars_2019.json",
+        varfile: Union[str, List[str]] = "tableids/subject_vars_2019.json",
         estimate: Union[int, str] = "5",
         join: bool = True,
         debug: bool = True,
@@ -84,12 +84,93 @@ async def get_acs(
             Whether or not to join all the results together into one large table, by default True
         debug: bool, optional
             If True, prints out extra information useful for debugging
+        
+        Returns
+        -------
+        pd.DataFrame, List[pd.DataFrame]
+            If only one table is called, then returns the dataframe. Else, return a list of dataframes
         """
         # [Code is here]
 ```
 
+An example call to the function might look something like
 
+```python
 
+locs = [{"state": str(st.fips)} for st in us.states.STATES]
+
+responses = await client.get_acs(
+        vars=subjects,
+        start_year="2012",
+        end_year="2019",
+        location=locs,
+        varfile=[
+            "tableids/subject_vars_2019.json",
+        ],
+        infer_type=True,
+        estimate="5",
+        join=False,
+        debug=False,
+    )
+```
+
+Note that `client.get_acs` is an asynchronous function (coroutine), so you must use the `await` keyword when calling it if you want to return a dataframe or list of dataframes and not a coroutine object.
+
+Putting it all together, we have
+
+```python
+from lowe.acs.acs_async import ACSClient
+client = ACSClient() # Make sure your .env file has a variable named API_KEY_ACS
+
+client.initialize() # Initialize the aiohttp session
+
+locs = [{"state": str(st.fips)} for st in us.states.STATES]
+
+responses = await client.get_acs(
+        vars=subjects,
+        start_year="2012",
+        end_year="2019",
+        location=locs,
+        varfile=[
+            "tableids/subject_vars_2019.json",
+        ],
+        infer_type=True,
+        estimate="5",
+        join=False,
+        debug=False,
+    )
+
+await client.close() # Close the aiohttp client session
+
+# [do any data processing here]
+```
+
+The column names are a bit messy and may take a bit of tweaking to get right for filtering and renaming. For that reason, we recommend developing in a notebook or ipython until you know what you want to do, and then migrating over to a `.py` script afterwards.
+
+## lowe.fred
+
+The FRED API wrapper works very similar to the ACS wrapper. It can be imported by
+
+```python
+from lowe.fred.fred_async import FREDClient
+
+client = FREDClient() # Initialize the FRED Client, assuming your API key is in your .env file as API_KEY_FRED
+# Else, you can run
+# client = FREDClient(key_env_name = "varname")
+# where varname is the name of the variable corresponding to your FRED API key
+
+resp = await client.get_fred(
+        vars=subjects, # list of subject IDs to pull (available from their website)
+        startDate="2009-01-01",
+        endDate="2010-01-01",
+        file_type="json", # always pass json here
+        frequency="a", # Options are "m", "q", and "a'
+        export=False, # Usually want to rename columns first
+        debug=True,
+    )
+
+await client.close()
+```
 ## lowe.locations
 
 The core of this subpackage is effectively working with **Location Dictionaries**. These are dictionaries where the keys are strictly contained in `{"state", "msa", "county", "city"}`, which are used to specify geographies within the United States. Location dictionaries are heavily used in the ACS API wrapper since this is how we let ACS know what geography we are looking for. Values can either be the actual names (lowercase), or **FIPS (Federal Information Processing Standards)** Codes.
