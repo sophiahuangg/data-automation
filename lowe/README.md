@@ -10,7 +10,85 @@ This is an importable Python package we have developed with the goal of making a
 Since we install this package as an editable module (through `setup.py` in the root directory, which is activated in the setup step `pip install -e .`), you can import these packages within **any** script so long as you are using a conda environment that has it installed.
 
 ## lowe.acs
-`lowe.acs` contains an asynchronous API wrapper for the American Community Survey API.
+`lowe.acs` contains an asynchronous API wrapper for the American Community Survey API. To use this, you will want to import the `ACSClient` class from `lowe.acs.acs_async`:
+
+```python
+from lowe.acs.acs_async import ACSClient
+```
+
+Now, you need to create an `ACSClient` object and initialize its `aiohttp` session:
+
+```python
+client = ACSClient() # Make sure your .env file has a variable named API_KEY_ACS
+# Else, if varname is the name of your ACS API key in your .env file:
+client = ACSClient(key_env_name = "varname")
+
+client.initialize() # Initialize the aiohttp session
+```
+
+Now, you can make a request using the `get_acs()` function. The docstring is listed below:
+
+```python
+async def get_acs(
+        self,
+        vars: List[str],
+        start_year: Union[int, str],
+        end_year: Union[int, str],
+        location: Union[Dict[str, str], List[Dict[str, str]]],
+        translate_location: bool = False,
+        tabletype: Union[str, List[str]] = None,
+        infer_type: bool = True,
+        varfile: Union[str, List[str]] = "subject_vars_2019.json",
+        estimate: Union[int, str] = "5",
+        join: bool = True,
+        debug: bool = True,
+    ):
+        """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
+
+        Parameters
+        ----------
+        vars : List[str]
+            List of tables we want to grab from ACS, example ["S1001", "S1501"]
+        year_start : Union[int, str]
+            Year we want to start collecting data from, earliest being "2011"
+        year_end : Union[int, str]
+            Last year we want to collect data from, latest being "2019". Must be >= year_start
+        location : Union[Dict[str, str], List[Dict[str, str]]]
+            Dictionary with the following keys to specify location:
+            {
+                "state": str, FIPS code of the state,
+                "msa": str, code for the MSA,
+                "county": str, FIPS code for the county,
+                "city": str, FIPS code for the city of interest
+            }
+            NOTE: You may also pass a list of location dictionaries -- this is the preferred method, since it will parallelize easily
+        translate_location: bool
+            Whether or not we want to convert the location dictionary to FIPS codes. This essentially does
+                location = lowe.locations.lookups.name2fips(location)
+            Note that when passing in a dictionary with name vakues instead of FIPS values, all non-state values must have
+            the state attached to it. That is, if I want to query for Palm Springs, I would do {city: "palm springs, ca"}
+            For safety, always pass strings in as lowercase. Checks are in place for this but they may not be comprehensive
+        tabletype : Union[str, List[str]], optional
+            Table type to collect, must be one of ["detail", "subject", "dprofile", "cprofile"]
+            Respectively, these are Detailed Tables, Subject Tables, Data Profiles, and Comparison Profiles
+            If there are various types of tables being collected with one call, pass a list of length len(vars)
+            Each entry of this list should correspond to the table type of the corresponding entry in
+            NOTE: Pass as None if you want to infer the table type
+        infer_type: bool, optional
+            Whether or not we want to infer table types
+        varfile: Union[str, List[str]]
+            File (or list of files) that should be used to translate variable names
+        estimate: Union[int,str]
+            ACS estimates to gather (1, 3, or 5-year)
+        join: bool, optional
+            Whether or not to join all the results together into one large table, by default True
+        debug: bool, optional
+            If True, prints out extra information useful for debugging
+        """
+        # [Code is here]
+```
+
+
 
 ## lowe.locations
 
