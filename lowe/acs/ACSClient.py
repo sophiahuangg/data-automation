@@ -344,8 +344,8 @@ class ACSClient(object):
         infer_type: bool = True,
         varfile: Union[str, List[str]] = None,
         estimate: Union[int, str] = "5",
-        join: bool = True,
-        debug: bool = True,
+        join: bool = False,
+        debug: bool = False,
     ):
         """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
 
