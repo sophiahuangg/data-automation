@@ -11,10 +11,10 @@ from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict
 
-# State -- first two digits of city geoid (state=*)
-# MSA - geocomp (MSA code, state)
-# County -- where to find the codes???? (county, state)
-# Place (city) -- (geoid,state) "place="
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 
 class ACSClient(object):
@@ -117,11 +117,6 @@ class ACSClient(object):
         return js
 
     def _infer_table_type(self, tableid: str):
-        # There are 4 checks:
-        # detail tables: tableid[0] == "B"
-        # subject tables: tableid[0] == "S"
-        # data profiles: tableid[0:2] == "DP"
-        # comparison profiles: tableid[0:2] == "CP"
         tableid = tableid.lower()
         if tableid[0] == "b":
             return "detail"
@@ -133,8 +128,16 @@ class ACSClient(object):
             return "cprofile"
         return None
 
+    def _infer_varfile(self, year: Union[int, str], tabletype: str):
+        if tabletype.lower() == "detail":
+            return f"detail_vars_{str(year)}.json"
+        elif tabletype.lower() == "subject":
+            return f"subject_vars_{str(year)}.json"
+        elif tabletype.lower() == "dprofile":
+            return f"dprofile_vars_{str(year)}.json"
+
     @backoff.on_exception(
-        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=1
+        backoff.expo, (aiohttp.ClientError, aiohttp.ClientResponseError), max_tries=5
     )
     async def _collect_table(
         self,
@@ -220,7 +223,7 @@ class ACSClient(object):
             print("opening JSON...")
         # Opens the JSON file with subject tables info
 
-        with open(varfile) as f:
+        with pkg_resources.open_text("lowe.acs.tableids", varfile) as f:
             subjectDict = json.load(f)
 
         # ids: list of subject ids
@@ -339,10 +342,10 @@ class ACSClient(object):
         translate_location: bool = False,
         tabletype: Union[str, List[str]] = None,
         infer_type: bool = True,
-        varfile: Union[str, List[str]] = "subject_vars_2019.json",
+        varfile: Union[str, List[str]] = None,
         estimate: Union[int, str] = "5",
-        join: bool = True,
-        debug: bool = True,
+        join: bool = False,
+        debug: bool = False,
     ):
         """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
 
@@ -350,9 +353,9 @@ class ACSClient(object):
         ----------
         vars : List[str]
             List of tables we want to grab from ACS, example ["S1001", "S1501"]
-        year_start : Union[int, str]
+        start_year : Union[int, str]
             Year we want to start collecting data from, earliest being "2011"
-        year_end : Union[int, str]
+        end_year : Union[int, str]
             Last year we want to collect data from, latest being "2019". Must be >= year_start
         location : Union[Dict[str, str], List[Dict[str, str]]]
             Dictionary with the following keys to specify location:
@@ -379,24 +382,38 @@ class ACSClient(object):
             Whether or not we want to infer table types
         varfile: Union[str, List[str]]
             File (or list of files) that should be used to translate variable names
+            NOTE: Pass None (default) if you want to infer the varfile.
         estimate: Union[int,str]
             ACS estimates to gather (1, 3, or 5-year)
         join: bool, optional
             Whether or not to join all the results together into one large table, by default True
         debug: bool, optional
             If True, prints out extra information useful for debugging
+
+        Returns
+        -------
+        pd.DataFrame, List[pd.DataFrame]
+            If only one table is called, then returns the dataframe. Else, return a list of dataframes
         """
         # Split the vars into equal partitions
         if infer_type:
             tabletypes = [self._infer_table_type(var) for var in vars]
             if debug:
                 print(tabletypes)
-            if len(tabletypes) == 1:
-                tabletype = tabletypes[0]
+            tabletypes = tabletypes[0] if len(tabletypes) == 1 else tabletypes
 
         # Translate the dictionary to FIPS values if necessary
         if translate_location:
             location = name2fips(location)
+
+        if varfile is None:  # We want to infer which file to use
+            varfile = [
+                self._infer_varfile(
+                    tabletype=tabletype, year="2019"
+                )  # NOTE: This may not work in later years
+                for tabletype in tabletypes
+            ]
+            varfile = varfile[0] if len(varfile) == 1 else varfile
 
         if isinstance(varfile, str):
             dfs = await asyncio.gather(
@@ -442,16 +459,6 @@ class ACSClient(object):
             return dfs[0] if len(dfs) == 1 else dfs
 
 
-"""
-%pop 85+ -- DPO05
-%pop 75-85 -- DP05
-%pop black -- DP05
-%pop hispanic -- DP05
-%pop Indian native -- DP05
-%poverty -- S1701
-"""
-
-
 async def main():
     subjects = ["S1701"]
     # dp = "DP05"
@@ -468,12 +475,9 @@ async def main():
 
     responses = await client.get_acs(
         vars=subjects,
-        start_year="2012",
+        start_year="2019",
         end_year="2019",
         location=locs,
-        varfile=[
-            "tableids/subject_vars_2019.json",
-        ],
         infer_type=True,
         estimate="5",
         join=False,
