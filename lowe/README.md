@@ -10,7 +10,7 @@ This is an importable Python package we have developed with the goal of making a
 Since we install this package as an editable module (through `setup.py` in the root directory, which is activated in the setup step `pip install -e .`), you can import these packages within **any** script so long as you are using a conda environment that has it installed.
 
 ## lowe.acs
-`lowe.acs` contains an asynchronous API wrapper for the American Community Survey API. To use this, you will want to import the `ACSClient` class from `lowe.acs.acs_async`:
+`lowe.acs` contains an asynchronous API wrapper for the American Community Survey API. To use this, you will want to import the `ACSClient` class from `lowe.acs.ACSClient.py`:
 
 ```python
 from lowe.acs.ACSClient import ACSClient
@@ -98,6 +98,8 @@ An example call to the function might look something like
 
 ```python
 
+subjects = ["S1701", "DP05"]
+
 locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
 responses = await client.get_acs(
@@ -122,6 +124,8 @@ async def main():
     client = ACSClient() # Make sure your .env file has a variable named API_KEY_ACS
 
     client.initialize() # Initialize the aiohttp session
+    
+    subjects = ["S1701", "DP05"]
 
     locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
@@ -155,6 +159,8 @@ client = FREDClient() # Initialize the FRED Client, assuming your API key is in 
 # Else, you can run
 # client = FREDClient(key_env_name = "varname")
 # where varname is the name of the variable corresponding to your FRED API key
+
+subjects = subjects = ["GNPCA", "GDP"]
 
 resp = await client.get_fred(
         vars=subjects, # list of subject IDs to pull (available from their website)
