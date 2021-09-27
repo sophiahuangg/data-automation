@@ -11,6 +11,11 @@ from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
 from typing import Union, List, Dict
 
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
+
 # State -- first two digits of city geoid (state=*)
 # MSA - geocomp (MSA code, state)
 # County -- where to find the codes???? (county, state)
@@ -220,7 +225,7 @@ class ACSClient(object):
             print("opening JSON...")
         # Opens the JSON file with subject tables info
 
-        with open(varfile) as f:
+        with pkg_resources.open_text("lowe.acs.tableids", varfile) as f:
             subjectDict = json.load(f)
 
         # ids: list of subject ids
@@ -385,7 +390,7 @@ class ACSClient(object):
             Whether or not to join all the results together into one large table, by default True
         debug: bool, optional
             If True, prints out extra information useful for debugging
-        
+
         Returns
         -------
         pd.DataFrame, List[pd.DataFrame]
@@ -473,11 +478,11 @@ async def main():
 
     responses = await client.get_acs(
         vars=subjects,
-        start_year="2012",
+        start_year="2019",
         end_year="2019",
         location=locs,
         varfile=[
-            "tableids/subject_vars_2019.json",
+            "subject_vars_2019.json",
         ],
         infer_type=True,
         estimate="5",
