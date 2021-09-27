@@ -382,6 +382,7 @@ class ACSClient(object):
             Whether or not we want to infer table types
         varfile: Union[str, List[str]]
             File (or list of files) that should be used to translate variable names
+            NOTE: Pass None (default) if you want to infer the varfile.
         estimate: Union[int,str]
             ACS estimates to gather (1, 3, or 5-year)
         join: bool, optional
@@ -407,7 +408,9 @@ class ACSClient(object):
 
         if varfile is None:  # We want to infer which file to use
             varfile = [
-                self._infer_varfile(tabletype=tabletype, year=end_year)
+                self._infer_varfile(
+                    tabletype=tabletype, year="2019"
+                )  # NOTE: This may not work in later years
                 for tabletype in tabletypes
             ]
             varfile = varfile[0] if len(varfile) == 1 else varfile
