@@ -130,13 +130,8 @@ async def main():
             start_year="2012",
             end_year="2019",
             location=locs,
-            varfile=[
-                "tableids/subject_vars_2019.json",
-            ],
             infer_type=True,
             estimate="5",
-            join=False,
-            debug=False,
         )
 
     await client.close() # Close the aiohttp client session
