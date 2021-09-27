@@ -13,7 +13,7 @@ Since we install this package as an editable module (through `setup.py` in the r
 `lowe.acs` contains an asynchronous API wrapper for the American Community Survey API. To use this, you will want to import the `ACSClient` class from `lowe.acs.acs_async`:
 
 ```python
-from lowe.acs.acs_async import ACSClient
+from lowe.acs.ACSClient import ACSClient
 ```
 
 Now, you need to create an `ACSClient` object and initialize its `aiohttp` session:
@@ -30,67 +30,68 @@ Now, you can make a request using the `get_acs()` function. The docstring is lis
 
 ```python
 async def get_acs(
-        self,
-        vars: List[str],
-        start_year: Union[int, str],
-        end_year: Union[int, str],
-        location: Union[Dict[str, str], List[Dict[str, str]]],
-        translate_location: bool = False,
-        tabletype: Union[str, List[str]] = None,
-        infer_type: bool = True,
-        varfile: Union[str, List[str]] = "tableids/subject_vars_2019.json",
-        estimate: Union[int, str] = "5",
-        join: bool = True,
-        debug: bool = True,
-    ):
-        """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
+    self,
+    vars: List[str],
+    start_year: Union[int, str],
+    end_year: Union[int, str],
+    location: Union[Dict[str, str], List[Dict[str, str]]],
+    translate_location: bool = False,
+    tabletype: Union[str, List[str]] = None,
+    infer_type: bool = True,
+    varfile: Union[str, List[str]] = None,
+    estimate: Union[int, str] = "5",
+    join: bool = False,
+    debug: bool = False,
+):
+    """get_acs queries the ACS API and gathers data for any subject or data table into pandas dataframes
 
-        Parameters
-        ----------
-        vars : List[str]
-            List of tables we want to grab from ACS, example ["S1001", "S1501"]
-        year_start : Union[int, str]
-            Year we want to start collecting data from, earliest being "2011"
-        year_end : Union[int, str]
-            Last year we want to collect data from, latest being "2019". Must be >= year_start
-        location : Union[Dict[str, str], List[Dict[str, str]]]
-            Dictionary with the following keys to specify location:
-            {
-                "state": str, FIPS code of the state,
-                "msa": str, code for the MSA,
-                "county": str, FIPS code for the county,
-                "city": str, FIPS code for the city of interest
-            }
-            NOTE: You may also pass a list of location dictionaries -- this is the preferred method, since it will parallelize easily
-        translate_location: bool
-            Whether or not we want to convert the location dictionary to FIPS codes. This essentially does
-                location = lowe.locations.lookups.name2fips(location)
-            Note that when passing in a dictionary with name vakues instead of FIPS values, all non-state values must have
-            the state attached to it. That is, if I want to query for Palm Springs, I would do {city: "palm springs, ca"}
-            For safety, always pass strings in as lowercase. Checks are in place for this but they may not be comprehensive
-        tabletype : Union[str, List[str]], optional
-            Table type to collect, must be one of ["detail", "subject", "dprofile", "cprofile"]
-            Respectively, these are Detailed Tables, Subject Tables, Data Profiles, and Comparison Profiles
-            If there are various types of tables being collected with one call, pass a list of length len(vars)
-            Each entry of this list should correspond to the table type of the corresponding entry in
-            NOTE: Pass as None if you want to infer the table type
-        infer_type: bool, optional
-            Whether or not we want to infer table types
-        varfile: Union[str, List[str]]
-            File (or list of files) that should be used to translate variable names
-        estimate: Union[int,str]
-            ACS estimates to gather (1, 3, or 5-year)
-        join: bool, optional
-            Whether or not to join all the results together into one large table, by default True
-        debug: bool, optional
-            If True, prints out extra information useful for debugging
-        
-        Returns
-        -------
-        pd.DataFrame, List[pd.DataFrame]
-            If only one table is called, then returns the dataframe. Else, return a list of dataframes
-        """
-        # [Code is here]
+    Parameters
+    ----------
+    vars : List[str]
+        List of tables we want to grab from ACS, example ["S1001", "S1501"]
+    start_year : Union[int, str]
+        Year we want to start collecting data from, earliest being "2011"
+    end_year : Union[int, str]
+        Last year we want to collect data from, latest being "2019". Must be >= year_start
+    location : Union[Dict[str, str], List[Dict[str, str]]]
+        Dictionary with the following keys to specify location:
+        {
+            "state": str, FIPS code of the state,
+            "msa": str, code for the MSA,
+            "county": str, FIPS code for the county,
+            "city": str, FIPS code for the city of interest
+        }
+        NOTE: You may also pass a list of location dictionaries -- this is the preferred method, since it will parallelize easily
+    translate_location: bool
+        Whether or not we want to convert the location dictionary to FIPS codes. This essentially does
+            location = lowe.locations.lookups.name2fips(location)
+        Note that when passing in a dictionary with name vakues instead of FIPS values, all non-state values must have
+        the state attached to it. That is, if I want to query for Palm Springs, I would do {city: "palm springs, ca"}
+        For safety, always pass strings in as lowercase. Checks are in place for this but they may not be comprehensive
+    tabletype : Union[str, List[str]], optional
+        Table type to collect, must be one of ["detail", "subject", "dprofile", "cprofile"]
+        Respectively, these are Detailed Tables, Subject Tables, Data Profiles, and Comparison Profiles
+        If there are various types of tables being collected with one call, pass a list of length len(vars)
+        Each entry of this list should correspond to the table type of the corresponding entry in
+        NOTE: Pass as None (defualt) if you want to infer the table type
+    infer_type: bool, optional
+        Whether or not we want to infer table types
+    varfile: Union[str, List[str]]
+        File (or list of files) that should be used to translate variable names
+        NOTE: Pass None (default) if you want to infer the varfile.
+    estimate: Union[int,str]
+        ACS estimates to gather (1, 3, or 5-year)
+    join: bool, optional
+        Whether or not to join all the results together into one large table, by default True
+    debug: bool, optional
+        If True, prints out extra information useful for debugging
+
+    Returns
+    -------
+    pd.DataFrame, List[pd.DataFrame]
+        If only one table is called, then returns the dataframe. Else, return a list of dataframes
+    """
+    # [Code is here]
 ```
 
 An example call to the function might look something like
@@ -104,13 +105,8 @@ responses = await client.get_acs(
         start_year="2012",
         end_year="2019",
         location=locs,
-        varfile=[
-            "tableids/subject_vars_2019.json",
-        ],
         infer_type=True,
         estimate="5",
-        join=False,
-        debug=False,
     )
 ```
 
@@ -158,7 +154,7 @@ The column names are a bit messy and may take a bit of tweaking to get right for
 The FRED API wrapper works very similar to the ACS wrapper. It can be imported by
 
 ```python
-from lowe.fred.fred_async import FREDClient
+from lowe.fred.FREDClient import FREDClient
 
 client = FREDClient() # Initialize the FRED Client, assuming your API key is in your .env file as API_KEY_FRED
 # Else, you can run
