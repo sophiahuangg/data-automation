@@ -318,7 +318,7 @@ def search(query: str, codetype: str, search_on: str = "name") -> pd.DataFrame:
     print(df)
     return None
 
-
+"""
 if __name__ == "__main__":
     PALM_SPRINGS = "55254"
     STATE = "06"
@@ -326,3 +326,4 @@ if __name__ == "__main__":
     english = fips2name(loc)
     # print(name2fips(english))
     search(query="palm", codetype="city", search_on="name")
+"""
