@@ -5,7 +5,6 @@ import json
 import os
 import pandas as pd
 import requests
-import us
 
 from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
@@ -475,7 +474,7 @@ class ACSClient(object):
             return dfs[0] if len(dfs) == 1 else dfs
 
 
-""" 
+"""
 async def main():
     subjects = ["S1701"]
     # dp = "DP05"
