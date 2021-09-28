@@ -5,7 +5,6 @@ import json
 import os
 import pandas as pd
 import requests
-import us
 
 from dotenv import load_dotenv, find_dotenv
 from lowe.locations.lookup import name2fips, fips2name
@@ -297,7 +296,16 @@ class ACSClient(object):
     ):
         """Helper function to get multiple years of ACS data for a single subject and return them as a single dataframe"""
         year_range = range(int(start_year), int(end_year) + 1)
+
         if isinstance(location, dict):  # If there is only one location passed
+            # Clean location
+            if len(location["city"]) == 7:
+                if "state" not in location.keys():
+                    location["state"] = location["city"][
+                        0:2
+                    ]  # Add the state code to the state key
+                location["city"] = location["city"][2:]  # shave off the state code
+
             results = await asyncio.gather(
                 *[
                     self._process_request(
@@ -313,6 +321,14 @@ class ACSClient(object):
                 ]
             )
         elif isinstance(location, list):  # If there is more than one location passed in
+            for loc in location:
+                if len(loc["city"]) == 7:
+                    if "state" not in loc.keys():
+                        loc["state"] = loc["city"][
+                            0:2
+                        ]  # Add the state code to the state key
+                    loc["city"] = loc["city"][2:]  # shave off the state code
+
             results = await asyncio.gather(
                 *[
                     self._process_request(
@@ -400,7 +416,6 @@ class ACSClient(object):
             tabletypes = [self._infer_table_type(var) for var in vars]
             if debug:
                 print(tabletypes)
-            tabletypes = tabletypes[0] if len(tabletypes) == 1 else tabletypes
 
         # Translate the dictionary to FIPS values if necessary
         if translate_location:
@@ -423,7 +438,7 @@ class ACSClient(object):
                         start_year=start_year,
                         end_year=end_year,
                         location=location,
-                        tabletype=tabletype,
+                        tabletype=tabletypes[0],
                         estimate=estimate,
                         varfile=varfile,
                         debug=debug,
@@ -459,6 +474,7 @@ class ACSClient(object):
             return dfs[0] if len(dfs) == 1 else dfs
 
 
+"""
 async def main():
     subjects = ["S1701"]
     # dp = "DP05"
@@ -504,3 +520,4 @@ async def main():
 
 
 asyncio.run(main())
+"""
