@@ -318,6 +318,7 @@ def search(query: str, codetype: str, search_on: str = "name") -> pd.DataFrame:
     print(df)
     return None
 
+
 """
 if __name__ == "__main__":
     PALM_SPRINGS = "55254"

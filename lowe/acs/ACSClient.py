@@ -302,9 +302,11 @@ class ACSClient(object):
             # Clean location
             if len(location["city"]) == 7:
                 if "state" not in location.keys():
-                    location["state"] = location["city"][0:2] # Add the state code to the state key
-                location["city"] = location["city"][2:] # shave off the state code
-                
+                    location["state"] = location["city"][
+                        0:2
+                    ]  # Add the state code to the state key
+                location["city"] = location["city"][2:]  # shave off the state code
+
             results = await asyncio.gather(
                 *[
                     self._process_request(
@@ -323,9 +325,11 @@ class ACSClient(object):
             for loc in location:
                 if len(loc["city"]) == 7:
                     if "state" not in loc.keys():
-                        loc["state"] = loc["city"][0:2] # Add the state code to the state key
-                    loc["city"] = loc["city"][2:] # shave off the state code
-                    
+                        loc["state"] = loc["city"][
+                            0:2
+                        ]  # Add the state code to the state key
+                    loc["city"] = loc["city"][2:]  # shave off the state code
+
             results = await asyncio.gather(
                 *[
                     self._process_request(
@@ -469,6 +473,7 @@ class ACSClient(object):
 
         else:
             return dfs[0] if len(dfs) == 1 else dfs
+
 
 """ 
 async def main():
