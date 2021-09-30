@@ -53,8 +53,10 @@ def generate_lookup_tables() -> dict:
     )
     cbsas["name_county"] = cbsas["name_county"] + ", " + cbsas["abbr_st"]
 
-    cbsas["fips_county"] = cbsas["fips_county"].astype(str).str.pad(width=3, side="left", fillchar="0")
-    
+    cbsas["fips_county"] = (
+        cbsas["fips_county"].astype(str).str.pad(width=3, side="left", fillchar="0")
+    )
+
     # County codes are unique UP TO STATE, so we need to concatenate them to get unique keys
     cbsas["fips_county"] = (
         cbsas["fips_state"].astype(str) + "_" + cbsas["fips_county"].astype(str)
