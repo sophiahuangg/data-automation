@@ -21,7 +21,7 @@ setup(
         "lowe.acs.tableids",
         "lowe.fred",
         "lowe.edd",
-	    "lowe.tutorials",
+        "lowe.tutorials",
         "lowe.locations",
         "lowe.locations.datasets",
         "lowe.locations.lookuptables",
