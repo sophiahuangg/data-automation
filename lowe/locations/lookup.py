@@ -53,6 +53,10 @@ def generate_lookup_tables() -> dict:
     )
     cbsas["name_county"] = cbsas["name_county"] + ", " + cbsas["abbr_st"]
 
+    cbsas["fips_county"] = (
+        cbsas["fips_county"].astype(str).str.pad(width=3, side="left", fillchar="0")
+    )
+
     # County codes are unique UP TO STATE, so we need to concatenate them to get unique keys
     cbsas["fips_county"] = (
         cbsas["fips_state"].astype(str) + "_" + cbsas["fips_county"].astype(str)
@@ -321,10 +325,5 @@ def search(query: str, codetype: str, search_on: str = "name") -> pd.DataFrame:
 
 """
 if __name__ == "__main__":
-    PALM_SPRINGS = "55254"
-    STATE = "06"
-    loc = {"state": "06", "city": "55254", "county": "65", "msa": "40140"}
-    english = fips2name(loc)
-    # print(name2fips(english))
-    search(query="palm", codetype="city", search_on="name")
+    generate_lookup_tables()
 """
