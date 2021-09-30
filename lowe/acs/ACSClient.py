@@ -299,12 +299,19 @@ class ACSClient(object):
 
         if isinstance(location, dict):  # If there is only one location passed
             # Clean location
-            if len(location["city"]) == 7:
-                if "state" not in location.keys():
-                    location["state"] = location["city"][
-                        0:2
-                    ]  # Add the state code to the state key
-                location["city"] = location["city"][2:]  # shave off the state code
+            if "city" in location.keys():
+                if len(location["city"]) == 7:
+                    if "state" not in location.keys():
+                        location["state"] = location["city"][
+                            0:2
+                        ]  # Add the state code to the state key
+                    location["city"] = location["city"][2:]  # shave off the state code
+            if "county" in location.keys():  # Clean the county
+                if "_" in location["county"]:
+                    splt = location["county"].split("_")
+                    location["county"] = splt[-1]
+                    if "state" not in location.keys():
+                        location["state"] = splt[0]
 
             results = await asyncio.gather(
                 *[
@@ -322,12 +329,19 @@ class ACSClient(object):
             )
         elif isinstance(location, list):  # If there is more than one location passed in
             for loc in location:
-                if len(loc["city"]) == 7:
-                    if "state" not in loc.keys():
-                        loc["state"] = loc["city"][
-                            0:2
-                        ]  # Add the state code to the state key
-                    loc["city"] = loc["city"][2:]  # shave off the state code
+                if "city" in loc.keys():
+                    if len(loc["city"]) == 7:
+                        if "state" not in loc.keys():
+                            loc["state"] = loc["city"][
+                                0:2
+                            ]  # Add the state code to the state key
+                        loc["city"] = loc["city"][2:]  # shave off the state code
+                if "county" in loc.keys():  # Clean the county
+                    if "_" in loc["county"]:
+                        splt = loc["county"].split("_")
+                        loc["county"] = splt[-1]
+                        if "state" not in loc.keys():
+                            loc["state"] = splt[0]
 
             results = await asyncio.gather(
                 *[
