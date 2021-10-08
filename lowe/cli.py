@@ -1,3 +1,4 @@
+#!/Users/abhiuppal/miniforge3/envs/lowe/bin/python
 # This file creates command line utilities for the Lowe
 # WORK IN PROGRESS
 
@@ -52,9 +53,9 @@ edd.add_command(news)
 @cli.command()
 @click.argument("locationtype", type=str, nargs=1)
 @click.argument("query", type=str, nargs=1)
-@click.option("search-on", "-s", default=None, type=str)
-def search(locationtype, query, search_on):
-    res = location_search(query=query, codetype=locationtype)
+# @click.option("searchon", "-s", default=None, type=str)
+def search(locationtype, query):
+    res = location_search(query=query, codetype=locationtype, search_on=None)
     click.echo(res)
     return None
 
