@@ -48,13 +48,16 @@ edd.add_command(news)
 # Locations Command Group
 # ----------------------------
 
+
 @cli.command()
 @click.argument("locationtype", type=str, nargs=1)
-@click.argument("query", type=str, nargs=-1)
-def search(locationtype, query):
+@click.argument("query", type=str, nargs=1)
+@click.option("search-on", "-s", default=None, type=str)
+def search(locationtype, query, search_on):
     res = location_search(query=query, codetype=locationtype)
     click.echo(res)
     return None
+
 
 def main():
     cli(obj={})
