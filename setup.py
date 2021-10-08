@@ -26,6 +26,11 @@ setup(
         "lowe.locations.datasets",
         "lowe.locations.lookuptables",
     ],
+    package_data={"": ["*.csv"]},
+    include_package_data=True,
+    entry_points = {
+        'console_scripts': ['search=lowe.cli:search'],
+    },
     install_requires=[
         "aiohttp",
         "aiolimiter",
