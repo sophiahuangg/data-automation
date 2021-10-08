@@ -3,6 +3,7 @@
 
 import click
 from lowe.edd.autoedd import news_release_numbers
+from lowe.locations.lookup import search as location_search
 
 
 @click.group()
@@ -43,6 +44,17 @@ def news(fname: str = "./edd/data/RIVE$HWS.xlsx", num_top_results: int = 10):
 cli.add_command(edd)
 edd.add_command(news)
 
+# ----------------------------
+# Locations Command Group
+# ----------------------------
+
+@cli.command()
+@click.argument("locationtype", type=str, nargs=1)
+@click.argument("query", type=str, nargs=-1)
+def search(locationtype, query):
+    res = location_search(query=query, codetype=locationtype)
+    click.echo(res)
+    return None
 
 def main():
     cli(obj={})
