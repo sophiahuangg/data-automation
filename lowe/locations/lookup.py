@@ -315,7 +315,7 @@ def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
     None. Prints the first 25 search results in dataframe format
     """
     if search_on is None:
-        search_on = "fips" if codetype.strip().isnumeric() else "name"
+        search_on = "fips" if query.isdigit() else "name"
     df = generate_df_json(codetype=codetype)
     df = df.astype(str)  # Convert all cols to string
     # df[df['A'].str.contains("hello")]
@@ -324,8 +324,7 @@ def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
     print(df)
     return None
 
-
-"""
+""" 
 if __name__ == "__main__":
-    generate_lookup_tables()
+    search(query = "13756", codetype="city")
 """
