@@ -1,6 +1,5 @@
 import json
 import pandas as pd
-import us
 
 from bidict import bidict
 from typing import Dict
@@ -21,7 +20,10 @@ def generate_lookup_tables() -> dict:
     # Load datasets
     cbsas = pd.read_csv("datasets/cbsas.csv", skipfooter=4)
     cities = pd.read_csv("datasets/city_geoids.csv")
-    decoder_states = {k.fips: k.abbr.lower() for k in us.states.STATES_AND_TERRITORIES}
+    # decoder_states = {k.fips: k.abbr.lower() for k in us.states.STATES_AND_TERRITORIES}
+    # decoder_states can be generated with the us package, but only works on python 3.8
+    with pkg_resources.open_text("lowe.locations.lookuptables", "states.json") as f:
+        decoder_states = json.load(f)
 
     # Rename columns to make sure they are standardized
 
@@ -323,6 +325,7 @@ def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
     pd.options.display.max_rows = len(df) if len(df) < 25 else 25
     print(df)
     return None
+
 
 """ 
 if __name__ == "__main__":
