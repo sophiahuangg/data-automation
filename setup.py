@@ -53,7 +53,6 @@ setup(
         "pandasql",
         "python-dotenv",
         "pytz",
-        "ratelimit",
-        "us==2.0.2",
+        "ratelimit"
     ],
 )
