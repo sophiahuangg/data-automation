@@ -327,7 +327,7 @@ def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
     return None
 
 
-""" 
+"""
 if __name__ == "__main__":
     search(query = "13756", codetype="city")
 """
