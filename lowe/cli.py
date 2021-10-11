@@ -1,8 +1,10 @@
+#!/Users/abhiuppal/miniforge3/envs/lowe/bin/python
 # This file creates command line utilities for the Lowe
 # WORK IN PROGRESS
 
 import click
 from lowe.edd.autoedd import news_release_numbers
+from lowe.locations.lookup import search as location_search
 
 
 @click.group()
@@ -42,6 +44,20 @@ def news(fname: str = "./edd/data/RIVE$HWS.xlsx", num_top_results: int = 10):
 
 cli.add_command(edd)
 edd.add_command(news)
+
+# ----------------------------
+# Locations Command Group
+# ----------------------------
+
+
+@cli.command()
+@click.argument("locationtype", type=str, nargs=1)
+@click.argument("query", type=str, nargs=1)
+# @click.option("searchon", "-s", default=None, type=str)
+def search(locationtype, query):
+    res = location_search(query=query, codetype=locationtype, search_on=None)
+    click.echo(res)
+    return None
 
 
 def main():
