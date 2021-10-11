@@ -3,7 +3,7 @@
 # WORK IN PROGRESS
 
 import click
-from lowe.edd.autoedd import news_release_numbers
+# from lowe.edd.autoedd import news_release_numbers
 from lowe.locations.lookup import search as location_search
 
 
@@ -39,7 +39,8 @@ def news(fname: str = "./edd/data/RIVE$HWS.xlsx", num_top_results: int = 10):
     num_top_results : int, optional
         [description], by default 10
     """
-    news_release_numbers(fname=fname, num_top_results=num_top_results)
+    # news_release_numbers(fname=fname, num_top_results=num_top_results)
+    pass
 
 
 cli.add_command(edd)
