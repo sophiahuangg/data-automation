@@ -15,6 +15,8 @@ try:
 except ImportError:
     import importlib_resources as pkg_resources
 
+from . import tableids
+
 
 class ACSClient(object):
     def __init__(self, key_env_name: str = "API_KEY_ACS"):
@@ -222,7 +224,7 @@ class ACSClient(object):
             print("opening JSON...")
         # Opens the JSON file with subject tables info
 
-        with pkg_resources.open_text("lowe.acs.tableids", varfile) as f:
+        with pkg_resources.open_text(tableids, varfile) as f:
             subjectDict = json.load(f)
 
         # ids: list of subject ids
