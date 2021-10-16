@@ -181,11 +181,17 @@ class ACSClient(object):
                 "for": f"state:{location['state']}",
                 "key": self.API_KEY,
             }
-        else:
+        elif len(keyz) > 1:
             params = {
                 "get": f"group({tableid})",
                 "for": place,
                 "in": f"state:{location['state']}",
+                "key": self.API_KEY,
+            }
+        else:
+            params = {
+                "get": f"group({tableid})",
+                "for": "us:1",
                 "key": self.API_KEY,
             }
 
@@ -272,6 +278,9 @@ class ACSClient(object):
         acs_subject_pivoted.drop(acs_subject_pivoted.columns[0], axis=1, inplace=True)
 
         location_str = ""
+
+        if not location:  # If the location is empty
+            location_str = "us"
 
         for key, value in location_names.items():
             if key.lower() != "state":
@@ -489,10 +498,9 @@ class ACSClient(object):
         else:
             return dfs[0] if len(dfs) == 1 else dfs
 
-
-"""
+""" 
 async def main():
-    subjects = ["S1701"]
+    subjects = ["S2701"]
     # dp = "DP05"
     # PALM_SPRINGS = "55254"
     # RANCHO_MIRAGE = "59500"
@@ -501,34 +509,22 @@ async def main():
     client = ACSClient()
     await client.initialize()
 
-    locs = [{"state": str(st.fips)} for st in us.states.STATES]
+    # locs = [{"state": str(st.fips)} for st in us.states.STATES]
 
     # locs = [{"state": "06"}, {"state": "04"}]
 
     responses = await client.get_acs(
         vars=subjects,
-        start_year="2019",
+        start_year="2017",
         end_year="2019",
-        location=locs,
+        location={},
         infer_type=True,
         estimate="5",
         join=False,
-        debug=False,
+        debug=True,
     )
 
-    responses = responses[
-        [
-            "state",
-            "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined",
-        ]
-    ]
-    responses = responses.rename(
-        columns={
-            "POVERTY STATUS IN THE PAST 12 MONTHS Estimate Percent below poverty level Population for whom poverty status is determined": "perc_poverty"
-        }
-    )
-
-    # final.to_csv("outputs/povertyrates_1year.csv")
+    print(responses["location_key"])
 
     await client.close()
 
