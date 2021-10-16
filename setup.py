@@ -19,6 +19,7 @@ setup(
         "lowe",
         "lowe.acs",
         "lowe.acs.tableids",
+        "lowe.bls",
         "lowe.fred",
         "lowe.edd",
         "lowe.tutorials",
