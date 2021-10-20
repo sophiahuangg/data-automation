@@ -182,7 +182,7 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     return df
 
 
-def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int = 10):
+def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int = 10, current_date : str = None):
     """news_release_numbers calculates all of the numbers we typically use in the IEEP monthly news releases
 
     Parameters
@@ -191,11 +191,18 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
         Path to the EDD data we want to process, by default "data/RIVE$HWS.xlsx"
     num_top_results: int, optional
         Number of top industry gains/losses to display in the output
+    current_date: str
+        If we want to simulate this back in time, then pass a value for current date in the format Mon-Yr
+        Example: Jan-21; Mar-13; Dec-19
+        If left as None (default), uses the latest date available
     """
     if pd.options.display.max_rows < num_top_results:
         pd.options.display.max_rows = num_top_results
     # First, load the dataframe
     df_processed = _kleinhenz_process(fname=fname)
+
+    if current_date is not None:
+        df_processed = df_processed.loc[:, :current_date]
 
     # Get the DF for jus tthe 2-digit NAICS Sectors
     twodigit = df_processed[df_processed["Industry Level"] == 2]
