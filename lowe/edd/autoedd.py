@@ -3,10 +3,10 @@ import numpy as np
 import pandas as pd
 
 from bidict import bidict
-from typing import Union
+from typing import Union, List
 
 
-def _load_msa(fname: str = "data/RIVE$HWS.xlsx", melted: bool = True):
+def _load_data(fname: str = "data/RIVE$HWS.xlsx", melted: bool = True):
     """Helper function to load and preprocess the data for a particular MSA"""
     # Read in the data
     df = pd.read_excel(fname, skiprows=7, skipfooter=9)
@@ -26,8 +26,72 @@ def _load_msa(fname: str = "data/RIVE$HWS.xlsx", melted: bool = True):
 
     if melted:
         df["time"] = pd.to_datetime(df["time"], format="%Y-%m-%d")
+        df = df.pivot(index="time", columns="TITLE", values="value")
 
     return df
+
+
+def _add_dfs(fnames: List[str], region_name: str):
+    """_add_dfs adds together the data for multiple different regions' dataframes and
+    returns this as a new dataframe
+
+    Parameters
+    ----------
+    dfs : List[str]
+        List of filenames to read in
+    """
+    dfs = []
+    colsets = []
+    for fname in fnames:
+        df = _load_data(fname, melted=True)
+        df.columns = [colname.strip() for colname in list(df.columns)]
+        df = df.drop(
+            columns="Civilian Unemployment Rate", axis=1
+        )  # This will be recalculated
+        colsets.append(set(df.columns))
+        dfs.append(df)
+
+    intersect = list(set.intersection(*colsets))
+    dfs = [df[intersect] for df in dfs]
+
+    for i, df in enumerate(dfs):
+        if i == 0:
+            combined = df
+        else:
+            combined = combined + df
+
+    combined["Civilian Unemployment Rate"] = (
+        combined["Civilian Unemployment"] / combined["Civilian Labor Force"]
+    )
+    combined = combined.reset_index()
+
+    format_template = _load_data(fnames[0], melted=False)
+    format_template.loc[:, "TITLE"] = format_template["TITLE"].str.strip()
+    format_template.set_index(
+        "TITLE", drop=True, inplace=True
+    )  # We will use this as a lookup template and put the joined data in
+    format_template.columns = [
+        _colname_to_str(col) for col in list(format_template.columns)
+    ]
+    for title in list(format_template.index.unique()):
+        try:
+            format_template.loc[title, "Jan-00":] = combined[title].tolist()
+        except KeyError:
+            format_template = format_template.drop(
+                title,
+                axis=0,
+            )
+            continue
+
+    if region_name is not None:
+        format_template["AREA"] = region_name
+
+    format_template.columns = [
+        _colname_to_str(col) for col in list(format_template.columns)
+    ]
+    format_template.reset_index(inplace=True)
+
+    return format_template
 
 
 def _colname_to_str(colname):
@@ -36,7 +100,6 @@ def _colname_to_str(colname):
     Apr-20 -- that is, '%b-%y'
     """
     # See https://strftime.org/
-
     if isinstance(colname, dt.datetime):
         colname = colname.strftime(format="%b-%y")
     return colname
@@ -112,7 +175,11 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
 
     # Load and preprocess
 
-    df = _load_msa(fname=fname, melted=False)
+    if isinstance(fname, str):
+        df = _load_data(fname=fname, melted=False)
+    elif isinstance(fname, pd.DataFrame):
+        df = fname
+
     df.columns = [_colname_to_str(col) for col in df.columns]
 
     indices = {df.columns.get_loc(c): c for idx, c in enumerate(df.columns)}
@@ -158,31 +225,35 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     DIFF_AVG = AVG_2020 - AVG_2019
     DIFF_AVG_PERC = (AVG_2020 / AVG_2019) - 1
 
-    df["Industry Level"] = df["SS-NAICS"].apply(_naics_level)
-    df["MTM"] = MTM
-    df["MTM%"] = MTM_PERC
-    df["YTY"] = YTY
-    df["YTY%"] = YTY_PERC
-    df["now minus feb 2020"] = NOW_MINUS_FEB
-    df["now minus feb 2020%"] = NOW_MINUS_FEB_PERC
-    df["apr 2020 minus feb 2020"] = APR_MINUS_FEB_2020
-    df["apr 2020 minus feb 2020%"] = APR_MINUS_FEB_2020_PERC
-    df["recovery"] = RECOVERY
-    df["recovery%"] = RECOVERY_PERC
-    df["now as percent of feb 2020"] = NOW_AS_OF_FEB_2020
-    df["YTD 2020"] = YTD_2020
-    df["YTD 2021"] = YTD_2021
-    df["YTD change"] = CHG
-    df["YTD change%"] = CHG_PERC
-    df["average 2019"] = AVG_2019
-    df["average 2020"] = AVG_2020
-    df["difference in averages"] = DIFF_AVG
-    df["difference in averages%"] = DIFF_AVG_PERC
+    df.loc[:, "Industry Level"] = df["SS-NAICS"].apply(_naics_level)
+    df.loc[:, "MTM"] = MTM
+    df.loc[:, "MTM%"] = MTM_PERC
+    df.loc[:, "YTY"] = YTY
+    df.loc[:, "YTY%"] = YTY_PERC
+    df.loc[:, "now minus feb 2020"] = NOW_MINUS_FEB
+    df.loc[:, "now minus feb 2020%"] = NOW_MINUS_FEB_PERC
+    df.loc[:, "apr 2020 minus feb 2020"] = APR_MINUS_FEB_2020
+    df.loc[:, "apr 2020 minus feb 2020%"] = APR_MINUS_FEB_2020_PERC
+    df.loc[:, "recovery"] = RECOVERY
+    df.loc[:, "recovery%"] = RECOVERY_PERC
+    df.loc[:, "now as percent of feb 2020"] = NOW_AS_OF_FEB_2020
+    df.loc[:, "YTD 2020"] = YTD_2020
+    df.loc[:, "YTD 2021"] = YTD_2021
+    df.loc[:, "YTD change"] = CHG
+    df.loc[:, "YTD change%"] = CHG_PERC
+    df.loc[:, "average 2019"] = AVG_2019
+    df.loc[:, "average 2020"] = AVG_2020
+    df.loc[:, "difference in averages"] = DIFF_AVG
+    df.loc[:, "difference in averages%"] = DIFF_AVG_PERC
 
     return df
 
 
-def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int = 10, current_date : str = None):
+def news_release_numbers(
+    fname: str = "data/RIVE$HWS.xlsx",
+    num_top_results: int = 10,
+    current_date: str = None,
+):
     """news_release_numbers calculates all of the numbers we typically use in the IEEP monthly news releases
 
     Parameters
@@ -196,11 +267,27 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
         Example: Jan-21; Mar-13; Dec-19
         If left as None (default), uses the latest date available
     """
+    # First, load the dataframe
+    if fname.lower() == "socal":
+        socal_list = [
+            "data/RIVE$HWS.xlsx",
+            "data/VENT$HWS.xlsx",
+            "data/ORAN$HWS.xlsx",
+            "data/SAND$HWS.xlsx",
+            "data/LA$HWS.xlsx",
+            "data/ECEN$HWS.xlsx",
+        ]
+        temp = _add_dfs(socal_list, region_name="socal")
+        print(temp)
+        df_processed = _kleinhenz_process(temp)
+
+    else:
+        df_processed = _kleinhenz_process(fname=fname)
+
     if pd.options.display.max_rows < num_top_results:
         pd.options.display.max_rows = num_top_results
-    # First, load the dataframe
-    df_processed = _kleinhenz_process(fname=fname)
 
+    # Subset if we want to simulate the results as of a certain date
     if current_date is not None:
         df_processed = df_processed.loc[:, :current_date]
 
@@ -246,7 +333,7 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
     ]
 
     # Clean the TITLE column
-    df_processed["TITLE"] = df_processed["TITLE"].str.strip()
+    df_processed.loc[:, "TITLE"] = df_processed["TITLE"].str.strip()
 
     total_nonfarm = df_processed[df_processed["TITLE"] == "Total Nonfarm"]
 
@@ -263,7 +350,7 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
         axis=1
     ) - pre_recession_to_present.max(axis=1)
 
-    twodigit["Max Drawdown"] = pre_recession_to_present.loc[:, "Max Drawdown"]
+    twodigit.loc[:, "Max Drawdown"] = pre_recession_to_present.loc[:, "Max Drawdown"]
 
     # Sort the dataframe in descending order by the best performing industries MTM
     # Then get rid of aggregates, which all begin their NAICS codes with "00-"
@@ -337,4 +424,4 @@ def news_release_numbers(fname: str = "data/RIVE$HWS.xlsx", num_top_results: int
 
 
 if __name__ == "__main__":
-    res = news_release_numbers(fname="data/RIVE$HWS.xlsx")
+    res = news_release_numbers(fname="socal")
