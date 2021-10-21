@@ -252,7 +252,9 @@ def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
 def news_release_numbers(
     fname: str = "data/RIVE$HWS.xlsx",
     num_top_results: int = 10,
+    output_file: str = None,
     current_date: str = None,
+    print_output: bool = False,
 ):
     """news_release_numbers calculates all of the numbers we typically use in the IEEP monthly news releases
 
@@ -375,53 +377,106 @@ def news_release_numbers(
 
     # Print all of the outputs
 
-    print("")
-    print("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED")
-    print("---------------------------------------")
-    print("")
+    if output_file is not None:
+        with open("outputs/" + output_file + ".txt", "w") as f:
+            f.write("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED \n")
+            f.write("--------------------------------------- \n")
 
-    print(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}%")
-    print(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}%")
-    print(f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}%")
-    print(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP}")
+            f.write(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}% \n")
+            f.write(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}% \n")
+            f.write(
+                f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}% \n"
+            )
+            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n \n")
 
-    print("")
-    print("CES STATISTICS - ALL NOT SEASONALY ADJUSTED")
-    print("---------------------------------------")
-    print("")
+            f.write("CES STATISTICS - ALL NOT SEASONALLY ADJUSTED \n")
+            f.write("--------------------------------------- \n")
 
-    print(f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT)}")
-    print(f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH)}")
-    print(f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR)}")
-    print(
-        f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2)}%"
-    )
-    print(f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)}")
-    print(
-        f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2)}%"
-    )
-    print(f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}%")
+            f.write(f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT)} \n")
+            f.write(
+                f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH)} \n"
+            )
+            f.write(
+                f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR)} \n"
+            )
+            f.write(
+                f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2)}% \n"
+            )
+            f.write(
+                f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)} \n"
+            )
+            f.write(
+                f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2)}% \n"
+            )
+            f.write(
+                f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}% \n"
+            )
+            f.write(
+                f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED} \n"
+            )
+            f.write(
+                f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED} \n \n"
+            )
 
-    print("")
+            f.write(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS} \n\n")
+            f.write(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES} \n\n")
+            f.write(f"TOP {num_top_results} SMALLEST MOVEMENTS: \n {SLOW_MOVERS} \n\n")
 
-    print(
-        f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED}"
-    )
-    print(
-        f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED}"
-    )
+    if print_output:
+        print("")
+        print("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED")
+        print("---------------------------------------")
+        print("")
 
-    print("")
-    print(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS}")
-    print("")
-    print(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES}")
-    print("")
-    print(f"TOP {num_top_results} SMALLEST MOVEMENTS: \n {SLOW_MOVERS}")
+        print(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}%")
+        print(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}%")
+        print(f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}%")
+        print(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP}")
 
-    print("")
+        print("")
+        print("CES STATISTICS - ALL NOT SEASONALY ADJUSTED")
+        print("---------------------------------------")
+        print("")
+
+        print(f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT)}")
+        print(f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH)}")
+        print(f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR)}")
+        print(
+            f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2)}%"
+        )
+        print(
+            f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)}"
+        )
+        print(
+            f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2)}%"
+        )
+        print(
+            f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}%"
+        )
+
+        print("")
+
+        print(
+            f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED}"
+        )
+        print(
+            f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED}"
+        )
+
+        print("")
+        print(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS}")
+        print("")
+        print(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES}")
+        print("")
+        print(f"TOP {num_top_results} SMALLEST MOVEMENTS: \n {SLOW_MOVERS}")
+
+        print("")
 
     return UNEMPL_CURRENT
 
 
 if __name__ == "__main__":
-    res = news_release_numbers(fname="socal")
+    news_release_numbers(fname="socal", output_file="socal")
+    news_release_numbers(fname="data/RIVE$HWS.xlsx", output_file="ie")
+    news_release_numbers(fname="data/CAL$HWS.xlsx", output_file="ca_nsa")
+    news_release_numbers(fname="data/CAL$SHWS.xlsx", output_file="ca_sa")

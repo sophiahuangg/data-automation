@@ -1,0 +1,58 @@
+CPS STATISTICS - ALL NOT SEASONALY ADJUSTED 
+--------------------------------------- 
+UNEMPLOYMENT RATE for Aug-21: 8.219062920340756% 
+UNEMPLOYMENT RATE for Jul-21: 8.6230786284363% 
+UNEMPLOYMENT RATE for Aug-20: 14.113674197384066% 
+MAX UNEMPLOYMENT RATE: ('May-20', '16.836869831366432%') 
+ 
+CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
+--------------------------------------- 
+TOTAL NONFARM FOR Aug-21: 9118000 
+TOTAL NONFARM FOR Jul-21: 9041700 
+TOTAL NONFARM FOR Aug-20: 8583500 
+TOTAL NONFARM AS PERCENT OF FEB 2020: -6.72% 
+CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 76300 
+TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 0.84% 
+TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 57.99999999999999% 
+NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 8 
+NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 6 
+ 
+TOP 10 INDUSTRY GAINS: 
+                                       TITLE      MTM  Max Drawdown
+24                               Government  53300.0     -189000.0
+20         Professional & Business Services   8300.0     -176600.0
+17  Transportation, Warehousing & Utilities   6000.0      -85300.0
+18                              Information   5700.0      -87400.0
+22                    Leisure & Hospitality   5300.0     -539200.0
+21            Educational & Health Services   2100.0     -166500.0
+11                         Nondurable Goods   1800.0      -41500.0
+9                             Manufacturing    900.0      -81200.0
+14        Trade, Transportation & Utilities   -600.0     -287800.0
+10                            Durable Goods   -900.0      -43800.0 
+
+TOP 10 INDUSTRY LOSSES: 
+                                 TITLE     MTM  Max Drawdown
+16                       Retail Trade -4200.0     -189700.0
+15                    Wholesale Trade -2400.0      -54900.0
+19               Financial Activities -2200.0      -31700.0
+23                     Other Services -1800.0     -114100.0
+10                      Durable Goods  -900.0      -43800.0
+14  Trade, Transportation & Utilities  -600.0     -287800.0
+9                       Manufacturing   900.0      -81200.0
+11                   Nondurable Goods  1800.0      -41500.0
+21      Educational & Health Services  2100.0     -166500.0
+22              Leisure & Hospitality  5300.0     -539200.0 
+
+TOP 10 SMALLEST MOVEMENTS: 
+                                 TITLE     MTM  Max Drawdown
+22              Leisure & Hospitality  5300.0     -539200.0
+21      Educational & Health Services  2100.0     -166500.0
+11                   Nondurable Goods  1800.0      -41500.0
+9                       Manufacturing   900.0      -81200.0
+14  Trade, Transportation & Utilities  -600.0     -287800.0
+10                      Durable Goods  -900.0      -43800.0
+23                     Other Services -1800.0     -114100.0
+19               Financial Activities -2200.0      -31700.0
+15                    Wholesale Trade -2400.0      -54900.0
+16                       Retail Trade -4200.0     -189700.0 
+
