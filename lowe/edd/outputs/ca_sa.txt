@@ -1,58 +1,76 @@
 CPS STATISTICS - ALL NOT SEASONALY ADJUSTED 
 --------------------------------------- 
+UNEMPLOYMENT RATE for Sep-21: 7.5% 
 UNEMPLOYMENT RATE for Aug-21: 7.5% 
-UNEMPLOYMENT RATE for Jul-21: 7.6% 
-UNEMPLOYMENT RATE for Aug-20: 12.3% 
+UNEMPLOYMENT RATE for Sep-20: 10.6% 
 MAX UNEMPLOYMENT RATE: ('Apr-20', '16.0%') 
+LABOR FORCE FOR Sep-21: 19013300.0 
+LABOR FORCE FOR Aug-21: 18982800.0 
+CHANGE IN LABOR FORCE FROM Aug-21 to Sep-21: 30500.0 
  
-CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
+ CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
 --------------------------------------- 
-TOTAL NONFARM FOR Aug-21: 16632100 
-TOTAL NONFARM FOR Jul-21: 16527800 
-TOTAL NONFARM FOR Aug-20: 15757800 
-TOTAL NONFARM AS PERCENT OF FEB 2020: -5.83% 
-CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 104300 
-TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 0.63% 
-TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 62.0% 
-NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 13 
-NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 6 
+TOTAL NONFARM FOR Sep-21: 16669900 
+TOTAL NONFARM FOR Aug-21: 16622500 
+TOTAL NONFARM FOR Sep-20: 15874100 
+TOTAL NONFARM AS PERCENT OF FEB 2020: -5.61% 
+CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 47400 
+TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 0.29% 
+TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 63.0% 
+NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 16 
+NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 3 
  
-TOP 10 INDUSTRY GAINS: 
-                                      TITLE       MTM  Max Drawdown
-12                       Service Providing  100700.0    -2416800.0
-32                              Government   46900.0     -218100.0
-28                   Leisure & Hospitality   33100.0     -985500.0
-21        Professional & Business Services   14000.0     -297600.0
-31                          Other Services    8400.0     -198000.0
-6                          Goods Producing    3600.0     -298000.0
-10                           Durable Goods    3200.0      -59300.0
-18                    Financial Activities    3200.0      -48600.0
-9                            Manufacturing    2900.0     -121400.0
-17                             Information    2200.0      -79600.0 
+TOP 15 INDUSTRY GAINS: 
+                                              TITLE      MTM  Max Drawdown
+12                               Service Providing  40400.0    -2416800.0
+28                           Leisure & Hospitality  23300.0     -985500.0
+6                                  Goods Producing   7000.0     -298000.0
+21                Professional & Business Services   6900.0     -297600.0
+9                                    Manufacturing   5700.0     -121400.0
+17                                     Information   5000.0      -79600.0
+10                                   Durable Goods   4100.0      -59300.0
+16         Transportation, Warehousing & Utilities   3600.0      -90100.0
+32                                      Government   3100.0     -218100.0
+25                   Educational & Health Services   2600.0     -284400.0
+13               Trade, Transportation & Utilities   1900.0     -436800.0
+11                                Nondurable Goods   1600.0      -62100.0
+8                                     Construction   1400.0     -174700.0
+18                            Financial Activities   1300.0      -48600.0
+15                                    Retail Trade    900.0     -313300.0 
 
-TOP 10 INDUSTRY LOSSES: 
+TOP 15 INDUSTRY LOSSES: 
                                               TITLE     MTM  Max Drawdown
-25                   Educational & Health Services -6300.0     -284400.0
-4                                       Total Farm -1500.0      -53900.0
-14                                 Wholesale Trade  -900.0      -75500.0
-13               Trade, Transportation & Utilities  -800.0     -436800.0
-15                                    Retail Trade  -800.0     -313300.0
-11                                Nondurable Goods  -300.0      -62100.0
-7                               Mining and Logging   100.0       -3800.0
-8                                     Construction   600.0     -174700.0
-16         Transportation, Warehousing & Utilities   900.0      -85400.0
-17                                     Information  2200.0      -79600.0 
+31                                  Other Services -3700.0     -198000.0
+14                                 Wholesale Trade -2600.0      -75500.0
+7                               Mining and Logging  -100.0       -3800.0
+4                                       Total Farm   700.0      -53900.0
+15                                    Retail Trade   900.0     -313300.0
+18                            Financial Activities  1300.0      -48600.0
+8                                     Construction  1400.0     -174700.0
+11                                Nondurable Goods  1600.0      -62100.0
+13               Trade, Transportation & Utilities  1900.0     -436800.0
+25                   Educational & Health Services  2600.0     -284400.0
+32                                      Government  3100.0     -218100.0
+16         Transportation, Warehousing & Utilities  3600.0      -90100.0
+10                                   Durable Goods  4100.0      -59300.0
+17                                     Information  5000.0      -79600.0
+9                                    Manufacturing  5700.0     -121400.0 
 
-TOP 10 SMALLEST MOVEMENTS: 
+TOP 15 SMALLEST MOVEMENTS: 
                                               TITLE     MTM  Max Drawdown
-17                                     Information  2200.0      -79600.0
-16         Transportation, Warehousing & Utilities   900.0      -85400.0
-8                                     Construction   600.0     -174700.0
-7                               Mining and Logging   100.0       -3800.0
-11                                Nondurable Goods  -300.0      -62100.0
-13               Trade, Transportation & Utilities  -800.0     -436800.0
-15                                    Retail Trade  -800.0     -313300.0
-14                                 Wholesale Trade  -900.0      -75500.0
-4                                       Total Farm -1500.0      -53900.0
-25                   Educational & Health Services -6300.0     -284400.0 
+9                                    Manufacturing  5700.0     -121400.0
+17                                     Information  5000.0      -79600.0
+10                                   Durable Goods  4100.0      -59300.0
+16         Transportation, Warehousing & Utilities  3600.0      -90100.0
+32                                      Government  3100.0     -218100.0
+25                   Educational & Health Services  2600.0     -284400.0
+13               Trade, Transportation & Utilities  1900.0     -436800.0
+11                                Nondurable Goods  1600.0      -62100.0
+8                                     Construction  1400.0     -174700.0
+18                            Financial Activities  1300.0      -48600.0
+15                                    Retail Trade   900.0     -313300.0
+4                                       Total Farm   700.0      -53900.0
+7                               Mining and Logging  -100.0       -3800.0
+14                                 Wholesale Trade -2600.0      -75500.0
+31                                  Other Services -3700.0     -198000.0 
 

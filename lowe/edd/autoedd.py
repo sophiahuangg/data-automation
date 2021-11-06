@@ -338,7 +338,10 @@ def news_release_numbers(
     df_processed.loc[:, "TITLE"] = df_processed["TITLE"].str.strip()
 
     total_nonfarm = df_processed[df_processed["TITLE"] == "Total Nonfarm"]
+    labor_force = df_processed[df_processed["TITLE"] == "Civilian Labor Force"]
 
+    LABOR_FORCE_CURRENT = float(labor_force[current])
+    LABOR_FORCE_LAST_MONTH = float(labor_force[prev_month])
     TOTAL_NONFARM_CURRENT = float(total_nonfarm[current])
     TOTAL_NONFARM_LAST_MONTH = float(total_nonfarm[prev_month])
     TOTAL_NONFARM_LAST_YEAR = float(total_nonfarm[last_year_colname])
@@ -374,8 +377,43 @@ def news_release_numbers(
         ["TITLE", "MTM", "Max Drawdown"]
     ].sort_values(by="MTM")
     SLOW_MOVERS = slow_movers.tail(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
+    '''
+    TOTALS = [
+        "Civilian Labor Force",
+        "Civilian Employment",
+        "Civilian Unemployment",
+        "Civilian Unemployment Rate",
+        "Total, All Industries",
+        "Total Farm",
+        "Total Nonfarm",
+        "Total Private",
+    ]
+
+    df_sorted = df_sorted.set_index("TITLE")
+    gains = df_sorted[df_sorted["MTM"] > 0]
+    gains = gains[~gains["TITLE"].str.strip().isin(TOTALS)]
+    '''
 
     # Print all of the outputs
+    print(current)
+    print(prev_month)
+
+    if output_file is not None:
+        with open("outputs/" + output_file + ".txt", "w") as f:
+            f.write("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED \n")
+            f.write("--------------------------------------- \n")
+
+            f.write(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}% \n")
+            f.write(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}% \n")
+            f.write(
+                f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}% \n"
+            )
+            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n")
+            f.write(f"LABOR FORCE FOR {current}: {LABOR_FORCE_CURRENT} \n")
+            f.write(f"LABOR FORCE FOR {prev_month}: {LABOR_FORCE_LAST_MONTH} \n")
+            f.write(
+                f"CHANGE IN LABOR FORCE FROM {prev_month} to {current}: {LABOR_FORCE_CURRENT - LABOR_FORCE_LAST_MONTH} \n \n "
+            )
 
     if output_file is not None:
         with open("outputs/" + output_file + ".txt", "w") as f:
@@ -476,7 +514,20 @@ def news_release_numbers(
 
 
 if __name__ == "__main__":
-    news_release_numbers(fname="socal", output_file="socal")
-    news_release_numbers(fname="data/RIVE$HWS.xlsx", output_file="ie")
-    news_release_numbers(fname="data/CAL$HWS.xlsx", output_file="ca_nsa")
-    news_release_numbers(fname="data/CAL$SHWS.xlsx", output_file="ca_sa")
+    news_release_numbers(fname="socal", output_file="socal", num_top_results=15)
+    news_release_numbers(
+        fname="data/RIVE$HWS.xlsx", output_file="ie", num_top_results=15
+    )
+    news_release_numbers(
+        fname="data/CAL$HWS.xlsx", output_file="ca_nsa", num_top_results=15
+    )
+    news_release_numbers(
+        fname="data/CAL$SHWS.xlsx", output_file="ca_sa", num_top_results=15
+    )
+    news_release_numbers(
+        fname="data/ORAN$HWS.xlsx", output_file="orange", num_top_results=15
+    )
+    news_release_numbers(
+        fname="data/LA$HWS.xlsx", output_file="la", num_top_results=15
+    )
+    
