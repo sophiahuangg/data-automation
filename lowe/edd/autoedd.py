@@ -34,7 +34,6 @@ def _load_data(fname: str = "data/RIVE$HWS.xlsx", melted: bool = True):
 def _add_dfs(fnames: List[str], region_name: str):
     """_add_dfs adds together the data for multiple different regions' dataframes and
     returns this as a new dataframe
-
     Parameters
     ----------
     dfs : List[str]
@@ -125,7 +124,6 @@ def _year_avg(
     end_month: str = "Dec",
 ):
     """_year_avg averages the vectors for an unmelted dataframe for the specified year from the starting month to the ending month
-
     Parameters
     ----------
     df : pd.DataFrame
@@ -148,12 +146,10 @@ def _year_avg(
 
 def _naics_level(code: str) -> int:
     """_naics_level is a helper that allows us to determine what level the employment sector is talking about
-
     Parameters
     ----------
     code : str
         NAICS Sector as a string in the format xx-xxxxxx
-
     Returns
     -------
     int: The number corresponding to the level of the NAICS sector
@@ -166,7 +162,6 @@ def _naics_level(code: str) -> int:
 
 def _kleinhenz_process(fname: str = "data/RIVE$HWS.xlsx"):
     """_kleinhenz_process produces the variables Dr. Kleinhenz has us use for the EDD news releases
-
     Parameters
     ----------
     fname : str
@@ -257,7 +252,6 @@ def news_release_numbers(
     print_output: bool = False,
 ):
     """news_release_numbers calculates all of the numbers we typically use in the IEEP monthly news releases
-
     Parameters
     ----------
     fname : str, optional
@@ -334,10 +328,6 @@ def news_release_numbers(
         "Goods Producing",
     ]
 
-    INCLUDED_INDUSTRIES = [
-        "",
-    ]
-
     # Clean the TITLE column
     df_processed.loc[:, "TITLE"] = df_processed["TITLE"].str.strip()
 
@@ -376,11 +366,14 @@ def news_release_numbers(
     NUM_INDUSTRIES_INCREASED = sum(df_sorted["MTM"] > 0)
     NUM_INDUSTRIES_DECREASED = sum(df_sorted["MTM"] < 0)
 
-    TOP_GAINS = df_sorted.head(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
+    TOP_GAINS = df_sorted.head(num_top_results)[["TITLE", "MTM", "YTY", "Max Drawdown"]]
     TOP_LOSSES = df_sorted.tail(num_top_results)[
-        ["TITLE", "MTM", "Max Drawdown"]
+        ["TITLE", "MTM", "YTY", "Max Drawdown"]
     ].sort_values(by="MTM")
-    SLOW_MOVERS = slow_movers.tail(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
+    SLOW_MOVERS = slow_movers.tail(num_top_results)[
+        ["TITLE", "MTM", "YTY", "Max Drawdown"]
+    ]
+    print(df_sorted)
     """
     TOTALS = [
         "Civilian Labor Force",
@@ -392,7 +385,6 @@ def news_release_numbers(
         "Total Nonfarm",
         "Total Private",
     ]
-
     df_sorted = df_sorted.set_index("TITLE")
     gains = df_sorted[df_sorted["MTM"] > 0]
     gains = gains[~gains["TITLE"].str.strip().isin(TOTALS)]
@@ -412,24 +404,12 @@ def news_release_numbers(
             f.write(
                 f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}% \n"
             )
-            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n")
+            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n \n")
             f.write(f"LABOR FORCE FOR {current}: {LABOR_FORCE_CURRENT} \n")
             f.write(f"LABOR FORCE FOR {prev_month}: {LABOR_FORCE_LAST_MONTH} \n")
             f.write(
                 f"CHANGE IN LABOR FORCE FROM {prev_month} to {current}: {LABOR_FORCE_CURRENT - LABOR_FORCE_LAST_MONTH} \n \n "
             )
-
-    if output_file is not None:
-        with open("outputs/" + output_file + ".txt", "w") as f:
-            f.write("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED \n")
-            f.write("--------------------------------------- \n")
-
-            f.write(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}% \n")
-            f.write(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}% \n")
-            f.write(
-                f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}% \n"
-            )
-            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n \n")
 
             f.write("CES STATISTICS - ALL NOT SEASONALLY ADJUSTED \n")
             f.write("--------------------------------------- \n")
@@ -460,9 +440,14 @@ def news_release_numbers(
                 f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED} \n \n"
             )
 
+            """
             f.write(f"TOP {num_top_results} INDUSTRY GAINS: \n {TOP_GAINS} \n\n")
             f.write(f"TOP {num_top_results} INDUSTRY LOSSES: \n {TOP_LOSSES} \n\n")
             f.write(f"TOP {num_top_results} SMALLEST MOVEMENTS: \n {SLOW_MOVERS} \n\n")
+            """
+
+            f.write("Industries sorted by MTM gains: \n")
+            df_sorted[["TITLE", "MTM", "YTY", "Max Drawdown"]].to_string(f)
 
     if print_output:
         print("")
