@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv, find_dotenv
 from typing import Union, List
 
+
 class BLSClient(object):
     def __init__(self, key_env_name: str = "API_KEY_BLS"):
         """the BLS Client class provides methods for wrapping around the BLS client
@@ -22,8 +23,8 @@ class BLSClient(object):
             print(
                 f"Error: make sure you have your ACS API key loaded as an environment variable under the name {key_env_name}."
             )
-        
-        self.headers = {'Content-type': 'application/json'}
+
+        self.headers = {"Content-type": "application/json"}
         self.BASE_URL = "https://api.bls.gov/publicAPI/v2/timeseries/data/"
 
     def get_bls(series: Union[str, List[str]]):

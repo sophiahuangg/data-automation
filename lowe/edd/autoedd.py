@@ -334,6 +334,10 @@ def news_release_numbers(
         "Goods Producing",
     ]
 
+    INCLUDED_INDUSTRIES = [
+        "",
+    ]
+
     # Clean the TITLE column
     df_processed.loc[:, "TITLE"] = df_processed["TITLE"].str.strip()
 
@@ -377,7 +381,7 @@ def news_release_numbers(
         ["TITLE", "MTM", "Max Drawdown"]
     ].sort_values(by="MTM")
     SLOW_MOVERS = slow_movers.tail(num_top_results)[["TITLE", "MTM", "Max Drawdown"]]
-    '''
+    """
     TOTALS = [
         "Civilian Labor Force",
         "Civilian Employment",
@@ -392,7 +396,7 @@ def news_release_numbers(
     df_sorted = df_sorted.set_index("TITLE")
     gains = df_sorted[df_sorted["MTM"] > 0]
     gains = gains[~gains["TITLE"].str.strip().isin(TOTALS)]
-    '''
+    """
 
     # Print all of the outputs
     print(current)
@@ -527,7 +531,4 @@ if __name__ == "__main__":
     news_release_numbers(
         fname="data/ORAN$HWS.xlsx", output_file="orange", num_top_results=15
     )
-    news_release_numbers(
-        fname="data/LA$HWS.xlsx", output_file="la", num_top_results=15
-    )
-    
+    news_release_numbers(fname="data/LA$HWS.xlsx", output_file="la", num_top_results=15)
