@@ -17,6 +17,7 @@ def avg_mthly_employ(city: str, save: bool, save_path: str, data_path: str):
         '''
         empl_data_plot = px.bar(df, x=df.index, y='Average Monthly Employment', labels={'DATE': 'Year'}, text='Average Monthly Employment')
         empl_data_plot.update_traces(textposition='outside')
+        empl_data_plot.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
         empl_data_plot.show()
         return empl_data_plot
     empl_data = pd.read_csv(data_path, na_values=["***", ".", "NA"])
@@ -35,7 +36,7 @@ def avg_mthly_employ(city: str, save: bool, save_path: str, data_path: str):
     if save:
         fig.write_image(save_path)
 
-def change_employment_composition(city: str, filepath: str):
+def change_employment_composition(city: str, data_path: str, save: bool, save_path: str):
     def filter_df(city: str, df):
         '''
         Filters df by city
@@ -48,6 +49,7 @@ def change_employment_composition(city: str, filepath: str):
         '''
         empl_data_plot = px.bar(df, x=df.index, y='Change in Employment Share', labels={'index': 'Sector'}, text='Change in Employment Share')
         empl_data_plot.update_traces(textposition='outside')
+        empl_data_plot.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
         empl_data_plot.show()
         return empl_data_plot
     def consolidate_industries(df: pd.DataFrame):
@@ -68,7 +70,7 @@ def change_employment_composition(city: str, filepath: str):
         
         res = df[cols_to_select]
         return res
-    empl_data = pd.read_csv(filepath, na_values=["***", ".", "NA"])
+    empl_data = pd.read_csv(data_path, na_values=["***", ".", "NA"])
     empl_data['DATE'] = empl_data['DATE'].str.pad(width=6, side="left", fillchar="0")
     empl_data['DATE'] = pd.to_datetime(empl_data.DATE, format='%y-%b')
     empl_data = empl_data.fillna(0)
@@ -85,9 +87,11 @@ def change_employment_composition(city: str, filepath: str):
     change_df = change_df[change_df['Change in Employment Share'] != 0.0]
     change_df = change_df.dropna()
     change_df['Change in Employment Share'] = change_df['Change in Employment Share'] * 100
-    plots(change_df)
+    fig = plots(change_df)
+    if save:
+        fig.write_image(save_path)
 
-def employment_composition(city: str, data_path: str):
+def employment_composition(city: str, data_path: str, save: bool, save_path: str):
     def filter_df(city: str, df):
         '''
         Filters df by city
@@ -100,6 +104,7 @@ def employment_composition(city: str, data_path: str):
         '''
         empl_data_plot = px.bar(df, x=df.index, y='Employment Share', labels={'index': 'Sector'}, text='Employment Share')
         empl_data_plot.update_traces(textposition='outside')
+        empl_data_plot.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
         empl_data_plot.show()
         return empl_data_plot
     def consolidate_industries(df: pd.DataFrame):
@@ -140,7 +145,7 @@ def employment_composition(city: str, data_path: str):
 #employment_composition('Cathedral City', '../data-automation/data/CV_EMPL.csv')
 
 
-def chge_empl_share_prepk_sector(city: str, data_path: str):
+def chge_empl_share_prepk_sector(city: str, data_path: str, save: bool, save_path: str):
     def filter_df(city: str, df):
         '''
         Filters df by city
@@ -154,12 +159,14 @@ def chge_empl_share_prepk_sector(city: str, data_path: str):
         fig = px.bar(graph_df, x="INDUSTRY",
                  y=["remaining", "recovery", "netgain"],
                  title=f"Change  (Absolute Changes)")
+        fig.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
         fig.show()
     
         fig2 = px.bar(graph_df, x="INDUSTRY",
                  y=["remaining_perc", "recovery_perc", "netgain_perc"],
                  title=f"Peak-to-trough employment (Percent Changes)")
-    
+
+        fig2.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
         fig2.show()
     def consolidate_industries(df: pd.DataFrame):
         """Returns a dataframe that has the 12 consolidated industries we want"""
@@ -233,10 +240,12 @@ def chge_empl_share_prepk_sector(city: str, data_path: str):
     graph_df["recovery_perc"] = graph_df["recovery"] / graph_df["MAX"]
     graph_df["netgain_perc"] = graph_df["netgain"] / graph_df["MAX"]
     
-    
+    graph_df = graph_df[:-1]
     #print(empl_data)
-    plots(graph_df)
-#chge_empl_share_prepk_sector('Cathedral City', '../data-automation/data/CV_EMPL.csv')
+    fig = plots(graph_df)
+    if save:
+        fig.write_image(save_path)
+chge_empl_share_prepk_sector('Cathedral City', '../data-automation/data/CV_EMPL.csv', save=False, save_path='../edd-testing/empl_share_prepk.png')
 
 def peak_to_trough_empl(data: str, city: str):
 
@@ -334,11 +343,13 @@ def peak_to_trough_empl(data: str, city: str):
     fig = px.bar(graph_df, x="INDUSTRY",
                  y=["remaining", "recovery", "netgain"],
                  title=f"Peak-to-trough employment (Absolute Changes)")
+    fig.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
     fig.show()
     
     fig2 = px.bar(graph_df, x="INDUSTRY",
                  y=["remaining_perc", "recovery_perc", "netgain_perc"],
                  title=f"Peak-to-trough employment (Percent Changes)")
+    fig2.update_layout(template='plotly_white', font=dict(family="Old-style", size=14, color="Black"))
     
     fig2.show()
     
