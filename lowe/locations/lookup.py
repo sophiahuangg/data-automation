@@ -296,9 +296,6 @@ def generate_df_json(codetype: str):
     return None
 
 
-# TODO: Consolidate both search functions
-
-
 def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
     """search searches the relevant dataset specified by codetype for all entries matching the fips code or name provided
 
@@ -320,11 +317,9 @@ def search(query: str, codetype: str, search_on: str = None) -> pd.DataFrame:
         search_on = "fips" if query.isdigit() else "name"
     df = generate_df_json(codetype=codetype)
     df = df.astype(str)  # Convert all cols to string
-    # df[df['A'].str.contains("hello")]
     df = df[df[search_on].str.contains(query)]
     pd.options.display.max_rows = len(df) if len(df) < 25 else 25
-    print(df)
-    return None
+    return df
 
 
 """
