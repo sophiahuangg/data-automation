@@ -51,6 +51,7 @@ setup(
         "openpyxl",
         "pandas",
         "pandasql",
+        "plotly==5.3.1",
         "python-dotenv",
         "pytz",
         "ratelimit",
