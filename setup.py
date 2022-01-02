@@ -26,6 +26,11 @@ setup(
         "lowe.locations.datasets",
         "lowe.locations.lookuptables",
     ],
+    package_data={"": ["*.csv"]},
+    include_package_data=True,
+    entry_points={
+        "console_scripts": ["search=lowe.cli:search"],
+    },
     install_requires=[
         "aiohttp",
         "aiolimiter",
@@ -42,13 +47,13 @@ setup(
         "nbdev",
         "nbformat",
         "notebook",
-        "numpy",
+        "numpy==1.19.5",
         "openpyxl",
         "pandas",
         "pandasql",
+        "plotly==5.3.1",
         "python-dotenv",
         "pytz",
         "ratelimit",
-        "us==2.0.2",
     ],
 )
