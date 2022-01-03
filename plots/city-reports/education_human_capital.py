@@ -7,7 +7,7 @@ import plotly.graph_objects as go
 from lowe.acs.ACSClient import ACSClient
 from lowe.locations.lookup import name2fips
 
-# Primary and secondary colors
+# Primary, secondary, and tertiary colors
 pri_color = "#961a30"
 sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
