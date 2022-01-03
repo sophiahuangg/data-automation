@@ -106,7 +106,7 @@ async def health_insurance(
             mode="lines+markers+text",
             textposition="top center",
             legendrank=3,
-            textfont=dict(family="Old-style", size=14, color=pri_color),
+            textfont=dict(family="Glacial Indifference", size=14, color=pri_color),
         )
     )
 
@@ -143,7 +143,7 @@ async def health_insurance(
             orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5
         ),
         template="plotly_white",
-        font=dict(family="Old-style", size=14, color="Black"),
+        font=dict(family="Glacial Indifference", size=14, color="Black"),
         yaxis=dict(tickformat=".0%", hoverformat="closest"),
         yaxis_title="Percentage of Population with Health Insurance",
     )
