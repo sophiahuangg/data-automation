@@ -40,8 +40,11 @@ async def total_household_income(
     """
     Parameters
     ----------
+    client: intialized ACS Client from lowe.acs.ACSClient
     city: name of the city eg.
     target
+    year: str
+        Year to get the data for
     save: bool
     True or False, whether or not you want to save
     save_path: str
@@ -130,8 +133,11 @@ async def median_household_income(
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
     Parameters
     ----------
+    client: intialized ACS Client from lowe.acs.ACSClient
     city: name of the city eg.
     target
+    year: str
+        Year to get the data for
     save: bool
     True or False, whether or not you want to save
     save_path: str
@@ -199,8 +205,11 @@ async def household_income_by_class(
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
     Parameters
     ----------
+    client: intialized ACS Client from lowe.acs.ACSClient
     city: name of the city eg.
     target
+    year: str
+        Year to get the data for
     save: bool
     True or False, whether or not you want to save
     save_path: str
@@ -287,8 +296,11 @@ async def residence_and_work_loc(
     """
     Parameters
     ----------
+    client: intialized ACS Client from lowe.acs.ACSClient
     city: name of the city eg.
     target
+    year: str
+        Year to get the data for
     save: bool
     True or False, whether or not you want to save
     save_path: str
