@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 import plotly.figure_factory as ff
 
-from lowe.locations.lookup import search, name2fips
+from lowe.locations.lookup import name2fips
 from lowe.acs.ACSClient import ACSClient
 
 # Primary and secondary colors
