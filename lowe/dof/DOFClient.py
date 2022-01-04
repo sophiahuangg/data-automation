@@ -7,6 +7,12 @@ import requests
 from bidict import bidict
 from bs4 import BeautifulSoup
 
+# NOTE to future developers: how to maintain this code
+# The code will automatically get all of the raw data and put it in the scraped-data/ directory
+# The helper functions _county_data_clean_and_join and _city_data_clean_and_join
+# may need to be edited as DOF adds more spreadsheets to the raw data.
+# Just some pandas manipulation!
+
 
 def get_dof_pop_data_raw(path_to_save: str = "scraped-data/"):
     base_url = "https://www.dof.ca.gov/Forecasting/Demographics/Estimates/"
