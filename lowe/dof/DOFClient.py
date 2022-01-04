@@ -8,7 +8,7 @@ from bidict import bidict
 from bs4 import BeautifulSoup
 
 
-def get_dof_pop_data(path_to_save: str = "scraped-data/"):
+def get_dof_pop_data_raw(path_to_save: str = "scraped-data/"):
     base_url = "https://www.dof.ca.gov/Forecasting/Demographics/Estimates/"
     r = requests.get(base_url, verify=False)
     resp = r.text
@@ -246,9 +246,29 @@ def _city_data_clean_and_join(dir: str = "scraped-data/"):
     return final.T
 
 
+def get_dof_pop_data(
+    raw_data_path: str = "scraped-data/", output_path: str = "clean-data/"
+):
+    """Extracts, transforms, and loads CA population data from the Department of Finance"""
+    # Extract raw data
+    get_dof_pop_data_raw(path_to_save=raw_data_path)
+
+    # Clean the raw data
+    county_data = _county_data_clean_and_join(dir=raw_data_path)
+    city_data = _city_data_clean_and_join(dir=raw_data_path)
+
+    # Output the clean data
+
+    output_path = output_path[:-1] if output_path[-1] == "/" else output_path
+
+    county_data.to_csv(f"{output_path}/county.csv")
+    city_data.to_csv(f"{output_path}/city.csv")
+
+    return county_data, city_data
+
+
 def main():
-    test = _city_data_clean_and_join(dir="scraped-data/")
-    print(test)
+    get_dof_pop_data()
 
 
 if __name__ == "__main__":
