@@ -26,7 +26,7 @@ setup(
         "lowe.locations.datasets",
         "lowe.locations.lookuptables",
     ],
-    package_data={"": ["*.csv"]},
+    package_data={"": ["*.csv", "*.xls*"]},
     include_package_data=True,
     entry_points={
         "console_scripts": ["search=lowe.cli:search"],
