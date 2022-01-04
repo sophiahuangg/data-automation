@@ -147,7 +147,11 @@ def _county_data_clean_and_join(dir: str = "scraped-data/"):
         .dropna(how="all")
         .rename(columns={"COUNTY": "County"}),
     )
-    county_10s["County"] = county_10s["County"].str.strip().astype(str)
+    try:
+        county_10s["County"] = county_10s["County"].str.strip().astype(str)
+    except TypeError:  # Sometimes Python reads this in as a tuple
+        county_10s = county_10s[0]
+        county_10s["County"] = county_10s["County"].str.strip().astype(str)
 
     final = county_90s.merge(county_00s, on="County").merge(county_10s, on="County")
 
