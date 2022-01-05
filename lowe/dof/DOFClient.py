@@ -271,8 +271,8 @@ def get_dof_pop_data(
 
     output_path = output_path[:-1] if output_path[-1] == "/" else output_path
 
-    county_data.to_csv(f"{output_path}/county.csv")
-    city_data.to_csv(f"{output_path}/city.csv")
+    county_data.to_csv(f"{output_path}/county.csv", index_label="Year")
+    city_data.to_csv(f"{output_path}/city.csv", index_label="Year")
 
     return county_data, city_data
 
