@@ -1,21 +1,235 @@
 # Code written by Aaron Xie and Abhi Uppal, modified for script format by Abhi Uppal
 
 import asyncio
+import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import plotly.figure_factory as ff
 
 from lowe.locations.lookup import name2fips
 from lowe.acs.ACSClient import ACSClient
+from typing import Union
+
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
+
 
 # Primary and secondary colors
 pri_color = "#961a30"
 sec_color = "#e7c8ae"
+ter_color = "#e6aeb7"
+
+# ------------------------------
+# Helper Functions
+# ------------------------------
+
+
+def _load_dof_data() -> pd.DataFrame:
+    """Helper function to load in the population data"""
+    with pkg_resources.open_text("lowe.dof.clean-data", "city.csv") as f:
+        pop_data = pd.read_csv(f, index_col="Year")
+    return pop_data
+
+
+def _growth_rate(initial, final):
+    """Calculates the growth rate between the initial and final values.
+    NOTE: This does NOT produce a percentage"""
+    return (final - initial) / initial
 
 
 # ------------------------------
 # Plot Generation
 # ------------------------------
+
+# Figure 1: City Population in Coachella Valley -- APPROVED
+
+
+def city_population_cv_present(
+    year: Union[int, str] = "2021",
+    target_city: str = "Coachella",
+    save: bool = False,
+    save_path: str = None,
+) -> go.Figure:
+    # Load in data and filter for the correct year (casted to int)
+    df = _load_dof_data()
+    year = int(year) if isinstance(year, str) else year
+
+    # Get city populations and store them in plot_df
+    cities = [
+        "Coachella",
+        "Cathedral City",
+        "Desert Hot Springs",
+        "Indian Wells",
+        "Indio",
+        "La Quinta",
+        "Palm Desert",
+        "Palm Springs",
+        "Rancho Mirage",
+    ]
+    pops = []
+    for city in cities:
+        city_pop = df.loc[year, city]
+        pops.append(city_pop)
+    plot_df = pd.DataFrame({"City": cities, "Population": pops})
+    plot_df = plot_df.sort_values(by="Population", ascending=False)
+    print(plot_df)
+
+    # Plot!
+
+    # Highlight the target city
+
+    colors = [pri_color] * 9
+    idx = list(plot_df.City).index(target_city.title())
+    colors[idx] = sec_color
+
+    fig = go.Figure()
+
+    # Add the bar and mess with the formatting
+
+    fig.add_trace(
+        go.Bar(
+            x=plot_df["City"],
+            y=plot_df["Population"],
+            text=plot_df["Population"].apply(lambda x: "{:,.0f}".format(x)),
+            marker_color=colors,
+        )
+    )
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Population",
+        legend_title_font_color="black",
+        template="simple_white",
+        xaxis_title="City",
+    )
+
+    return fig
+
+
+# Fig 2: City Population, CV, 1990-Present -- APPROVED
+
+
+def city_population_cv_time_series(
+    save: bool = False,
+    save_path: str = None,
+) -> go.Figure:
+    # Load the data
+    df = _load_dof_data()
+    cities = [
+        "Coachella",
+        "Cathedral City",
+        "Desert Hot Springs",
+        "Indian Wells",
+        "Indio",
+        "La Quinta",
+        "Palm Desert",
+        "Palm Springs",
+        "Rancho Mirage",
+    ]
+    df = df[cities]
+    plot_df = df.melt(
+        ignore_index=False, value_vars=cities, var_name="City", value_name="Population"
+    )
+
+    print(plot_df)
+
+    # Plot!
+
+    fig = px.line(plot_df, x=plot_df.index, y="Population", color="City")
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Population",
+        legend_title_font_color="black",
+        template="plotly_white",
+        xaxis_title="Year",
+    )
+
+    return fig
+
+
+# Fig 3: Population Growth Rates, City, Rest of CV -- WIP
+
+
+def pop_growth_rates(
+    target_city: str = "Coachella", save: bool = False, save_path: str = None
+) -> go.Figure:
+    df = _load_dof_data()
+    fig = go.Figure()
+    return fig
+
+
+# Fig 4: Population Growth Rates, 1999-2007, 2008-Present -- WIP
+# NOTE: Needs to be checked by hand
+
+
+def pop_growth_rates_year_groups(
+    year: Union[int, str] = "2020", save: bool = False, save_path: str = None
+) -> go.Figure:
+    df = _load_dof_data()
+    cities = [
+        "Coachella",
+        "Cathedral City",
+        "Desert Hot Springs",
+        "Indian Wells",
+        "Indio",
+        "La Quinta",
+        "Palm Desert",
+        "Palm Springs",
+        "Rancho Mirage",
+    ]
+    plot_df = df[cities]
+
+    year = int(df.index.max()) if year is None else int(year)
+
+    group1 = [1997, 2007]
+    initial_1 = df.loc[group1[0], :]
+    final_1 = df.loc[group1[1], :]
+    growth_rates_1 = _growth_rate(initial=initial_1, final=final_1)
+
+    group2 = [2008, year]
+    initial_2 = df.loc[group2[0], :]
+    final_2 = df.loc[group2[1], :]
+    growth_rates_2 = _growth_rate(initial=initial_2, final=final_2)
+
+    # Plot!
+
+    fig = go.Figure()
+
+    fig.add_trace(
+        go.Bar(
+            x=plot_df.columns,
+            y=growth_rates_1,
+            text=np.array([*map(lambda x: "{:,.2f}%".format(x * 100), growth_rates_1)]),
+            marker_color=pri_color,
+            name=f"{group1[0]}-{group1[1]}",
+        )
+    )
+
+    fig.add_trace(
+        go.Bar(
+            x=plot_df.columns,
+            y=growth_rates_2,
+            text=np.array([*map(lambda x: "{:,.2f}%".format(x * 100), growth_rates_2)]),
+            marker_color=ter_color,
+            name=f"{group2[0]}-{group2[1]}",
+        )
+    )
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Population Growth Rate",
+        legend_title_font_color="black",
+        template="plotly_white",
+        xaxis_title="City",
+    )
+    return fig
 
 
 # Fig 6: Race Group Distribution -- APPROVED
@@ -81,8 +295,6 @@ async def race_group_distribution(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
-        title_font_family="Glacial Indifference",
-        title_font_color="black",
         yaxis_title="Percent of Population",
         legend_title_font_color="black",
         template="simple_white",
@@ -183,14 +395,8 @@ async def households_with_internet(
 
 
 async def main():
-    client = ACSClient()
-    await client.initialize()
-    try:
-        test = await households_with_internet(client=client)
-    finally:
-        await client.close()
+    test = pop_growth_rates_year_groups()
     test.show()
-    return test
 
 
 if __name__ == "__main__":
