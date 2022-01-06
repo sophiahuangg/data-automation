@@ -75,7 +75,6 @@ def city_population_cv_present(
         pops.append(city_pop)
     plot_df = pd.DataFrame({"City": cities, "Population": pops})
     plot_df = plot_df.sort_values(by="Population", ascending=False)
-    print(plot_df)
 
     # Plot!
 
@@ -103,7 +102,7 @@ def city_population_cv_present(
         font_color="black",
         yaxis_title="Population",
         legend_title_font_color="black",
-        template="simple_white",
+        template="plotly_white",
         xaxis_title="City",
     )
 
@@ -169,7 +168,7 @@ def pop_growth_rates(
 
 
 def pop_growth_rates_year_groups(
-    year: Union[int, str] = "2020", save: bool = False, save_path: str = None
+    year: Union[int, str] = "2021", save: bool = False, save_path: str = None
 ) -> go.Figure:
     df = _load_dof_data()
     cities = [
@@ -185,16 +184,16 @@ def pop_growth_rates_year_groups(
     ]
     plot_df = df[cities]
 
-    year = int(df.index.max()) if year is None else int(year)
+    year = int(plot_df.index.max()) if year is None else int(year)
 
     group1 = [1997, 2007]
-    initial_1 = df.loc[group1[0], :]
-    final_1 = df.loc[group1[1], :]
+    initial_1 = plot_df.loc[group1[0], :]
+    final_1 = plot_df.loc[group1[1], :]
     growth_rates_1 = _growth_rate(initial=initial_1, final=final_1)
 
     group2 = [2008, year]
-    initial_2 = df.loc[group2[0], :]
-    final_2 = df.loc[group2[1], :]
+    initial_2 = plot_df.loc[group2[0], :]
+    final_2 = plot_df.loc[group2[1], :]
     growth_rates_2 = _growth_rate(initial=initial_2, final=final_2)
 
     # Plot!
@@ -205,7 +204,7 @@ def pop_growth_rates_year_groups(
         go.Bar(
             x=plot_df.columns,
             y=growth_rates_1,
-            text=np.array([*map(lambda x: "{:,.2f}%".format(x * 100), growth_rates_1)]),
+            text=np.array([*map(lambda x: "{:,.1f}%".format(x * 100), growth_rates_1)]),
             marker_color=pri_color,
             name=f"{group1[0]}-{group1[1]}",
         )
@@ -215,7 +214,7 @@ def pop_growth_rates_year_groups(
         go.Bar(
             x=plot_df.columns,
             y=growth_rates_2,
-            text=np.array([*map(lambda x: "{:,.2f}%".format(x * 100), growth_rates_2)]),
+            text=np.array([*map(lambda x: "{:,.1f}%".format(x * 100), growth_rates_2)]),
             marker_color=ter_color,
             name=f"{group2[0]}-{group2[1]}",
         )
@@ -395,7 +394,7 @@ async def households_with_internet(
 
 
 async def main():
-    test = pop_growth_rates_year_groups()
+    test = pop_growth_rates_year_groups(year=2020)
     test.show()
 
 
