@@ -240,6 +240,12 @@ def change_empl_share_prev_peak_per_sector(
         fig = go.Figure(
             [
                 go.Bar(
+                    name="Gain From Previous Peak",
+                    x=industries,
+                    y=df["netgain"],
+                    marker_color="lightgreen",
+                ),
+                go.Bar(
                     name="Remaining Loss From Previous Peak",
                     x=industries,
                     y=df["remaining"],
@@ -251,12 +257,6 @@ def change_empl_share_prev_peak_per_sector(
                     y=df["recovery"],
                     marker_color="darkblue",
                 ),
-                go.Bar(
-                    name="Gain From Previous Peak",
-                    x=industries,
-                    y=df["netgain"],
-                    marker_color="lightgreen",
-                ),
             ]
         )
         fig.update_layout(
@@ -264,22 +264,43 @@ def change_empl_share_prev_peak_per_sector(
             font=dict(family="Glacial Indifference", size=14, color="Black"),
             yaxis_title="Change in Employment Share",
             xaxis_title="Industry",
-            barmode="stack",
+            barmode="relative",
         )
         fig.show()
 
-        fig2 = px.bar(
-            graph_df,
-            x="INDUSTRY",
-            y=["remaining_perc", "recovery_perc", "netgain_perc"],
+        fig2 = go.Figure(
+            [
+                go.Bar(
+                    name="Gain From Previous Peak",
+                    x=industries,
+                    y=df["netgain_perc"],
+                    marker_color="lightgreen",
+                ),
+                go.Bar(
+                    name="Remaining Loss From Previous Peak",
+                    x=industries,
+                    y=df["remaining_perc"],
+                    marker_color="red",
+                ),
+                go.Bar(
+                    name="Recovery Since Peak",
+                    x=industries,
+                    y=df["recovery_perc"],
+                    marker_color="darkblue",
+                ),
+            ]
         )
-
         fig2.update_layout(
             template="plotly_white",
             font=dict(family="Glacial Indifference", size=14, color="Black"),
             yaxis_title="Percent Change in Employment Share",
+            xaxis_title="Industry",
+            barmode="relative",
         )
+
         fig2.show()
+
+        return fig, fig2
 
     # Read in and preprocess the data
     empl_data = preprocess_data(path=data_path)
@@ -339,19 +360,78 @@ def change_empl_share_prev_peak_per_sector(
         fig.write_image(save_path)
 
 
-""" 
-chge_empl_share_prepk_sector(
-    "Cathedral City",
-    "../data-automation/data/CV_EMPL.csv",
-    save=False,
-    save_path="../edd-testing/empl_share_prepk.png",
-)
-"""
-
 # Fig 19, 20: Change in Employment, Peak to Trough, Absolute and Percentages -- WIP
 
 
 def peak_to_trough_empl(data_path: str, city: str):
+    def plots(df):
+        """
+        Plots data using plotly
+        """
+        industries = list(df["INDUSTRY"])
+        fig = go.Figure(
+            [
+                go.Bar(
+                    name="Gain From Previous Peak",
+                    x=industries,
+                    y=df["netgain"],
+                    marker_color="green",
+                ),
+                go.Bar(
+                    name="Remaining Loss From Previous Peak",
+                    x=industries,
+                    y=df["remaining"],
+                    marker_color=pri_color,
+                ),
+                go.Bar(
+                    name="Recovery Since Peak",
+                    x=industries,
+                    y=df["recovery"],
+                    marker_color="darkblue",
+                ),
+            ]
+        )
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            yaxis_title="Change in Employment",
+            xaxis_title="Industry",
+            barmode="relative",
+        )
+        fig.show()
+
+        fig2 = go.Figure(
+            [
+                go.Bar(
+                    name="Gain From Previous Peak",
+                    x=industries,
+                    y=df["netgain_perc"],
+                    marker_color="green",
+                ),
+                go.Bar(
+                    name="Remaining Loss From Previous Peak",
+                    x=industries,
+                    y=df["remaining_perc"],
+                    marker_color=pri_color,
+                ),
+                go.Bar(
+                    name="Recovery Since Peak",
+                    x=industries,
+                    y=df["recovery_perc"],
+                    marker_color="darkblue",
+                ),
+            ]
+        )
+        fig2.update_layout(
+            template="plotly_white",
+            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            yaxis_title="Percent Change in Employment",
+            xaxis_title="Industry",
+            barmode="relative",
+        )
+
+        fig2.show()
+
     # Read in the employment data
     empl = pd.read_csv(data_path, na_values=["***", ".", "NA"])
     empl["DATE"] = empl["DATE"].str.pad(width=6, side="left", fillchar="0")
@@ -364,7 +444,8 @@ def peak_to_trough_empl(data_path: str, city: str):
 
     empl_c = consolidate_industries(empl)
     # Filter for the city
-    city = empl[empl["City"] == city.lower()]
+    city = empl_c[empl_c["City"] == city.lower()]
+    city["Total"] = city.loc[:, "Logistics":].sum(axis=1)
 
     # Set the index to be a datetime index and get rid of empty rows
     city = city.set_index("DATE")
@@ -424,28 +505,9 @@ def peak_to_trough_empl(data_path: str, city: str):
     graph_df["recovery_perc"] = graph_df["recovery"] / graph_df["MAX"]
     graph_df["netgain_perc"] = graph_df["netgain"] / graph_df["MAX"]
 
-    fig = px.bar(
-        graph_df,
-        x="INDUSTRY",
-        y=["remaining", "recovery", "netgain"],
-        title=f"Peak-to-trough employment (Absolute Changes)",
-    )
-    fig.update_layout(
-        template="plotly_white", font=dict(family="Old-style", size=14, color="Black")
-    )
-    fig.show()
+    print(graph_df)
 
-    fig2 = px.bar(
-        graph_df,
-        x="INDUSTRY",
-        y=["remaining_perc", "recovery_perc", "netgain_perc"],
-        title=f"Peak-to-trough employment (Percent Changes)",
-    )
-    fig2.update_layout(
-        template="plotly_white", font=dict(family="Old-style", size=14, color="Black")
-    )
-
-    fig2.show()
+    fig, fig2 = plots(graph_df)
 
     return graph_df
 
