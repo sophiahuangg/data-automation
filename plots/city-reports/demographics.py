@@ -27,10 +27,23 @@ ter_color = "#e6aeb7"
 # ------------------------------
 
 
-def _load_dof_data() -> pd.DataFrame:
+def _load_dof_data(filter_cities: bool = False) -> pd.DataFrame:
     """Helper function to load in the population data"""
     with pkg_resources.open_text("lowe.dof.clean-data", "city.csv") as f:
         pop_data = pd.read_csv(f, index_col="Year")
+    if filter_cities:
+        cities = [
+            "Coachella",
+            "Cathedral City",
+            "Desert Hot Springs",
+            "Indian Wells",
+            "Indio",
+            "La Quinta",
+            "Palm Desert",
+            "Palm Springs",
+            "Rancho Mirage",
+        ]
+        pop_data = pop_data[cities]
     return pop_data
 
 
@@ -134,8 +147,6 @@ def city_population_cv_time_series(
         ignore_index=False, value_vars=cities, var_name="City", value_name="Population"
     )
 
-    print(plot_df)
-
     # Plot!
 
     fig = px.line(plot_df, x=plot_df.index, y="Population", color="City")
@@ -158,18 +169,7 @@ def city_population_cv_time_series(
 def pop_growth_rates(
     target_city: str = "Coachella", save: bool = False, save_path: str = None
 ) -> go.Figure:
-    df = _load_dof_data()
-    fig = go.Figure()
-    return fig
-
-
-# Fig 4: Population Growth Rates, 1999-2007, 2008-Present -- APPROVED
-
-
-def pop_growth_rates_year_groups(
-    year: Union[int, str] = None, save: bool = False, save_path: str = None
-) -> go.Figure:
-    df = _load_dof_data()
+    df = _load_dof_data(filter_cities=True)
     cities = [
         "Coachella",
         "Cathedral City",
@@ -181,7 +181,70 @@ def pop_growth_rates_year_groups(
         "Palm Springs",
         "Rancho Mirage",
     ]
-    plot_df = df[cities]
+
+    # In case we mess up the city capitalization
+    target_city = target_city.title()
+
+    # Get a column for CV excluding the target city
+    colname_cv_excl = f"CV Excl. {target_city}"
+
+    df[colname_cv_excl] = 0
+    for city in cities:
+        if city != target_city:
+            df[colname_cv_excl] += df[city]
+
+    # Calculate growth rates
+
+    df["g_target"] = df[target_city].pct_change()
+    df["g_rest_cv"] = df[colname_cv_excl].pct_change()
+
+    df = df[["g_target", "g_rest_cv"]]
+
+    # Plot!
+
+    fig = go.Figure()
+
+    # Bar plot for target city
+    fig.add_trace(
+        go.Bar(
+            x=df.index,
+            y=df["g_target"],
+            marker_color=pri_color,
+            text=df["g_target"].apply(lambda x: "{:.1f}%".format(x * 100)),
+            name=f"{target_city}",
+        )
+    )
+
+    # Bar pot for rest of CV
+    fig.add_trace(
+        go.Bar(
+            x=df.index,
+            y=df["g_rest_cv"],
+            marker_color=ter_color,
+            text=df["g_rest_cv"].apply(lambda x: "{:.1f}%".format(x * 100)),
+            name="Rest of CV",
+        )
+    )
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Population Growth Rate",
+        legend_title_font_color="black",
+        template="plotly_white",
+        xaxis_title="Year",
+        legend=dict(x=0.5, orientation="h", xanchor="center"),
+    )
+    return fig
+
+
+# Fig 4: Population Growth Rates, 1999-2007, 2008-Present -- APPROVED
+
+
+def pop_growth_rates_year_groups(
+    year: Union[int, str] = None, save: bool = False, save_path: str = None
+) -> go.Figure:
+    plot_df = _load_dof_data(filter_cities=True)
 
     year = int(plot_df.index.max()) if year is None else int(year)
 
@@ -393,7 +456,7 @@ async def households_with_internet(
 
 
 async def main():
-    test = pop_growth_rates_year_groups()
+    test = pop_growth_rates()
     test.show()
 
 
