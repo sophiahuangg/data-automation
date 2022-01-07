@@ -163,12 +163,11 @@ def pop_growth_rates(
     return fig
 
 
-# Fig 4: Population Growth Rates, 1999-2007, 2008-Present -- WIP
-# NOTE: Needs to be checked by hand
+# Fig 4: Population Growth Rates, 1999-2007, 2008-Present -- APPROVED
 
 
 def pop_growth_rates_year_groups(
-    year: Union[int, str] = "2021", save: bool = False, save_path: str = None
+    year: Union[int, str] = None, save: bool = False, save_path: str = None
 ) -> go.Figure:
     df = _load_dof_data()
     cities = [
@@ -186,7 +185,7 @@ def pop_growth_rates_year_groups(
 
     year = int(plot_df.index.max()) if year is None else int(year)
 
-    group1 = [1997, 2007]
+    group1 = [1999, 2007]
     initial_1 = plot_df.loc[group1[0], :]
     final_1 = plot_df.loc[group1[1], :]
     growth_rates_1 = _growth_rate(initial=initial_1, final=final_1)
@@ -394,7 +393,7 @@ async def households_with_internet(
 
 
 async def main():
-    test = pop_growth_rates_year_groups(year=2020)
+    test = pop_growth_rates_year_groups()
     test.show()
 
 
