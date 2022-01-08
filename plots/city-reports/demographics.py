@@ -291,6 +291,155 @@ def pop_growth_rates_year_groups(
     )
     return fig
 
+# Fig 5: Age Distribution Graph
+
+async def age_distribution_data(
+    client: ACSClient,
+    cities: list = ["desert hot springs, ca"],
+    year: str = "2019",
+    target_city: str = "desert hot springs ca", #TEMPORARY ASK ABHI THIS
+    save: bool = False,
+    save_path: str = None,
+):
+    # Location City Dictionary and Fips code
+    loc_dicts = [{"city": city} for city in cities]
+    loc_fips = [*map(name2fips, loc_dicts)]
+    county = [{"county": "06_065"}]
+
+    resp = await client.get_acs(
+        vars=["S0101"],
+        start_year=year,
+        end_year=year,
+        location=loc_fips + county,
+        estimate="5",
+        debug=False)
+    
+    cols_mask = resp.columns.str.contains("AGE AND SEX Estimate Percent|city|location_key")
+    resp = resp.loc[:, cols_mask]
+    no_gender_mask = ~resp.columns.str.contains("male|female|Male|Female|MALE|FEMALE")
+    resp = resp.loc[:, no_gender_mask]
+    other_mask = ~resp.columns.str.contains("SELECTED AGE CATEGORIES|SUMMARY INDICATORS|PERCENT ALLOCATED")
+    resp = resp.loc[:, other_mask]
+    
+    # Renaming the columns to remove long ACS title leaving the age range only
+    resp = resp.rename(columns=lambda x: x.replace("AGE AND SEX Estimate Percent Total population AGE ", ""))
+    resp = resp.rename(columns = {"AGE AND SEX Estimate Percent Total population": "Total population"})
+    
+    # newcols = []
+    # for col in resp.columns:
+    #     newcols.append(col.replace("AGE AND SEX Estimate Percent Total population AGE ", ""))
+    # resp.columns = newcols
+
+    # Consolidating the age groups
+    resp["0-14 years perc"] = resp["Under 5 years"].astype(float) + resp["5 to 9 years"].astype(float) + resp["10 to 14 years"].astype(float)
+    resp["15-24 years perc"] = resp["15 to 19 years"].astype(float) + resp["20 to 24 years"].astype(float)
+    resp["25-34 years perc"] = resp["25 to 29 years"].astype(float) + resp["30 to 34 years"].astype(float)
+    resp["35-44 years perc"] = resp["35 to 39 years"].astype(float) + resp["40 to 44 years"].astype(float)
+    resp["45-64 years perc"] = resp["45 to 49 years"].astype(float) + resp["50 to 54 years"].astype(float) + resp["55 to 59 years"].astype(float) + resp["60 to 64 years"].astype(float)
+    resp["65+ years perc"] = resp["65 to 69 years"].astype(float) + resp["70 to 74 years"].astype(float) + resp["75 to 79 years"].astype(float) + resp["80 to 84 years"].astype(float) + resp["85 years and over"].astype(float)
+
+    perc_cols = ["0-14 years perc", "15-24 years perc", "25-34 years perc",
+                 "35-44 years perc","45-64 years perc","65+ years perc"]
+    
+    raw_cols = ["0-14 years", "15-24 years", "25-34 years", 
+                "35-44 years","45-64 years","65+ years"]
+
+    resp["0-14 years"] = resp["0-14 years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+    resp["15-24 years"] = resp["15-24 years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+    resp["25-34 years"] = resp["25-34 years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+    resp["35-44 years"] = resp["35-44 years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+    resp["45-64 years"] = resp["45-64 years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+    resp["65+ years"] = resp["65+ years perc"].astype(float) * resp["Total population"].astype(float) * 0.01
+
+    cols = ["location_key"] + perc_cols + raw_cols + ["Total population"]
+
+    resp = resp[cols]
+
+    resp["Total population"] = resp["Total population"].astype(float)
+
+    # Adding values of each city per section to get Coachella Valley values
+    cv = resp.loc[resp["location_key"] != "riverside county ca"]
+
+    cv = resp.groupby(["year"]).sum()
+    cv["0-14 years perc"] = cv["0-14 years"] / cv["Total population"]
+    cv["15-24 years perc"] = cv["15-24 years"] / cv["Total population"]
+    cv["25-34 years perc"] = cv["25-34 years"] / cv["Total population"]
+    cv["35-44 years perc"] = cv["35-44 years"] / cv["Total population"]
+    cv["45-64 years perc"] = cv["45-64 years"] / cv["Total population"]
+    cv["65+ years perc"] = cv["65+ years"] / cv["Total population"]
+    cv["location_key"] = "Coachella Valley"
+
+    # Dataframe for Coachella Valley ONLY
+    cv_df = cv[cols]
+    
+    # Dataframe for riverside county ONLY
+    rc_df = resp[resp['location_key'] == 'riverside county ca']
+    
+    # Following is unique to each city
+
+    city_df = resp[resp['location_key'] == target_city]
+
+    #Riverside county and Coachella Valley values without the target city
+    rcxcity = rc_df.drop(columns=['location_key']).subtract(city_df.drop(columns=['location_key']))
+    cvxcity = cv_df.drop(columns=['location_key']).subtract(city_df.drop(columns=['location_key']))
+    
+    # Getting riverside county and coachella valley perc without the target city
+    rcxcity_perc = [*map(lambda categ: rcxcity.iloc[0][categ]/rcxcity.iloc[0]['Total population'], raw_cols)]
+    cvxcity_perc = [*map(lambda categ: cvxcity.iloc[0][categ]/cvxcity.iloc[0]['Total population'], raw_cols)]
+    
+    # bar_1 = 100*(rcxcity.iloc[0]['0-14 years']/rcxcity.iloc[0]['Total population'])
+    # bar_2 = 100*(rcxcity.iloc[0]['15-24 years']/rcxcity.iloc[0]['Total population'])
+    # bar_3 = 100*(rcxcity.iloc[0]['25-34 years']/rcxcity.iloc[0]['Total population'])
+    # bar_4 = 100*(rcxcity.iloc[0]['35-44 years']/rcxcity.iloc[0]['Total population'])
+    # bar_5 = 100*(rcxcity.iloc[0]['45-64 years']/rcxcity.iloc[0]['Total population'])
+    # bar_6 = 100*(rcxcity.iloc[0]['65+ years']/rcxcity.iloc[0]['Total population'])
+    
+
+    # bar_1_cv = 100*(cvxcity.iloc[0]['0-14 years']/cvxcity.iloc[0]['Total population'])
+    # bar_2_cv = 100*(cvxcity.iloc[0]['15-24 years']/cvxcity.iloc[0]['Total population'])
+    # bar_3_cv = 100*(cvxcity.iloc[0]['25-34 years']/cvxcity.iloc[0]['Total population'])
+    # bar_4_cv = 100*(cvxcity.iloc[0]['35-44 years']/cvxcity.iloc[0]['Total population'])
+    # bar_5_cv = 100*(cvxcity.iloc[0]['45-64 years']/cvxcity.iloc[0]['Total population'])
+    # bar_6_cv = 100*(cvxcity.iloc[0]['65+ years']/cvxcity.iloc[0]['Total population'])
+
+    # Plot!
+    city_name = target_city[0:(len(target_city))-2].title()
+    
+    x_axis=[city_name, f'Riverside County ex {city_name}', f'Coachella Valley ex {city_name}']
+    
+    y1 = pd.Series([city_df.iloc[0]['0-14 years perc'], rcxcity_perc[0], cvxcity_perc[0]])
+    y2 = pd.Series([city_df.iloc[0]['15-24 years perc'], rcxcity_perc[1], cvxcity_perc[1]])
+    y3 = pd.Series([city_df.iloc[0]['25-34 years perc'], rcxcity_perc[2], cvxcity_perc[2]])
+    y4 = pd.Series([city_df.iloc[0]['35-44 years perc'], rcxcity_perc[3], cvxcity_perc[3]])
+    y5 = pd.Series([city_df.iloc[0]['45-64 years perc'], rcxcity_perc[4], cvxcity_perc[4]])
+    y6 = pd.Series([city_df.iloc[0]['65+ years perc'], rcxcity_perc[5], cvxcity_perc[5]])
+    
+    # y1 = pd.Series([city_df.iloc[0]['0-14 years perc'], bar_1, bar_1_cv])
+    # y2 = pd.Series([city_df.iloc[0]['15-24 years perc'], bar_2, bar_2_cv])
+    # y3 = pd.Series([city_df.iloc[0]['25-34 years perc'], bar_3, bar_3_cv])
+    # y4 = pd.Series([city_df.iloc[0]['35-44 years perc'], bar_4, bar_4_cv])
+    # y5 = pd.Series([city_df.iloc[0]['45-64 years perc'], bar_5, bar_5_cv])
+    # y6 = pd.Series([city_df.iloc[0]['65+ years perc'], bar_6, bar_6_cv])
+    
+    fig = go.Figure(data=[
+        go.Bar(name='0-14 Years', x=x_axis, y=y1,  text= y1.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside'),
+        go.Bar(name='15-24 Years', x=x_axis, y=y2, text= y2.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside'),
+        go.Bar(name='25-34 Years', x=x_axis, y=y3, text= y3.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside'),
+        go.Bar(name='35-44 Years', x=x_axis, y=y4, text= y4.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside'),
+        go.Bar(name='45-64 Years', x=x_axis, y=y5, text= y5.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside'),
+        go.Bar(name='65+ Years', x=x_axis, y=y6, text= y6.apply(lambda x: '{0:1.1f}%'.format(x)),textposition='outside')
+    ])
+
+    fig.update_layout(
+    barmode='group',
+    template='plotly_white',
+    font=dict(
+        family="Old-style", size=14,color="Black")
+    )
+
+    if save:
+        fig.write_image(save_path, format="png")
+    return fig
 
 # Fig 6: Race Group Distribution -- APPROVED
 
