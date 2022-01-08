@@ -113,6 +113,7 @@ def city_population_cv_present(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Population",
         legend_title_font_color="black",
         template="plotly_white",
@@ -120,7 +121,9 @@ def city_population_cv_present(
     )
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -158,6 +161,7 @@ def city_population_cv_time_series(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Population",
         legend_title_font_color="black",
         template="plotly_white",
@@ -165,7 +169,9 @@ def city_population_cv_time_series(
     )
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -239,6 +245,7 @@ def pop_growth_rates(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Population Growth Rate",
         legend_title_font_color="black",
         template="plotly_white",
@@ -247,7 +254,9 @@ def pop_growth_rates(
     )
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -302,6 +311,7 @@ def pop_growth_rates_year_groups(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Population Growth Rate",
         legend_title_font_color="black",
         template="plotly_white",
@@ -309,7 +319,9 @@ def pop_growth_rates_year_groups(
     )
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -584,13 +596,15 @@ async def age_distribution_data(
     fig.update_layout(
         barmode="group",
         template="plotly_white",
-        font=dict(family="Glacial Indifference", size=14, color="Black"),
+        font=dict(family="Glacial Indifference", size=18, color="Black"),
         xaxis_title="Region",
         yaxis_title="Percent of Total Population",
     )
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -659,6 +673,7 @@ async def race_group_distribution(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Percent of Population",
         legend_title_font_color="black",
         template="simple_white",
@@ -669,7 +684,9 @@ async def race_group_distribution(
     fig.update_traces(marker_color=pri_color)
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
@@ -740,6 +757,7 @@ async def households_with_internet(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         title_font_family="Glacial Indifference",
         title_font_color="black",
         legend_title_font_color="black",
@@ -751,7 +769,9 @@ async def households_with_internet(
     fig.update_traces(marker_color=pri_color)
 
     if save_path is not None:
-        fig.save(save_path, height=img_height, width=img_width)
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=2, format="png"
+        )
 
     return fig
 
