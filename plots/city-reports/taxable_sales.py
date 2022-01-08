@@ -1,14 +1,16 @@
 # Code written by Abhi Uppal
 
 import asyncio
+import os
 import pandas as pd
 import plotly.graph_objects as go
 import requests
 import time
 
-
+from datetime import datetime
+from demographics import _load_dof_data  # Get the helper from the demographics file
+from dotenv import load_dotenv
 from functools import wraps, lru_cache
-from lowe.FRED.FREDClient import FREDClient
 
 # Primary and secondary colors
 pri_color = "#961a30"
@@ -72,49 +74,144 @@ def _load_data(data_path: str = None):
 # Figure 21: Real and Nominal Taxable Retail Sales Per Capita in City, 2010-Present -- WIP
 
 
-async def real_nominal_sales_pc_time_series(
+def real_nominal_sales_pc_time_series(
     city: str = "Cathedral City", data_path: str = None
 ):
-    # Load in the data and filter for the annual data for the city of interest
+    """real_nominal_sales_pc_time_series [summary]
+    NOTE: Yearly CPI numbers are released around January 12th of the following year.
+    So, the plot should be re-generated after then. Otherwise, the last year's CPI number will be inaccurate.
+
+    Parameters
+    ----------
+    city : str, optional
+        [description], by default "Cathedral City"
+    data_path : str, optional
+        [description], by default None
+
+    Returns
+    -------
+    [type]
+        [description]
+    """
+    # Load in the data and filter for just the quarterly data for the city of interest
+    # The quarterly data will be aggregated with a groupby
     df = _load_data(data_path)
     df = df[df["City"].str.lower().str.contains(city.lower())]
-    df = df[df["Quarter"].str.contains("A")]
+    df = df[~df["Quarter"].str.contains("A")]
 
     df = df.sort_values(by="CalendarYear", ascending=True)
 
-    # Get CPI
+    # Find out what quarter the last year goes up to -- a bit involved :)
 
-    client = FREDClient()
-    await client.initialize()
+    maxYear = df["CalendarYear"].max()
+    maxYear_df = df[df["CalendarYear"] == maxYear]
+    maxMonth = maxYear_df["QuarterMonthTo"].max()
+    maxQuarter = maxMonth // 3
 
-    try:
-        res = await client.get_fred(
-            vars=["CPIAUCSL"],
-            startDate="2010-01-01",
-            endDate="2021-01-01",
-            frequency="a",
-            export=False,
-            file_type=".xls",
-            debug=False,
+    last_year_descriptor = (
+        f"{maxYear}" if maxQuarter == 4 else f"{maxYear} (Q{maxQuarter})"
+    )
+
+    # Aggregate the data and get the total taxable sales for each year
+
+    df = df.groupby("CalendarYear").agg(
+        {"RetailandFoodServicesTaxableTransactions": "sum"}
+    )
+
+    # Get CPI for inflation adjustment
+    load_dotenv()
+    date = datetime.today()
+    yr = date.year
+    apiKey = os.environ.get("API_KEY_FRED", None)
+    assert (
+        apiKey is not None
+    ), "Please ensure API_KEY_FRED is specified in your .env file."
+
+    base = "https://api.stlouisfed.org/fred/series/observations"
+
+    params = {
+        "series_id": "CPIAUCSL",
+        "observation_start": "2010-01-01",
+        "observation_end": f"{yr}-01-01",
+        "frequency": "m",
+        "api_key": apiKey,
+        "file_type": "json",
+    }
+
+    r = requests.get(base, params).json()
+    cpi_df = pd.json_normalize(r, record_path="observations")
+    cpi_df["year"] = cpi_df["date"].apply(
+        lambda x: datetime.strptime(x, "%Y-%m-%d").year
+    )
+    cpi_df["value"] = cpi_df["value"].astype(float)
+    cpi_df = (
+        cpi_df.groupby("year").agg({"value": "mean"}).rename(columns={"value": "CPI"})
+    )
+
+    # Get Population data
+
+    pop = _load_dof_data(filter_cities=True)
+    pop = pop[city.title()]
+
+    # Join the datasets together
+
+    plot_df = (
+        df.merge(cpi_df, left_index=True, right_index=True)
+        .merge(pop, left_index=True, right_index=True)
+        .rename(
+            columns={
+                f"{city.title()}": "Population",
+                "RetailandFoodServicesTaxableTransactions": "Retail Sales",
+            }
         )
-    finally:
-        await client.close()
+    )
 
-    print(res)
+    # Calculate the columns we need
+
+    first_year_cpi = plot_df.loc[plot_df.index.min(), "CPI"]
+    plot_df["adj factor"] = first_year_cpi / plot_df["CPI"]
+    plot_df["Retail Adj"] = plot_df["Retail Sales"] * plot_df["adj factor"]
+
+    plot_df["Per Capita"] = plot_df["Retail Sales"] / plot_df["Population"]
+    plot_df["Per Capita Adj"] = plot_df["Retail Adj"] / plot_df["Population"]
+
+    dateList = list(plot_df.index)
+    dateList[-1] = last_year_descriptor
+    dateList = [*map(str, dateList)]
+
     # Plot!
-
     fig = go.Figure()
 
     fig.add_trace(
         go.Bar(
-            x=df["CalendarYear"],
-            y=df["PerCapita"],
+            x=dateList,
+            y=list(plot_df["Per Capita"]),
+            name="Nominal Taxable Sales Per Capita",
             marker_color=pri_color,
-            name="Nominal Retail Sales Per Capita",
+            text=plot_df["Per Capita"].apply(lambda x: "{:,.0f}".format(x)),
         )
     )
 
-    return df
+    fig.add_trace(
+        go.Scatter(
+            x=dateList,
+            y=list(plot_df["Per Capita Adj"]),
+            name=f"Real Taxable Sales Per Capita ({dateList[0]} Dollars)",
+            marker_color=sec_color,
+        )
+    )
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Taxable Retail and Food Sales",
+        legend_title_font_color="black",
+        template="plotly_white",
+        xaxis_title="Year",
+        legend=dict(x=0.5, orientation="h", xanchor="center"),
+    )
+
+    return fig
 
 
 def taxable_sales_per_capita_quarters_cv(data_path: str = None):
@@ -136,12 +233,12 @@ def taxable_sales_per_capita_quarters_cv(data_path: str = None):
     pattern = "|".join(cities)
 
 
-async def main():
-    test = await real_nominal_sales_pc_time_series(
+def main():
+    test = real_nominal_sales_pc_time_series(
         city="Desert Hot Springs", data_path="data/taxable_sales.csv"
     )
-    print(test)
+    test.show()
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
