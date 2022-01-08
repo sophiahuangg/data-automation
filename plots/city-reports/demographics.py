@@ -62,8 +62,9 @@ def _growth_rate(initial, final):
 def city_population_cv_present(
     year: Union[int, str] = "2021",
     target_city: str = "Coachella",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
 ) -> go.Figure:
     # Load in data and filter for the correct year (casted to int)
     df = _load_dof_data()
@@ -118,6 +119,9 @@ def city_population_cv_present(
         xaxis_title="City",
     )
 
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
@@ -125,8 +129,9 @@ def city_population_cv_present(
 
 
 def city_population_cv_time_series(
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
 ) -> go.Figure:
     # Load the data
     df = _load_dof_data()
@@ -159,14 +164,20 @@ def city_population_cv_time_series(
         xaxis_title="Year",
     )
 
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
-# Fig 3: Population Growth Rates, City, Rest of CV -- WIP
+# Fig 3: Population Growth Rates, City, Rest of CV -- APPROVED
 
 
 def pop_growth_rates(
-    target_city: str = "Coachella", save: bool = False, save_path: str = None
+    target_city: str = "Coachella",
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
 ) -> go.Figure:
     df = _load_dof_data(filter_cities=True)
     cities = [
@@ -234,6 +245,10 @@ def pop_growth_rates(
         xaxis_title="Year",
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
+
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
@@ -241,7 +256,10 @@ def pop_growth_rates(
 
 
 def pop_growth_rates_year_groups(
-    year: Union[int, str] = None, save: bool = False, save_path: str = None
+    year: Union[int, str] = None,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
 ) -> go.Figure:
     plot_df = _load_dof_data(filter_cities=True)
 
@@ -289,10 +307,14 @@ def pop_growth_rates_year_groups(
         template="plotly_white",
         xaxis_title="City",
     )
+
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
-# Fig 5: Age Distribution Graph
+# Fig 5: Age Distribution Graph -- APPROVED
 
 
 async def age_distribution_data(
@@ -310,9 +332,10 @@ async def age_distribution_data(
     ],
     year: str = "2019",
     target_city: str = "desert hot springs ca",
-    save: bool = False,
     save_path: str = None,
-):
+    img_height: int = 1080,
+    img_width: int = 1920,
+) -> go.Figure:
     # Location City Dictionary and Fips code
     loc_dicts = [{"city": city} for city in cities]
     loc_fips = [*map(name2fips, loc_dicts)]
@@ -431,7 +454,6 @@ async def age_distribution_data(
 
     # Dataframe for riverside county ONLY
     rc_df = resp[resp["location_key"] == "riverside county ca"]
-    print(rc_df)
 
     # Following is unique to each city
 
@@ -459,13 +481,6 @@ async def age_distribution_data(
             raw_cols,
         )
     ]
-
-    # bar_1 = 100*(rcxcity.iloc[0]['0-14 years']/rcxcity.iloc[0]['Total population'])
-    # bar_2 = 100*(rcxcity.iloc[0]['15-24 years']/rcxcity.iloc[0]['Total population'])
-    # bar_3 = 100*(rcxcity.iloc[0]['25-34 years']/rcxcity.iloc[0]['Total population'])
-    # bar_4 = 100*(rcxcity.iloc[0]['35-44 years']/rcxcity.iloc[0]['Total population'])
-    # bar_5 = 100*(rcxcity.iloc[0]['45-64 years']/rcxcity.iloc[0]['Total population'])
-    # bar_6 = 100*(rcxcity.iloc[0]['65+ years']/rcxcity.iloc[0]['Total population'])
 
     # Plot!
     city_name = target_city[0 : (len(target_city)) - 2].title()
@@ -518,13 +533,6 @@ async def age_distribution_data(
             rcxcity_perc[5] * 100,
         ]
     )
-
-    # y1 = pd.Series([city_df.iloc[0]['0-14 years perc'], bar_1, bar_1_cv])
-    # y2 = pd.Series([city_df.iloc[0]['15-24 years perc'], bar_2, bar_2_cv])
-    # y3 = pd.Series([city_df.iloc[0]['25-34 years perc'], bar_3, bar_3_cv])
-    # y4 = pd.Series([city_df.iloc[0]['35-44 years perc'], bar_4, bar_4_cv])
-    # y5 = pd.Series([city_df.iloc[0]['45-64 years perc'], bar_5, bar_5_cv])
-    # y6 = pd.Series([city_df.iloc[0]['65+ years perc'], bar_6, bar_6_cv])
 
     fig = go.Figure(
         data=[
@@ -581,8 +589,9 @@ async def age_distribution_data(
         yaxis_title="Percent of Total Population",
     )
 
-    if save:
-        fig.write_image(save_path, format="png")
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
@@ -593,9 +602,10 @@ async def race_group_distribution(
     client: ACSClient,
     cities: list = ["desert hot springs, ca"],
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
-):
+    img_height: int = 1080,
+    img_width: int = 1920,
+) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
     Parameters
@@ -658,8 +668,9 @@ async def race_group_distribution(
 
     fig.update_traces(marker_color=pri_color)
 
-    if save:
-        fig.write_image(save_path, format="png")
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
@@ -680,9 +691,10 @@ async def households_with_internet(
         "rancho mirage, ca",
     ],
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
-):
+    img_height: int = 1080,
+    img_width: int = 1920,
+) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
     Parameters
@@ -738,8 +750,9 @@ async def households_with_internet(
 
     fig.update_traces(marker_color=pri_color)
 
-    if save:
-        fig.write_image(save_path, format="png")
+    if save_path is not None:
+        fig.save(save_path, height=img_height, width=img_width)
+
     return fig
 
 
