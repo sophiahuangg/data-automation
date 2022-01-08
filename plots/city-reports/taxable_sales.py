@@ -16,6 +16,8 @@ from functools import wraps, lru_cache
 pri_color = "#961a30"
 sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
+qua_color = "#bf5e5e"
+pen_color = "#9c4d48"
 
 # ------------------------------
 # Helper Functions
@@ -71,7 +73,7 @@ def _load_data(data_path: str = None):
 # Plot Generation
 # ------------------------------
 
-# Figure 21: Real and Nominal Taxable Retail Sales Per Capita in City, 2010-Present -- WIP
+# Figure 21: Real and Nominal Taxable Retail Sales Per Capita in City, 2010-Present -- APPROVED
 
 
 def real_nominal_sales_pc_time_series(
@@ -214,7 +216,10 @@ def real_nominal_sales_pc_time_series(
     return fig
 
 
-def taxable_sales_per_capita_quarters_cv(data_path: str = None):
+# Figure 22: Taxable Sales Per Capita, Latest Year
+
+
+def taxable_sales_per_capita_quarters_cv(data_path: str = None, *args, **kwargs):
     # Load in the data
     df = _load_data(data_path)
 
@@ -232,11 +237,46 @@ def taxable_sales_per_capita_quarters_cv(data_path: str = None):
 
     pattern = "|".join(cities)
 
+    # Get the cities of interest and filter for the latest year and correct cities
+
+    maxYear = df["CalendarYear"].astype(int).max()
+    df = df[df["City"].str.contains(pattern)]
+    df = df[~df["Quarter"].str.contains("A")]
+    df = df[df["CalendarYear"].astype(int) == maxYear]
+
+    numQuarters = df["QuarterMonthTo"].max() // 3
+    sub_dfs = [df[df["Quarter"] == f"Q{q}"] for q in range(1, numQuarters + 1)]
+
+    colors = [pri_color, qua_color, ter_color, pen_color]
+
+    fig = go.Figure()
+
+    for i, data in enumerate(sub_dfs):
+        fig.add_trace(
+            go.Bar(
+                x=data["City"],
+                y=data["PerCapita"],
+                name=f"Quarter {i + 1}",
+                text=data["PerCapita"].apply(lambda x: "{:,.0f}".format(x)),
+                marker_color=colors[i],
+            )
+        )
+
+    fig.update_layout(
+        font_family="Glacial Indifference",
+        font_color="black",
+        yaxis_title="Taxable Retail and Food Sales",
+        legend_title_font_color="black",
+        template="plotly_white",
+        xaxis_title="City",
+        legend=dict(x=0.5, orientation="h", xanchor="center"),
+    )
+
+    return fig
+
 
 def main():
-    test = real_nominal_sales_pc_time_series(
-        city="Desert Hot Springs", data_path="data/taxable_sales.csv"
-    )
+    test = taxable_sales_per_capita_quarters_cv(data_path="data/taxable_sales.csv")
     test.show()
 
 
