@@ -1,7 +1,8 @@
-from lowe.locations.lookup import search, generate_df_json
+from lowe.locations.lookup import generate_df_json
 from lowe.acs.ACSClient import ACSClient
 import pandas as pd
 import plotly.graph_objects as go
+import plotly.express as px
 
 
 async def humanCapitalIndexCV(
@@ -206,8 +207,6 @@ async def educationalAttainmentCV(
         "EDUCATIONAL ATTAINMENT Estimate Percent AGE BY EDUCATIONAL ATTAINMENT Population 25 years and over High school graduate or higher": "High School Ed. Attainment",
         "EDUCATIONAL ATTAINMENT Estimate Percent AGE BY EDUCATIONAL ATTAINMENT Population 25 years and over Bachelor's degree or higher": "College Ed. Attainment",
     }
-
-    new_cols = ["High School Ed. Attainment", "College Ed. Attainment"]
 
     # restructuring final dataframe
 
