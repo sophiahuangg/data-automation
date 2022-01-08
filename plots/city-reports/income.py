@@ -3,7 +3,6 @@
 import asyncio
 import pandas as pd
 import plotly.express as px
-import plotly.figure_factory as ff
 
 from lowe.locations.lookup import name2fips
 from lowe.acs.ACSClient import ACSClient
@@ -99,9 +98,10 @@ async def total_household_income(
         title_font_family="Glacial Indifference",
         title_font_color="black",
         legend_title_font_color="black",
-        template="simple_white",
+        template="plotly_white",
         xaxis_title="City",
         yaxis_title="Total Household Income",
+        font_size=18,
     )
 
     fig.update_traces(marker_color=pri_color)
@@ -186,9 +186,10 @@ async def median_household_income(
         title_font_family="Glacial Indifference",
         title_font_color="black",
         legend_title_font_color="black",
-        template="simple_white",
+        template="plotly_white",
         xaxis_title="City",
         yaxis_title="Median Household Income",
+        font_size=18,
     )
 
     fig.update_traces(marker_color=pri_color)
@@ -283,9 +284,10 @@ async def household_income_by_class(
         title_font_color="black",
         legend_title_font_color="black",
         legend_title_text="Region",
-        template="simple_white",
+        template="plotly_white",
         xaxis_title="City",
         yaxis_title="Percent of Households",
+        font_size=18,
     )
 
     fig.update_traces(marker_color=pri_color)
