@@ -4,6 +4,7 @@ import asyncio
 import numpy as np
 import pandas as pd
 import plotly.express as px
+import plotly.figure_factory as ff
 import plotly.graph_objects as go
 
 from lowe.locations.lookup import name2fips
@@ -384,7 +385,6 @@ async def age_distribution(
     resp = resp.rename(
         columns={"AGE AND SEX Estimate Total Total population": "Total population"}
     )
-    resp.to_excel("debug.xlsx")
 
     # newcols = []
     # for col in resp.columns:
@@ -834,12 +834,15 @@ async def residence_and_work_loc(
         ans, colorscale=[[0, pri_color], [0.5, "#ffffff"], [1, "#ffffff"]]
     )
 
+    fig.update_layout(font=dict(family="Glacial Indifference", size=18, color="black"))
+
     if save_path is not None:
         fig.write_image(
             save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
+
 
 # ------------------------------
 # Testing Code
