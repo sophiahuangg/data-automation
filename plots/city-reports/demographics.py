@@ -65,6 +65,7 @@ def city_population_cv_present(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     # Load in data and filter for the correct year (casted to int)
     df = _load_dof_data()
@@ -122,7 +123,7 @@ def city_population_cv_present(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -132,9 +133,7 @@ def city_population_cv_present(
 
 
 def city_population_cv_time_series(
-    save_path: str = None,
-    img_height: int = 1080,
-    img_width: int = 1920,
+    save_path: str = None, img_height: int = 1080, img_width: int = 1920, scale: int = 2
 ) -> go.Figure:
     # Load the data
     df = _load_dof_data()
@@ -170,7 +169,7 @@ def city_population_cv_time_series(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -184,6 +183,7 @@ def pop_growth_rates(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     df = _load_dof_data(filter_cities=True)
     cities = [
@@ -255,7 +255,7 @@ def pop_growth_rates(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -269,6 +269,7 @@ def pop_growth_rates_year_groups(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     plot_df = _load_dof_data(filter_cities=True)
 
@@ -320,7 +321,7 @@ def pop_growth_rates_year_groups(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -347,6 +348,7 @@ async def age_distribution(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     # Location City Dictionary and Fips code
     loc_dicts = [{"city": city} for city in cities]
@@ -603,7 +605,7 @@ async def age_distribution(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -619,6 +621,7 @@ async def race_group_distribution(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -685,7 +688,7 @@ async def race_group_distribution(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
@@ -711,6 +714,7 @@ async def households_with_internet(
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
+    scale: int = 2,
 ) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -770,7 +774,7 @@ async def households_with_internet(
 
     if save_path is not None:
         fig.write_image(
-            save_path, height=img_height, width=img_width, scale=2, format="png"
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
 
     return fig
