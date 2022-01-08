@@ -34,8 +34,10 @@ async def total_household_income(
         "rancho mirage, ca",
     ],
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     Parameters
@@ -104,8 +106,11 @@ async def total_household_income(
 
     fig.update_traces(marker_color=pri_color)
 
-    if save:
-        fig.write_image(save_path, format="png")
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
@@ -126,8 +131,10 @@ async def median_household_income(
         "rancho mirage, ca",
     ],
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -186,8 +193,11 @@ async def median_household_income(
 
     fig.update_traces(marker_color=pri_color)
 
-    if save:
-        fig.write_image(save_path, format="png")
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
@@ -197,9 +207,11 @@ async def median_household_income(
 async def household_income_by_class(
     client: ACSClient,
     cities: list = ["coachella, ca", "desert hot springs, ca"],
-    save: bool = False,
-    save_path: str = None,
     year: str = "2019",
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -278,62 +290,10 @@ async def household_income_by_class(
 
     fig.update_traces(marker_color=pri_color)
 
-    if save:
-        fig.write_image(save_path, format="png")
-    return fig
-
-
-# Table 1: Residence and Work Location -- WIP
-
-
-async def residence_and_work_loc(
-    client: ACSClient,
-    cities: list = ["desert hot springs, ca"],
-    year: str = "2019",
-    save: bool = False,
-    save_path: str = None,
-):
-    """
-    Parameters
-    ----------
-    client: intialized ACS Client from lowe.acs.ACSClient
-    city: name of the city eg.
-    target
-    year: str
-        Year to get the data for
-    save: bool
-    True or False, whether or not you want to save
-    save_path: str
-    Path to save the file to
-    """
-    cols = {
-        # old col name: new name
-        "COMMUTING CHARACTERISTICS BY SEX Estimate Total PERCENT ALLOCATED Place of work": "% Allocated Place of Work",
-        "COMMUTING CHARACTERISTICS BY SEX Estimate Total Workers 16 years and over PLACE OF WORK Not living in 12 selected states": "Count, live outside state",
-        "COMMUTING CHARACTERISTICS BY SEX Estimate Total Workers 16 years and over PLACE OF WORK Worked in state of residence Worked outside county of residence": "Count, outside of county",
-        "COMMUTING CHARACTERISTICS BY SEX Estimate Total Workers 16 years and over PLACE OF WORK Worked in state of residence Worked in county of residence": "Count, inside county",
-    }
-
-    loc_dicts = [{"city": city} for city in cities]
-    loc_fips = [*map(name2fips, loc_dicts)]
-
-    resp = await client.get_acs(
-        vars=["S0801"], start_year=year, end_year=year, estimate="5", location=loc_fips
-    )
-
-    col_sub = [*list(cols.keys()), "state", "city"]
-    resp = resp[col_sub]
-    resp = resp.rename(columns=cols)
-
-    ans = [
-        ["Living/Working", resp.iloc[0]["city"]],
-        [resp.columns[1], resp.iloc[0][1]],
-        [resp.columns[2], resp.iloc[0][2]],
-        [resp.columns[3], resp.iloc[0][3]],
-    ]
-    fig = ff.create_table(
-        ans, colorscale=[[0, pri_color], [0.5, "#ffffff"], [1, "#ffffff"]]
-    )
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
 
     return fig
 
@@ -347,7 +307,7 @@ async def main():
     client = ACSClient()
     await client.initialize()
     try:
-        test = await residence_and_work_loc(client=client)
+        test = await household_income_by_class(client=client)
     finally:
         await client.close()
     test.show()
