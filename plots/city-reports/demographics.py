@@ -329,7 +329,7 @@ def pop_growth_rates_year_groups(
 # Fig 5: Age Distribution Graph -- APPROVED
 
 
-async def age_distribution_data(
+async def age_distribution(
     client: ACSClient,
     cities: list = [
         "cathedral city, ca",
@@ -785,7 +785,7 @@ async def main():
     client = ACSClient()
     try:
         await client.initialize()
-        test = await age_distribution_data(client=client)
+        test = await age_distribution(client=client)
     finally:
         await client.close()
     test.show()
