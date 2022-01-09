@@ -60,11 +60,15 @@ def _get_data(save_path: str = None):
     return res
 
 
-def _load_data(data_path: str = None):
+def _load_data(data_path: str = None, try_save: bool = False):
     try:
         df = pd.read_csv(data_path)
     except FileNotFoundError:
-        df = _get_data()
+        if try_save:
+            df = _get_data(save_path=data_path)
+        else:
+            df = _get_data()
+
     return df
 
 
@@ -76,7 +80,12 @@ def _load_data(data_path: str = None):
 
 
 def real_nominal_sales_pc_time_series(
-    city: str = "Cathedral City", data_path: str = None
+    city: str = "Cathedral City",
+    data_path: str = None,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """real_nominal_sales_pc_time_series [summary]
     NOTE: Yearly CPI numbers are released around January 12th of the following year.
@@ -205,6 +214,7 @@ def real_nominal_sales_pc_time_series(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Taxable Retail and Food Sales",
         legend_title_font_color="black",
         template="plotly_white",
@@ -212,13 +222,24 @@ def real_nominal_sales_pc_time_series(
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
 
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
 # Figure 22: Taxable Sales Per Capita, Latest Year
 
 
-def taxable_sales_per_capita_quarters_cv(data_path: str = None, *args, **kwargs):
+def taxable_sales_per_capita_quarters_cv(
+    data_path: str = None,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
+):
     # Load in the data
     df = _load_data(data_path)
 
@@ -264,12 +285,18 @@ def taxable_sales_per_capita_quarters_cv(data_path: str = None, *args, **kwargs)
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
+        font_size=18,
         yaxis_title="Taxable Retail and Food Sales",
         legend_title_font_color="black",
         template="plotly_white",
         xaxis_title="City",
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
+
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
 
     return fig
 
