@@ -85,7 +85,12 @@ def preprocess_data(path: str):
 
 
 def avg_monthly_employment(
-    city: str, data_path: str, save: bool = False, save_path: str = None
+    city: str,
+    data_path: str,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     This function creates plots for the average monthly employment per year.
@@ -106,7 +111,7 @@ def avg_monthly_employment(
         empl_data_plot.update_traces(textposition="outside", marker_color=pri_color)
         empl_data_plot.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
         )
         return empl_data_plot
 
@@ -126,9 +131,13 @@ def avg_monthly_employment(
         columns={"Total Employment": "Average Monthly Employment"}, inplace=True
     )
     empl_data.index = empl_data.index.strftime("%Y")
+
     fig = plots(empl_data)
-    if save:
-        fig.write_image(save_path)
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
@@ -136,7 +145,12 @@ def avg_monthly_employment(
 
 
 def change_employment_composition(
-    city: str, data_path: str, save: bool = False, save_path: str = None
+    city: str,
+    data_path: str,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     def plots(df):
         colname = "Change in Employment Share"
@@ -150,7 +164,7 @@ def change_employment_composition(
         empl_data_plot.update_traces(textposition="outside", marker_color=pri_color)
         empl_data_plot.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title=colname + " (Percentage Pts.)",
         )
         empl_data_plot.show()
@@ -177,15 +191,23 @@ def change_employment_composition(
         change_df["Change in Employment Share"] * 100
     )
     fig = plots(change_df)
-    if save:
-        fig.write_image(save_path)
+
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
 
 
 # Figure 16: Employment Composition -- APPROVED
 
 
 def employment_composition(
-    city: str, data_path: str, save: bool = False, save_path: str = None
+    city: str,
+    data_path: str,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     def plots(df):
         """
@@ -197,13 +219,12 @@ def employment_composition(
             x=df.index,
             y=df["Employment Share"] * 100,
             labels={"index": "Employment Sector"},
-            # text=df[colname].apply(lambda x: "{0:.1f}%".format(x)),
             text=df[colname].apply(lambda x: "{:.1f}%".format(x * 100)),
         )
         empl_data_plot.update_traces(textposition="outside", marker_color=pri_color)
         empl_data_plot.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Share of Total Employment",
         )
         empl_data_plot.show()
@@ -218,19 +239,33 @@ def employment_composition(
     empl_data["Total Employment"] = empl_data.iloc[:, 2:].sum(axis=1)
     for sector in empl_data.columns[2:]:
         empl_data[sector + " "] = empl_data[sector] / empl_data["Total Employment"]
+
+    # Calculate employment shares
     empl_share_df = pd.DataFrame()
     empl_share_df.index = empl_data.columns[14:]
     empl_share_df["Employment Share"] = empl_data.iloc[0, 14:]
     empl_share_df = empl_share_df.drop(index="Total Employment ")
     empl_share_df = empl_share_df.sort_values("Employment Share", ascending=False)
-    plots(empl_share_df)
+
+    fig = plots(empl_share_df)
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+    return fig
 
 
 # Fig 18: Change in Employment share from Previous peak by Sector
 
 
 def change_empl_share_prev_peak_per_sector(
-    city: str, data_path: str, save: bool = False, save_path: str = None
+    city: str,
+    data_path: str,
+    save_path_abs: str = None,
+    save_path_perc: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     def plots(df):
         """
@@ -261,7 +296,7 @@ def change_empl_share_prev_peak_per_sector(
         )
         fig.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Change in Employment Share",
             xaxis_title="Industry",
             barmode="relative",
@@ -292,7 +327,7 @@ def change_empl_share_prev_peak_per_sector(
         )
         fig2.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Percent Change in Employment Share",
             xaxis_title="Industry",
             barmode="relative",
@@ -355,15 +390,35 @@ def change_empl_share_prev_peak_per_sector(
 
     graph_df = graph_df[:-1]
     # print(empl_data)
-    fig = plots(graph_df)
-    if save:
-        fig.write_image(save_path)
+    fig_abs, fig_perc = plots(graph_df)
+
+    if save_path_abs is not None and save_path_perc is not None:
+        fig_abs.write_image(
+            save_path_abs, height=img_height, width=img_width, scale=scale, format="png"
+        )
+        fig_perc.write_image(
+            save_path_perc,
+            height=img_height,
+            width=img_width,
+            scale=scale,
+            format="png",
+        )
+
+    return fig_abs, fig_perc
 
 
 # Fig 19, 20: Change in Employment, Peak to Trough, Absolute and Percentages -- WIP
 
 
-def peak_to_trough_empl(data_path: str, city: str):
+def peak_to_trough_empl(
+    data_path: str,
+    city: str,
+    save_path_abs: str = None,
+    save_path_perc: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
+):
     def plots(df):
         """
         Plots data using plotly
@@ -393,7 +448,7 @@ def peak_to_trough_empl(data_path: str, city: str):
         )
         fig.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Change in Employment",
             xaxis_title="Industry",
             barmode="relative",
@@ -424,7 +479,7 @@ def peak_to_trough_empl(data_path: str, city: str):
         )
         fig2.update_layout(
             template="plotly_white",
-            font=dict(family="Glacial Indifference", size=14, color="Black"),
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Percent Change in Employment",
             xaxis_title="Industry",
             barmode="relative",
@@ -505,11 +560,21 @@ def peak_to_trough_empl(data_path: str, city: str):
     graph_df["recovery_perc"] = graph_df["recovery"] / graph_df["MAX"]
     graph_df["netgain_perc"] = graph_df["netgain"] / graph_df["MAX"]
 
-    print(graph_df)
+    fig_abs, fig_perc = plots(graph_df)
 
-    fig, fig2 = plots(graph_df)
+    if save_path_abs is not None and save_path_perc is not None:
+        fig_abs.write_image(
+            save_path_abs, height=img_height, width=img_width, scale=scale, format="png"
+        )
+        fig_perc.write_image(
+            save_path_perc,
+            height=img_height,
+            width=img_width,
+            scale=scale,
+            format="png",
+        )
 
-    return graph_df
+    return fig_abs, fig_perc
 
 
 def main():
