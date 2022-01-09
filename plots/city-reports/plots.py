@@ -32,6 +32,8 @@ from taxable_sales import (
 
 from education_human_capital import human_capital_index_cv, educational_attainment_cv
 
+from health_insurance import health_insurance
+
 from lowe.acs.ACSClient import ACSClient
 
 
@@ -210,6 +212,7 @@ async def education_human_capital_plots(
     await human_capital_index_cv(
         client=client,
         year=str(acs_year),
+        target_city=target_city.lower(),
         save_path=f"outputs/{target_city}/Human Capital Index CV.png",
     )
 
@@ -221,8 +224,16 @@ async def education_human_capital_plots(
     )
 
 
-def health_insurance_plots():
-    pass
+@timer_async
+async def health_insurance_plots(client: ACSClient, target_city: str, acs_year: int):
+    target_city_acs_comma = f"{target_city.lower()}, ca"
+    # Figure 27
+    await health_insurance(
+        client=client,
+        city=target_city_acs_comma,
+        year=str(acs_year),
+        save_path=f"outputs/{target_city}/Health Insurance.png",
+    )
 
 
 async def main(dof_year: int = 2021, acs_year: int = 2019):
@@ -257,6 +268,10 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
             # taxable_sales_plots(target_city=city)
 
             await education_human_capital_plots(
+                client=acs_client, target_city=city, acs_year=acs_year
+            )
+
+            await health_insurance_plots(
                 client=acs_client, target_city=city, acs_year=acs_year
             )
     finally:
