@@ -30,6 +30,8 @@ from taxable_sales import (
     timer,
 )
 
+from education_human_capital import human_capital_index_cv, educational_attainment_cv
+
 from lowe.acs.ACSClient import ACSClient
 
 
@@ -200,8 +202,23 @@ def taxable_sales_plots(target_city: str, data_path: str = "data/taxable_sales.c
     )
 
 
-def education_human_capital_plots():
-    pass
+@timer_async
+async def education_human_capital_plots(
+    client: ACSClient, target_city: str, acs_year: int
+):
+    # Figure 25
+    await human_capital_index_cv(
+        client=client,
+        year=str(acs_year),
+        save_path=f"outputs/{target_city}/Human Capital Index CV.png",
+    )
+
+    # Figure 26
+    await educational_attainment_cv(
+        client=client,
+        year=str(acs_year),
+        save_path=f"outputs/{target_city}/Educatinal Attainment.png",
+    )
 
 
 def health_insurance_plots():
@@ -223,18 +240,27 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
         "Rancho Mirage",
     ]
 
-    client = ACSClient()
-    await client.initialize()
+    acs_client = ACSClient()
+    await acs_client.initialize()
 
     try:
         for city in cities:
-            await demographics_plots(
-                target_city=city, dof_year=dof_year, acs_year=acs_year, client=client
+            # await demographics_plots(
+            #     target_city=city,
+            #     dof_year=dof_year,
+            #     acs_year=acs_year,
+            #     client=acs_client,
+            # )
+
+            # await income_plots(target_city=city, acs_year=acs_year, client=acs_client)
+
+            # taxable_sales_plots(target_city=city)
+
+            await education_human_capital_plots(
+                client=acs_client, target_city=city, acs_year=acs_year
             )
-            await income_plots(target_city=city, acs_year=acs_year, client=client)
-            taxable_sales_plots(target_city=city)
     finally:
-        await client.close()
+        await acs_client.close()
 
 
 if __name__ == "__main__":
