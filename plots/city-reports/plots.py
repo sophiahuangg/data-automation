@@ -236,6 +236,11 @@ async def health_insurance_plots(client: ACSClient, target_city: str, acs_year: 
     )
 
 
+# ------------------------------
+# Main Function
+# ------------------------------
+
+
 async def main(dof_year: int = 2021, acs_year: int = 2019):
     _make_dirs()
 
