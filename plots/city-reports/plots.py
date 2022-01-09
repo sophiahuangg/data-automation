@@ -5,6 +5,8 @@ import time
 from functools import wraps
 from multiprocessing import Pool, cpu_count
 
+from numpy import save
+
 from demographics import (
     city_population_cv_present,
     city_population_cv_time_series,
@@ -22,7 +24,13 @@ from income import (
     household_income_by_class,
 )
 
-from employment import avg_monthly_employment
+from employment import (
+    avg_monthly_employment,
+    change_employment_composition,
+    employment_composition,
+    peak_to_trough_empl,
+    change_empl_share_prev_peak_per_sector
+)
 
 from taxable_sales import (
     real_nominal_sales_pc_time_series,
@@ -182,11 +190,43 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
         save_path=f"outputs/{target_city}/Household Income By Class.png",
     )
 
+@timer
+def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv.dvc"):
+    # Figure 14
+    avg_monthly_employment(
+        city=target_city,
+        data_path= data_path,
+        save_path= f"outputs/{target_city}/Average Monthly Total Employment Per Year",
+    )
 
-def employment_plots(city: str, data_path: str):
-    # Saving this one for last
-    pass
+    # Figure 16
+    employment_composition(
+        city=target_city,
+        data_path=data_path,
+        save_path=f"outputs/{target_city}/Employment Composition"
+    )
+    # Figure 17
+    change_employment_composition(
+        city=target_city,
+        data_path=data_path,
+        save_path=f"outputs/{target_city}/Change in Employment Composition"
+    )
 
+    # Figure 18
+    change_empl_share_prev_peak_per_sector(
+        city=target_city,
+        data_path=data_path,
+        save_path_abs=f"outputs/{target_city}/Change in Employment Share from Previous Peak by Sector",
+        save_path_perc=f"outputs/{target_city}/% Change in Employment Share from Previous Peak by Sector"
+    )
+
+    # Figure 19 & Figure 20 ??
+    change_empl_share_prev_peak_per_sector(
+        city=target_city,
+        data_path=data_path,
+        save_path_abs=f"outputs/{target_city}/Change in Employment, Peak to Trough, by Sector",
+        save_path_perc=f"outputs/{target_city}/% Change in Employment,  Peak to Trough, by Sector"
+    )
 
 @timer
 def taxable_sales_plots(target_city: str, data_path: str = "data/taxable_sales.csv"):

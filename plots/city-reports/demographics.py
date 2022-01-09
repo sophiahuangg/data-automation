@@ -386,32 +386,32 @@ async def age_distribution(
         columns={"AGE AND SEX Estimate Total Total population": "Total population"}
     )
 
-    # newcols = []
-    # for col in resp.columns:
-    #     newcols.append(col.replace("AGE AND SEX Estimate Percent Total population AGE ", ""))
-    # resp.columns = newcols
-
     # Consolidating the age groups
     resp["0-14 years perc"] = (
         resp["Under 5 years"].astype(float)
         + resp["5 to 9 years"].astype(float)
         + resp["10 to 14 years"].astype(float)
     )
+    
     resp["15-24 years perc"] = resp["15 to 19 years"].astype(float) + resp[
         "20 to 24 years"
     ].astype(float)
+    
     resp["25-34 years perc"] = resp["25 to 29 years"].astype(float) + resp[
         "30 to 34 years"
     ].astype(float)
+    
     resp["35-44 years perc"] = resp["35 to 39 years"].astype(float) + resp[
         "40 to 44 years"
     ].astype(float)
+    
     resp["45-64 years perc"] = (
         resp["45 to 49 years"].astype(float)
         + resp["50 to 54 years"].astype(float)
         + resp["55 to 59 years"].astype(float)
         + resp["60 to 64 years"].astype(float)
     )
+    
     resp["65+ years perc"] = (
         resp["65 to 69 years"].astype(float)
         + resp["70 to 74 years"].astype(float)
@@ -455,12 +455,12 @@ async def age_distribution(
     cv = resp.loc[resp["location_key"] != "riverside county ca"]
 
     cv = cv.groupby(["year"]).sum()
-    cv["0-14 years perc"] = cv["0-14 years"] / cv["Total population"]
-    cv["15-24 years perc"] = cv["15-24 years"] / cv["Total population"]
-    cv["25-34 years perc"] = cv["25-34 years"] / cv["Total population"]
-    cv["35-44 years perc"] = cv["35-44 years"] / cv["Total population"]
-    cv["45-64 years perc"] = cv["45-64 years"] / cv["Total population"]
-    cv["65+ years perc"] = cv["65+ years"] / cv["Total population"]
+
+    for i, colname in enumerate(perc_cols):
+        cv[perc_cols] = (
+            cv[raw_cols[i]] / cv["Total population"]
+        )
+
     cv["location_key"] = "Coachella Valley"
 
     # Dataframe for Coachella Valley ONLY

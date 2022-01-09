@@ -140,64 +140,6 @@ def avg_monthly_employment(
 
     return fig
 
-
-# Figure 17: Change in Employment Composition -- APPROVED
-
-
-def change_employment_composition(
-    city: str,
-    data_path: str,
-    save_path: str = None,
-    img_height: int = 1080,
-    img_width: int = 1920,
-    scale: int = 2,
-):
-    def plots(df):
-        colname = "Change in Employment Share"
-        empl_data_plot = px.bar(
-            df,
-            x=df.index,
-            y=colname,
-            labels={"index": "Sector"},
-            text=df[colname].apply(lambda x: "{:.1f}%".format(x)),
-        )
-        empl_data_plot.update_traces(textposition="outside", marker_color=pri_color)
-        empl_data_plot.update_layout(
-            template="plotly_white",
-            font=dict(family="Glacial Indifference", size=18, color="Black"),
-            yaxis_title=colname + " (Percentage Pts.)",
-        )
-        empl_data_plot.show()
-        return empl_data_plot
-
-    # Read in and preprocess the data
-    empl_data = preprocess_data(path=data_path)
-    empl_data = filter_df(city, empl_data)
-    empl_data = consolidate_industries(empl_data)
-    empl_data = empl_data[empl_data["DATE"].dt.year > 2019]
-    empl_data = empl_data[empl_data["DATE"].dt.month == 3]
-
-    empl_data["Total Employment"] = empl_data.iloc[:, 2:].sum(axis=1)
-    for sector in empl_data.columns[2:]:
-        empl_data[sector + " "] = empl_data[sector] / empl_data["Total Employment"]
-    change_df = pd.DataFrame()
-    change_df.index = empl_data.columns[2:]
-    change_df["Change in Employment Share"] = (
-        empl_data.iloc[0, 14:] - empl_data.iloc[1, 14:]
-    )
-    change_df = change_df[change_df["Change in Employment Share"] != 0.0]
-    change_df = change_df.dropna()
-    change_df["Change in Employment Share"] = (
-        change_df["Change in Employment Share"] * 100
-    )
-    fig = plots(change_df)
-
-    if save_path is not None:
-        fig.write_image(
-            save_path, height=img_height, width=img_width, scale=scale, format="png"
-        )
-
-
 # Figure 16: Employment Composition -- APPROVED
 
 
@@ -254,6 +196,61 @@ def employment_composition(
         )
     return fig
 
+# Figure 17: Change in Employment Composition -- APPROVED
+
+
+def change_employment_composition(
+    city: str,
+    data_path: str,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
+):
+    def plots(df):
+        colname = "Change in Employment Share"
+        empl_data_plot = px.bar(
+            df,
+            x=df.index,
+            y=colname,
+            labels={"index": "Sector"},
+            text=df[colname].apply(lambda x: "{:.1f}%".format(x)),
+        )
+        empl_data_plot.update_traces(textposition="outside", marker_color=pri_color)
+        empl_data_plot.update_layout(
+            template="plotly_white",
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
+            yaxis_title=colname + " (Percentage Pts.)",
+        )
+        empl_data_plot.show()
+        return empl_data_plot
+
+    # Read in and preprocess the data
+    empl_data = preprocess_data(path=data_path)
+    empl_data = filter_df(city, empl_data)
+    empl_data = consolidate_industries(empl_data)
+    empl_data = empl_data[empl_data["DATE"].dt.year > 2019]
+    empl_data = empl_data[empl_data["DATE"].dt.month == 3]
+
+    empl_data["Total Employment"] = empl_data.iloc[:, 2:].sum(axis=1)
+    for sector in empl_data.columns[2:]:
+        empl_data[sector + " "] = empl_data[sector] / empl_data["Total Employment"]
+    change_df = pd.DataFrame()
+    change_df.index = empl_data.columns[2:]
+    change_df["Change in Employment Share"] = (
+        empl_data.iloc[0, 14:] - empl_data.iloc[1, 14:]
+    )
+    change_df = change_df[change_df["Change in Employment Share"] != 0.0]
+    change_df = change_df.dropna()
+    change_df["Change in Employment Share"] = (
+        change_df["Change in Employment Share"] * 100
+    )
+    fig = plots(change_df)
+
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
 
 # Fig 18: Change in Employment share from Previous peak by Sector
 
