@@ -35,8 +35,10 @@ async def human_capital_index_cv(
     ],
     target_city: str = "desert hot springs",
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     Parameters
@@ -45,11 +47,14 @@ async def human_capital_index_cv(
     target_city: the city you want to highlight in the bar graph **DONT INCLUDE THE STATE**
         i.e. 'coachella' or 'palm desert' etc
         NOT 'coachella, ca'
-
-    save: bool
-    True or False, whether or not you want to save
     save_path: str
-    Path to save the file to
+        Path to save the file to, default None
+    img_height: int
+        Saved image height in pixels
+    img_width: int
+        Saved image width in pixels
+    scale: Union[int, float]
+        Scale to generate the image at
     """
     loc_dicts = [{"city": city} for city in cities]
     locs = [*map(name2fips, loc_dicts)]
@@ -124,11 +129,14 @@ async def human_capital_index_cv(
     fig.update_layout(
         yaxis_title=f"Human Capital Index, {year}",
         template="plotly_white",
-        font=dict(family="Glacial Indifference", size=14, color="Black"),
+        font=dict(family="Glacial Indifference", size=18, color="Black"),
     )
 
-    if save:
-        fig.write_image(save_path)
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
@@ -149,17 +157,23 @@ async def educational_attainment_cv(
         "rancho mirage, ca",
     ],
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     Parameters
     ----------
     cities: cities in coachella valley as a list
-    save: bool
-    True or False, whether or not you want to save
     save_path: str
-    Path to save the file to
+        Path to save the file to, default None
+    img_height: int
+        Saved image height in pixels
+    img_width: int
+        Saved image width in pixels
+    scale: Union[int, float]
+        Scale to generate the image at
     """
     loc_dicts = [{"city": city} for city in cities]
     locs = [*map(name2fips, loc_dicts)]
@@ -231,14 +245,18 @@ async def educational_attainment_cv(
             orientation="h", yanchor="bottom", y=-0.17, xanchor="center", x=0.47
         ),
         template="plotly_white",
-        font=dict(family="Glacial Indifference", size=14, color="Black"),
+        font=dict(family="Glacial Indifference", size=18, color="Black"),
         yaxis=dict(tickformat=".0%", hoverformat="closest"),
         yaxis_title="Percent of Population 25+ Years Old",
     )
 
     # option for saving
-    if save:
-        fig.write_image(save_path)
+
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
