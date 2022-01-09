@@ -22,6 +22,14 @@ from income import (
     household_income_by_class,
 )
 
+from employment import avg_monthly_employment
+
+from taxable_sales import (
+    real_nominal_sales_pc_time_series,
+    taxable_sales_per_capita_quarters_cv,
+    timer,
+)
+
 from lowe.acs.ACSClient import ACSClient
 
 
@@ -171,6 +179,35 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
     )
 
 
+def employment_plots(city: str, data_path: str):
+    # Saving this one for last
+    pass
+
+
+@timer
+def taxable_sales_plots(target_city: str, data_path: str = "data/taxable_sales.csv"):
+    # Figure 21
+    real_nominal_sales_pc_time_series(
+        city=target_city,
+        data_path=data_path,
+        save_path=f"outputs/{target_city}/Real and Nominal Retail Sales Per Capita.png",
+    )
+
+    # Figure 22
+    taxable_sales_per_capita_quarters_cv(
+        data_path=data_path,
+        save_path=f"outputs/{target_city}/Taxable Sales Per Capita CV.png",
+    )
+
+
+def education_human_capital_plots():
+    pass
+
+
+def health_insurance_plots():
+    pass
+
+
 async def main(dof_year: int = 2021, acs_year: int = 2019):
     _make_dirs()
 
@@ -195,6 +232,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
                 target_city=city, dof_year=dof_year, acs_year=acs_year, client=client
             )
             await income_plots(target_city=city, acs_year=acs_year, client=client)
+            taxable_sales_plots(target_city=city)
     finally:
         await client.close()
 
