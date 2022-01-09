@@ -23,17 +23,23 @@ async def health_insurance(
     client: ACSClient,
     city: str = "indian wells, ca",
     year: str = "2019",
-    save: bool = False,
     save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
 ):
     """
     Parameters
     ----------
     city: name of the city as a list eg. ['cathedral city, ca'] or ['coachella, ca'] etc.
-    save: bool
-    True or False, whether or not you want to save
     save_path: str
-    Path to save the file to
+        Path to save the file to, default None
+    img_height: int
+        Saved image height in pixels
+    img_width: int
+        Saved image width in pixels
+    scale: Union[int, float]
+        Scale to generate the image at
     """
 
     # Pull data for city
@@ -143,13 +149,16 @@ async def health_insurance(
             orientation="h", yanchor="bottom", y=-0.15, xanchor="center", x=0.5
         ),
         template="plotly_white",
-        font=dict(family="Glacial Indifference", size=14, color="Black"),
+        font=dict(family="Glacial Indifference", size=18, color="Black"),
         yaxis=dict(tickformat=".0%", hoverformat="closest"),
         yaxis_title="Percentage of Population with Health Insurance",
     )
 
-    if save:
-        fig.write_image(save_path)
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
