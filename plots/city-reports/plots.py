@@ -29,7 +29,7 @@ from employment import (
     change_employment_composition,
     employment_composition,
     peak_to_trough_empl,
-    change_empl_share_prev_peak_per_sector
+    change_empl_share_prev_peak_per_sector,
 )
 
 from taxable_sales import (
@@ -190,26 +190,27 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
         save_path=f"outputs/{target_city}/Household Income By Class.png",
     )
 
+
 @timer
-def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv.dvc"):
+def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv"):
     # Figure 14
     avg_monthly_employment(
         city=target_city,
-        data_path= data_path,
-        save_path= f"outputs/{target_city}/Average Monthly Total Employment Per Year",
+        data_path=data_path,
+        save_path=f"outputs/{target_city}/Average Monthly Total Employment Per Year",
     )
 
     # Figure 16
     employment_composition(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Employment Composition"
+        save_path=f"outputs/{target_city}/Employment Composition",
     )
     # Figure 17
     change_employment_composition(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Change in Employment Composition"
+        save_path=f"outputs/{target_city}/Change in Employment Composition",
     )
 
     # Figure 18
@@ -217,7 +218,7 @@ def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv.dvc"):
         city=target_city,
         data_path=data_path,
         save_path_abs=f"outputs/{target_city}/Change in Employment Share from Previous Peak by Sector",
-        save_path_perc=f"outputs/{target_city}/% Change in Employment Share from Previous Peak by Sector"
+        save_path_perc=f"outputs/{target_city}/% Change in Employment Share from Previous Peak by Sector",
     )
 
     # Figure 19 & Figure 20 ??
@@ -225,8 +226,9 @@ def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv.dvc"):
         city=target_city,
         data_path=data_path,
         save_path_abs=f"outputs/{target_city}/Change in Employment, Peak to Trough, by Sector",
-        save_path_perc=f"outputs/{target_city}/% Change in Employment,  Peak to Trough, by Sector"
+        save_path_perc=f"outputs/{target_city}/% Change in Employment,  Peak to Trough, by Sector",
     )
+
 
 @timer
 def taxable_sales_plots(target_city: str, data_path: str = "data/taxable_sales.csv"):
@@ -309,6 +311,8 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
             # )
 
             # await income_plots(target_city=city, acs_year=acs_year, client=acs_client)
+
+            employment_plots(target_city=city, data_path="data/CV_EMPL.csv")
 
             # taxable_sales_plots(target_city=city)
 
