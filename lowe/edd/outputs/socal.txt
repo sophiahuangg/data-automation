@@ -1,0 +1,39 @@
+CPS STATISTICS - ALL NOT SEASONALY ADJUSTED 
+--------------------------------------- 
+UNEMPLOYMENT RATE for Oct-21: 6.676080937958713% 
+UNEMPLOYMENT RATE for Sep-21: 6.968618389176699% 
+UNEMPLOYMENT RATE for Oct-20: 10.266886326194399% 
+MAX UNEMPLOYMENT RATE: ('May-20', '16.836869831366432%') 
+ 
+LABOR FORCE FOR Oct-21: 10763800.0 
+LABOR FORCE FOR Sep-21: 10732400.0 
+CHANGE IN LABOR FORCE FROM Sep-21 to Oct-21: 31400.0 
+ 
+ CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
+--------------------------------------- 
+TOTAL NONFARM FOR Oct-21: 9291700 
+TOTAL NONFARM FOR Sep-21: 9172600 
+TOTAL NONFARM FOR Oct-20: 8829600 
+TOTAL NONFARM AS PERCENT OF FEB 2020: -4.94% 
+CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 119100 
+TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 1.3% 
+TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 69.0% 
+NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 14 
+NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 0 
+ 
+Industries sorted by MTM gains: 
+                                      TITLE      MTM       YTY  Max Drawdown
+24                               Government  26800.0   21700.0     -189000.0
+14        Trade, Transportation & Utilities  23700.0   65000.0     -287800.0
+20         Professional & Business Services  21800.0   66800.0     -176600.0
+21            Educational & Health Services  16300.0   48400.0     -166500.0
+16                             Retail Trade  16100.0   24800.0     -189700.0
+22                    Leisure & Hospitality  12500.0  191800.0     -539200.0
+17  Transportation, Warehousing & Utilities   5400.0   32100.0      -85300.0
+23                           Other Services   4800.0   33000.0     -114100.0
+9                             Manufacturing   3100.0   10300.0      -81200.0
+19                     Financial Activities   2500.0   -1000.0      -31700.0
+18                              Information   2300.0   16400.0      -87400.0
+15                          Wholesale Trade   2200.0    8100.0      -54900.0
+11                         Nondurable Goods   1600.0    3700.0      -41500.0
+10                            Durable Goods   1500.0    6600.0      -43800.0
