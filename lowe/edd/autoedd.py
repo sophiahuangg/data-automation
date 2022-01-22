@@ -399,45 +399,49 @@ def news_release_numbers(
             f.write("CPS STATISTICS - ALL NOT SEASONALY ADJUSTED \n")
             f.write("--------------------------------------- \n")
 
-            f.write(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100}% \n")
-            f.write(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100}% \n")
+            f.write(f"UNEMPLOYMENT RATE for {current}: {UNEMPL_CURRENT * 100:,.1f}% \n")
+            f.write(f"UNEMPLOYMENT RATE for {prev_month}: {UNEMPL_PREV * 100:,.1f}% \n")
             f.write(
-                f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100}% \n"
+                f"UNEMPLOYMENT RATE for {last_year_colname}: {UNEMPL_LAST_YEAR * 100:,.1f}% \n"
             )
-            f.write(f"MAX UNEMPLOYMENT RATE: {MAX_UNEMP} \n \n")
-            f.write(f"LABOR FORCE FOR {current}: {LABOR_FORCE_CURRENT} \n")
-            f.write(f"LABOR FORCE FOR {prev_month}: {LABOR_FORCE_LAST_MONTH} \n")
             f.write(
-                f"CHANGE IN LABOR FORCE FROM {prev_month} to {current}: {LABOR_FORCE_CURRENT - LABOR_FORCE_LAST_MONTH} \n \n "
+                f"MAX UNEMPLOYMENT RATE: ({MAX_UNEMP[0]}, {float(MAX_UNEMP[1][:-1]):,.1f}%) \n \n"
+            )
+            f.write(f"LABOR FORCE FOR {current}: {LABOR_FORCE_CURRENT:,.0f} \n")
+            f.write(f"LABOR FORCE FOR {prev_month}: {LABOR_FORCE_LAST_MONTH:,.0f} \n")
+            f.write(
+                f"CHANGE IN LABOR FORCE FROM {prev_month} to {current}: {LABOR_FORCE_CURRENT - LABOR_FORCE_LAST_MONTH:,.0f} \n \n "
             )
 
             f.write("CES STATISTICS - ALL NOT SEASONALLY ADJUSTED \n")
             f.write("--------------------------------------- \n")
 
-            f.write(f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT)} \n")
             f.write(
-                f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH)} \n"
+                f"TOTAL NONFARM FOR {current}: {int(TOTAL_NONFARM_CURRENT):,.0f} \n"
             )
             f.write(
-                f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR)} \n"
+                f"TOTAL NONFARM FOR {prev_month}: {int(TOTAL_NONFARM_LAST_MONTH):,.0f} \n"
             )
             f.write(
-                f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2)}% \n"
+                f"TOTAL NONFARM FOR {last_year_colname}: {int(TOTAL_NONFARM_LAST_YEAR):,.0f} \n"
             )
             f.write(
-                f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE)} \n"
+                f"TOTAL NONFARM AS PERCENT OF FEB 2020: {round(TOTAL_NONFARM_FEB_2020_PERC * 100, 2):,.1f}% \n"
             )
             f.write(
-                f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2)}% \n"
+                f"CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: {int(TOTAL_NONFARM_CHANGE):,.0f} \n"
             )
             f.write(
-                f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100}% \n"
+                f"TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: {round((TOTAL_NONFARM_CURRENT/TOTAL_NONFARM_LAST_MONTH - 1) * 100, 2):,.1f}% \n"
             )
             f.write(
-                f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED} \n"
+                f"TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: {RECOVERY_PERCENTAGE * 100:,.1f}% \n"
             )
             f.write(
-                f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED} \n \n"
+                f"NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_INCREASED:,.0f} \n"
+            )
+            f.write(
+                f"NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: {NUM_INDUSTRIES_DECREASED:,.0f} \n \n"
             )
 
             """
