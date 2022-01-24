@@ -457,7 +457,7 @@ async def age_distribution(
     cv = cv.groupby(["year"]).sum()
 
     for i, colname in enumerate(perc_cols):
-        cv[perc_cols] = (
+        cv[perc_cols[i]] = (
             cv[raw_cols[i]] / cv["Total population"]
         )
 
