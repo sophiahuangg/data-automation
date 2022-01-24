@@ -13,6 +13,16 @@ sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
 
 
+# Fundamental colors
+fund_pri = "#961a30"
+fund_sec = "#c5485f"
+fund_ter = "#e6aeb7"
+
+# Accent Colors
+acc_pri = "#965119"
+acc_sec = "#c57a49"
+acc_ter = "#e7c8ae"
+
 # ------------------------------
 # Plot Generation
 # ------------------------------
@@ -106,9 +116,9 @@ async def human_capital_index_cv(
 
     # set the colors
     colors = [
-        pri_color,
+        fund_pri,
     ] * 9
-    colors[list(df_resp["city"]).index(target_city.title())] = sec_color
+    colors[list(df_resp["city"]).index(target_city.title())] = acc_sec
 
     # build the figure
     fig = go.Figure()
@@ -125,7 +135,7 @@ async def human_capital_index_cv(
     )
 
     # Change the bar mode
-    fig.update_traces(texttemplate="", textposition="outside")
+    fig.update_traces(texttemplate="", textposition="outside", width=0.6, textfont_size=16)
     fig.update_layout(
         yaxis_title=f"Human Capital Index, {year}",
         template="plotly_white",
@@ -140,7 +150,7 @@ async def human_capital_index_cv(
     return fig
 
 
-# Fig 26: Educational Attainment Levels -- WIP
+# Fig 26: Educational Attainment Levels -- APPROVED
 
 
 async def educational_attainment_cv(
@@ -249,6 +259,7 @@ async def educational_attainment_cv(
         yaxis=dict(tickformat=".0%", hoverformat="closest"),
         yaxis_title="Percent of Population 25+ Years Old",
     )
+    fig.update_traces(textfont_size=16)
 
     # option for saving
 
@@ -269,7 +280,7 @@ async def main():
     client = ACSClient()
     await client.initialize()
     try:
-        test = await educational_attainment_cv(client=client)
+        test = await human_capital_index_cv(client=client)
     finally:
         await client.close()
     test.show()

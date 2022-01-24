@@ -18,6 +18,16 @@ ter_color = "#e6aeb7"
 qua_color = "#bf5e5e"
 pen_color = "#9c4d48"
 
+# Fundamental colors
+fund_pri = "#961a30"
+fund_sec = "#c5485f"
+fund_ter = "#e6aeb7"
+
+# Accent Colors
+acc_pri = "#965119"
+acc_sec = "#c57a49"
+acc_ter = "#e7c8ae"
+
 # ------------------------------
 # Helper Functions
 # ------------------------------

@@ -222,7 +222,7 @@ def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv"):
     )
 
     # Figure 19 & Figure 20 ??
-    change_empl_share_prev_peak_per_sector(
+    peak_to_trough_empl(
         city=target_city,
         data_path=data_path,
         save_path_abs=f"outputs/{target_city}/Change in Employment, Peak to Trough, by Sector",
@@ -289,7 +289,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
     cities = [
         "Coachella",
         "Cathedral City",
-        "Desert Hot Springs",
+        # "Desert Hot Springs",
         "Indian Wells",
         "Indio",
         "La Quinta",
@@ -303,18 +303,18 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
 
     try:
         for city in cities:
-            # await demographics_plots(
-            #     target_city=city,
-            #     dof_year=dof_year,
-            #     acs_year=acs_year,
-            #     client=acs_client,
-            # )
+            await demographics_plots(
+                target_city=city,
+                dof_year=dof_year,
+                acs_year=acs_year,
+                client=acs_client,
+            )
 
-            # await income_plots(target_city=city, acs_year=acs_year, client=acs_client)
+            await income_plots(target_city=city, acs_year=acs_year, client=acs_client)
 
             employment_plots(target_city=city, data_path="data/CV_EMPL.csv")
 
-            # taxable_sales_plots(target_city=city)
+            taxable_sales_plots(target_city=city)
 
             await education_human_capital_plots(
                 client=acs_client, target_city=city, acs_year=acs_year

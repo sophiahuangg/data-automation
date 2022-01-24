@@ -22,6 +22,16 @@ pri_color = "#961a30"
 sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
 
+# Fundamental colors
+fund_pri = "#961a30"
+fund_sec = "#c5485f"
+fund_ter = "#e6aeb7"
+
+# Accent Colors
+acc_pri = "#965119"
+acc_sec = "#c57a49"
+acc_ter = "#e7c8ae"
+
 # ------------------------------
 # Helper Functions
 # ------------------------------

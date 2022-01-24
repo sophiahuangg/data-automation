@@ -8,6 +8,20 @@ pri_color = "#961a30"
 sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
 
+# Fundamental colors
+fund_pri = "#961a30"
+fund_sec = "#c5485f"
+fund_ter = "#e6aeb7"
+
+# Accent Colors
+acc_pri = "#965119"
+acc_sec = "#c57a49"
+acc_ter = "#e7c8ae"
+
+# ------------------------------
+# Helper Functions
+# ------------------------------
+
 
 def filter_df(city: str, df):
     """
@@ -15,11 +29,6 @@ def filter_df(city: str, df):
     """
     df = df[df["City"].str.lower() == city.lower()]
     return df
-
-
-# ------------------------------
-# Helper Functions
-# ------------------------------
 
 
 def consolidate_industries(df: pd.DataFrame):
@@ -112,7 +121,10 @@ def avg_monthly_employment(
         empl_data_plot.update_layout(
             template="plotly_white",
             font=dict(family="Glacial Indifference", size=18, color="Black"),
+            yaxis_title="Average Monthly Total Employment",
+            xaxis_title="",
         )
+        empl_data_plot.update_traces(textfont_size=16, width=0.5)
         return empl_data_plot
 
     # Read in and preprocess the data
@@ -139,6 +151,7 @@ def avg_monthly_employment(
         )
 
     return fig
+
 
 # Figure 16: Employment Composition -- APPROVED
 
@@ -169,7 +182,6 @@ def employment_composition(
             font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title="Share of Total Employment",
         )
-        empl_data_plot.show()
         return empl_data_plot
 
     # Read in and preprocess the data
@@ -195,6 +207,7 @@ def employment_composition(
             save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
     return fig
+
 
 # Figure 17: Change in Employment Composition -- APPROVED
 
@@ -222,7 +235,6 @@ def change_employment_composition(
             font=dict(family="Glacial Indifference", size=18, color="Black"),
             yaxis_title=colname + " (Percentage Pts.)",
         )
-        empl_data_plot.show()
         return empl_data_plot
 
     # Read in and preprocess the data
@@ -251,6 +263,7 @@ def change_employment_composition(
         fig.write_image(
             save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
+
 
 # Fig 18: Change in Employment share from Previous peak by Sector
 
@@ -298,7 +311,6 @@ def change_empl_share_prev_peak_per_sector(
             xaxis_title="Industry",
             barmode="relative",
         )
-        fig.show()
 
         fig2 = go.Figure(
             [
@@ -329,8 +341,6 @@ def change_empl_share_prev_peak_per_sector(
             xaxis_title="Industry",
             barmode="relative",
         )
-
-        fig2.show()
 
         return fig, fig2
 
@@ -450,7 +460,6 @@ def peak_to_trough_empl(
             xaxis_title="Industry",
             barmode="relative",
         )
-        fig.show()
 
         fig2 = go.Figure(
             [
@@ -482,7 +491,7 @@ def peak_to_trough_empl(
             barmode="relative",
         )
 
-        fig2.show()
+        return fig, fig2
 
     # Read in the employment data
     empl = pd.read_csv(data_path, na_values=["***", ".", "NA"])
@@ -575,9 +584,7 @@ def peak_to_trough_empl(
 
 
 def main():
-    test = change_empl_share_prev_peak_per_sector(
-        city="Cathedral City", data_path="../data/CV_EMPL.csv"
-    )
+    test = avg_monthly_employment(city="Cathedral City", data_path="data/CV_EMPL.csv")
     test.show()
 
 
