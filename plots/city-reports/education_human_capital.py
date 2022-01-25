@@ -229,7 +229,7 @@ async def educational_attainment_cv(
             x=cities,
             y=high_School / 100,
             base=0,
-            marker_color=pri_color,
+            marker_color=fund_pri,
             name="High School",
             text=high_School.apply(lambda x: "{0:1.1f}%".format(x)),
             textposition="outside",
@@ -241,7 +241,7 @@ async def educational_attainment_cv(
             x=cities,
             y=College / 100,
             base=0,
-            marker_color=ter_color,
+            marker_color=fund_ter,
             name="College",
             text=College.apply(lambda x: "{0:1.1f}%".format(x)),
             textposition="outside",
@@ -280,7 +280,7 @@ async def main():
     client = ACSClient()
     await client.initialize()
     try:
-        test = await human_capital_index_cv(client=client)
+        test = await educational_attainment_cv(client=client)
     finally:
         await client.close()
     test.show()
