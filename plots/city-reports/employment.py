@@ -1,4 +1,6 @@
 # Code written by Karan Goel, modifications for production made by Abhi Uppal
+import datetime
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
@@ -21,6 +23,27 @@ acc_ter = "#e7c8ae"
 # ------------------------------
 # Helper Functions
 # ------------------------------
+
+
+def _axis_line_breaks_elem(elem: str, max_chars: int = 15):
+    """Adds line breaks to axis values so they can be plotted horizontally"""
+    splt = elem.split(" ")
+    res = ""
+    tmp = ""
+    for word in splt:
+        res += f"{word} "
+        tmp += f"{word} "
+        charcount = len(tmp.strip())
+        if charcount >= max_chars:
+            res += "<br>"
+            tmp = ""
+            charcount = 0
+
+    return res.strip()
+
+
+def _axis_line_breaks(elems: list, max_chars: int = 15):
+    return [*map(lambda x: _axis_line_breaks_elem(x, max_chars), elems)]
 
 
 def filter_df(city: str, df):
@@ -151,6 +174,98 @@ def avg_monthly_employment(
         )
 
     return fig
+
+
+# NEW FIGURE: Employment Compositions, Pandemic vs. Now -- WIP
+
+
+def employment_composition_pandemic_now(
+    city: str,
+    data_path: str,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
+):
+    def plots(df):
+        df = df.set_index("DATE", drop=True)
+        pandemic_shares = [df.loc[pandemic_date, x] for x in share_cols]
+        recent_shares = [df.loc[most_recent_date, x] for x in share_cols]
+        industry_names_to_plot = [*map(lambda x: x.split("_")[0], share_cols)]
+        industry_names_to_plot = _axis_line_breaks(industry_names_to_plot, 10)
+
+        dt = datetime.datetime.strptime(most_recent_date, "%Y-%m-%d")
+        dt_str = dt.strftime("%B %Y")
+
+        fig = go.Figure(
+            [
+                go.Bar(
+                    name="March 2020",
+                    x=industry_names_to_plot,
+                    y=pandemic_shares,
+                    text=[*map(lambda x: f"{x * 100:.1f}%", pandemic_shares)],
+                    marker_color=fund_pri,
+                ),
+                go.Bar(
+                    name=dt_str,
+                    x=industry_names_to_plot,
+                    y=recent_shares,
+                    text=[*map(lambda x: f"{x * 100:.1f}%", recent_shares)],
+                    marker_color=fund_ter,
+                ),
+            ]
+        )
+
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
+            yaxis_title="Share of Total Employment",
+            xaxis_title="",
+            xaxis_tickangle=0,
+        )
+
+        fig.update_traces(textposition="outside", textfont_size=14)
+
+        fig.update_xaxes(tickfont_size=16)
+
+        return fig
+
+    empl_data = preprocess_data(path=data_path)
+    empl_data = filter_df(city, empl_data)
+    empl_data = consolidate_industries(empl_data)
+    empl_data = empl_data[empl_data["DATE"].dt.year >= 2020]
+
+    empl_data["Total Employment"] = empl_data.iloc[:, 2:].sum(axis=1)
+
+    empl_data = empl_data[empl_data["Total Employment"] != 0]
+
+    # Get rid of any industries with zeros
+    empl_data.replace(0, np.nan, inplace=True)
+    empl_data.dropna(axis=1, inplace=True)
+
+    cols = list(empl_data.columns)[2:]  # Leave out the City and Date columns
+    share_cols = []
+
+    for col in cols:
+        if col != "Total Employment":
+            share_name = f"{col}_share"
+            empl_data[share_name] = empl_data[col] / empl_data["Total Employment"]
+            share_cols.append(share_name)
+
+    # Filter for the dates of interest
+    empl_data["DATE"] = empl_data["DATE"].astype(str)
+    pandemic_date = "2020-03-01"
+    most_recent_date = empl_data.iloc[-1, :].loc["DATE"]
+
+    pandemic_df = empl_data[empl_data["DATE"] == pandemic_date]
+    recent_df = empl_data[empl_data["DATE"] == most_recent_date]
+
+    empl_data = pd.concat([pandemic_df, recent_df])
+
+    fig = plots(empl_data)
+    fig.show()
+
+    return empl_data
 
 
 # Figure 16: Employment Composition -- APPROVED
@@ -584,8 +699,13 @@ def peak_to_trough_empl(
 
 
 def main():
-    test = avg_monthly_employment(city="Cathedral City", data_path="data/CV_EMPL.csv")
-    test.show()
+    test = employment_composition_pandemic_now(
+        city="Cathedral City", data_path="data/CV_EMPL.csv"
+    )
+    if not isinstance(test, pd.DataFrame):
+        test.show()
+    else:
+        print(test)
 
 
 if __name__ == "__main__":
