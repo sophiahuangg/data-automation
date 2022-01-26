@@ -207,8 +207,11 @@ def real_nominal_sales_pc_time_series(
             x=dateList,
             y=list(plot_df["Per Capita"]),
             name="Nominal Taxable Sales Per Capita",
-            marker_color=pri_color,
+            marker_color=fund_pri,
             text=plot_df["Per Capita"].apply(lambda x: "{:,.0f}".format(x)),
+            textposition="outside",
+            textfont_size=16,
+            width=0.6,
         )
     )
 
@@ -217,7 +220,9 @@ def real_nominal_sales_pc_time_series(
             x=dateList,
             y=list(plot_df["Per Capita Adj"]),
             name=f"Real Taxable Sales Per Capita ({dateList[0]} Dollars)",
-            marker_color=sec_color,
+            marker_color=acc_ter,
+            marker_size=8,
+            line=dict(width=3, color=acc_ter)
         )
     )
 
@@ -228,7 +233,7 @@ def real_nominal_sales_pc_time_series(
         yaxis_title="Taxable Retail and Food Sales",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="Year",
+        xaxis_title="",
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
 
@@ -277,7 +282,7 @@ def taxable_sales_per_capita_quarters_cv(
     numQuarters = df["QuarterMonthTo"].max() // 3
     sub_dfs = [df[df["Quarter"] == f"Q{q}"] for q in range(1, numQuarters + 1)]
 
-    colors = [pri_color, qua_color, ter_color, pen_color]
+    colors = [fund_pri, qua_color, fund_ter, pen_color]
 
     fig = go.Figure()
 
@@ -296,12 +301,14 @@ def taxable_sales_per_capita_quarters_cv(
         font_family="Glacial Indifference",
         font_color="black",
         font_size=18,
-        yaxis_title="Taxable Retail and Food Sales",
+        yaxis_title=f"Taxable Retail and Food Sales, {maxYear}",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="City",
+        xaxis_title="",
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
+
+    fig.update_traces(textposition="outside", textfont_size=14)
 
     if save_path is not None:
         fig.write_image(
