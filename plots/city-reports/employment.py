@@ -176,7 +176,7 @@ def avg_monthly_employment(
     return fig
 
 
-# NEW FIGURE: Employment Compositions, Pandemic vs. Now -- WIP
+# NEW FIGURE: Employment Compositions, Pandemic vs. Now -- APPROVED
 
 
 def employment_composition_pandemic_now(
@@ -194,20 +194,23 @@ def employment_composition_pandemic_now(
         industry_names_to_plot = [*map(lambda x: x.split("_")[0], share_cols)]
         industry_names_to_plot = _axis_line_breaks(industry_names_to_plot, 10)
 
-        dt = datetime.datetime.strptime(most_recent_date, "%Y-%m-%d")
-        dt_str = dt.strftime("%B %Y")
+        dt_recent = datetime.datetime.strptime(most_recent_date, "%Y-%m-%d")
+        dt_recent_str = dt_recent.strftime("%B %Y")
+
+        dt_pandemic = datetime.datetime.strptime(pandemic_date, "%Y-%m-%d")
+        dt_pandemic_str = dt_pandemic.strftime("%B %Y")
 
         fig = go.Figure(
             [
                 go.Bar(
-                    name="March 2020",
+                    name=dt_pandemic_str,
                     x=industry_names_to_plot,
                     y=pandemic_shares,
                     text=[*map(lambda x: f"{x * 100:.1f}%", pandemic_shares)],
                     marker_color=fund_pri,
                 ),
                 go.Bar(
-                    name=dt_str,
+                    name=dt_recent_str,
                     x=industry_names_to_plot,
                     y=recent_shares,
                     text=[*map(lambda x: f"{x * 100:.1f}%", recent_shares)],
@@ -254,7 +257,7 @@ def employment_composition_pandemic_now(
 
     # Filter for the dates of interest
     empl_data["DATE"] = empl_data["DATE"].astype(str)
-    pandemic_date = "2020-03-01"
+    pandemic_date = "2020-04-01"
     most_recent_date = empl_data.iloc[-1, :].loc["DATE"]
 
     pandemic_df = empl_data[empl_data["DATE"] == pandemic_date]
@@ -268,7 +271,7 @@ def employment_composition_pandemic_now(
     return empl_data
 
 
-# Figure 16: Employment Composition -- APPROVED
+# Figure 16: Employment Composition -- NOT USING
 
 
 def employment_composition(
@@ -324,7 +327,7 @@ def employment_composition(
     return fig
 
 
-# Figure 17: Change in Employment Composition -- APPROVED
+# Figure 17: Change in Employment Composition -- NOT USING
 
 
 def change_employment_composition(
@@ -380,7 +383,7 @@ def change_employment_composition(
         )
 
 
-# Fig 18: Change in Employment share from Previous peak by Sector
+# Fig 18: Change in Employment share from Previous peak by Sector -- NOT USING
 
 
 def change_empl_share_prev_peak_per_sector(
