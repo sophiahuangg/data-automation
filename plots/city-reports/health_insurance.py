@@ -13,6 +13,15 @@ pri_color = "#961a30"
 sec_color = "#e7c8ae"
 ter_color = "#e6aeb7"
 
+# Fundamental colors
+fund_pri = "#961a30"
+fund_sec = "#c5485f"
+fund_ter = "#e6aeb7"
+
+# Accent Colors
+acc_pri = "#965119"
+acc_sec = "#c57a49"
+acc_ter = "#e7c8ae"
 
 # ------------------------------
 # Plot Generation
@@ -107,7 +116,7 @@ async def health_insurance(
             x=df_final.index,
             y=df_final[cityname] / 100,
             name=cityname,
-            line=dict(color="#961a30"),
+            line=dict(color=fund_pri, width=4),
             text=df_final[cityname].apply(lambda x: "{0:1.1f}%".format(x)),
             mode="lines+markers+text",
             textposition="top center",
@@ -121,11 +130,12 @@ async def health_insurance(
             x=df_final.index,
             y=df_final["California"] / 100,
             name="California",
-            line=dict(color="#cc690f"),
-            # text= df_final['California'].apply(lambda x: '{0:1.1f}%'.format(x)),
-            # mode="lines+markers+text",
-            # textposition = 'top center',
+            line=dict(color=acc_pri, width=4),
+            text= df_final['California'].apply(lambda x: '{0:1.1f}%'.format(x)),
+            mode="lines+markers+text",
+            textposition = 'top center',
             legendrank=2,
+            textfont=dict(family="Glacial Indifference", size=14, color=acc_pri)
         )
     )
 
@@ -134,11 +144,12 @@ async def health_insurance(
             x=df_final.index,
             y=df_final["United States"] / 100,
             name="United States",
-            line=dict(color=ter_color),
-            # text= df_final['United States'].apply(lambda x: '{0:1.1f}%'.format(x)),
-            # textposition = 'bottom center',
-            # mode="lines+markers+text",
+            line=dict(color=fund_ter, width=4),
+            text= df_final['United States'].apply(lambda x: '{0:1.1f}%'.format(x)),
+            textposition = 'bottom center',
+            mode="lines+markers+text",
             legendrank=1,
+            textfont=dict(family="Glacial Indifference", size=14, color=fund_ter)
         )
     )
 
@@ -153,6 +164,8 @@ async def health_insurance(
         yaxis=dict(tickformat=".0%", hoverformat="closest"),
         yaxis_title="Percentage of Population with Health Insurance",
     )
+
+    fig.update_traces(marker_size=8)
 
     if save_path is not None:
         fig.write_image(
