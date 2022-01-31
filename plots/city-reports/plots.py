@@ -26,10 +26,11 @@ from income import (
 
 from employment import (
     avg_monthly_employment,
-    change_employment_composition,
-    employment_composition,
+    employment_composition_pandemic_now,
+    # change_employment_composition, NOT USING
+    # employment_composition, NOT USING
     peak_to_trough_empl,
-    change_empl_share_prev_peak_per_sector,
+    # change_empl_share_prev_peak_per_sector, NOT USING
 )
 
 from taxable_sales import (
@@ -200,28 +201,14 @@ def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv"):
         save_path=f"outputs/{target_city}/Average Monthly Total Employment Per Year",
     )
 
-    # Figure 16
-    employment_composition(
+    # Figure 16 -- Employment composition (new plot)
+    employment_composition_pandemic_now(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Employment Composition",
-    )
-    # Figure 17
-    change_employment_composition(
-        city=target_city,
-        data_path=data_path,
-        save_path=f"outputs/{target_city}/Change in Employment Composition",
+        save_path=f"outputs/{target_city}/Employment Composition Pandemic Drop to Now",
     )
 
-    # Figure 18
-    change_empl_share_prev_peak_per_sector(
-        city=target_city,
-        data_path=data_path,
-        save_path_abs=f"outputs/{target_city}/Change in Employment Share from Previous Peak by Sector",
-        save_path_perc=f"outputs/{target_city}/% Change in Employment Share from Previous Peak by Sector",
-    )
-
-    # Figure 19 & Figure 20 ??
+    # Former Figure 19 & Figure 20 ??
     peak_to_trough_empl(
         city=target_city,
         data_path=data_path,
@@ -303,6 +290,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
 
     try:
         for city in cities:
+            print(f"Generating plots for {city.title()}")
             await demographics_plots(
                 target_city=city,
                 dof_year=dof_year,
