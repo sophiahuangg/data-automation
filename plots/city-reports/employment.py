@@ -54,6 +54,16 @@ def filter_df(city: str, df):
     return df
 
 
+def _find_first_industry(df: pd.DataFrame):
+    """Finds the first industry column in a dataframe"""
+    cols = list(df.columns)
+    other_cols = ["city", "date"]
+    for col in cols:
+        if col.lower() not in other_cols:
+            return col
+    return None
+
+
 def consolidate_industries(df: pd.DataFrame):
     """Returns a dataframe that has the 12 consolidated industries we want"""
     df["Logistics"] = (
@@ -94,6 +104,7 @@ def consolidate_industries(df: pd.DataFrame):
         "Education and Health Services",
         "Government",
         "Mining and Natural Resources",
+        "Other Services (except Public Administration)",
     ]
 
     res = df[cols_to_select]
@@ -266,9 +277,12 @@ def employment_composition_pandemic_now(
     empl_data = pd.concat([pandemic_df, recent_df])
 
     fig = plots(empl_data)
-    fig.show()
 
-    return empl_data
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+    return fig
 
 
 # Figure 16: Employment Composition -- NOT USING
@@ -643,7 +657,8 @@ def peak_to_trough_empl(
         except ValueError:
             continue
     city = city.drop(columns=cols_to_drop + ["Total"])
-    industryCols = city.loc[:, "Logistics":].columns
+    firstCol = _find_first_industry(city)
+    industryCols = city.loc[:, firstCol:].columns
 
     # Get dataframes to calculate the max and min for each industry
     max_frame = city.loc["2013-01-01":"2020-03-01", :]
