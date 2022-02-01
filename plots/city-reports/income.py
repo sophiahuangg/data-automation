@@ -10,6 +10,7 @@ from lowe.acs.ACSClient import ACSClient
 # Primary and secondary colors
 pri_color = "#961a30"
 sec_color = "#e7c8ae"
+ter_color = "#e6aeb7"
 
 # Fundamental colors
 fund_pri = "#961a30"
@@ -20,6 +21,30 @@ fund_ter = "#e6aeb7"
 acc_pri = "#965119"
 acc_sec = "#c57a49"
 acc_ter = "#e7c8ae"
+
+# ------------------------------
+# Helper Functions
+# ------------------------------
+
+def _axis_line_breaks_elem(elem: str, max_chars: int = 15):
+    """Adds line breaks to axis values so they can be plotted horizontally"""
+    splt = elem.split(" ")
+    res = ""
+    tmp = ""
+    for word in splt:
+        res += f"{word} "
+        tmp += f"{word} "
+        charcount = len(tmp.strip())
+        if charcount >= max_chars:
+            res += "<br>"
+            tmp = ""
+            charcount = 0
+
+    return res.strip()
+
+
+def _axis_line_breaks(elems: list, max_chars: int = 15):
+    return [*map(lambda x: _axis_line_breaks_elem(x, max_chars), elems)]
 
 # ------------------------------
 # Plot Generation
@@ -41,6 +66,7 @@ async def total_household_income(
         "palm springs, ca",
         "rancho mirage, ca",
     ],
+    target_city: str = "desert hot springs ca",
     year: str = "2019",
     save_path: str = None,
     img_height: int = 1080,
@@ -93,6 +119,12 @@ async def total_household_income(
     plot_df = pd.DataFrame({"city": categ, "Value": value})
     plot_df.city = plot_df.city.str.title()  # Capitalize first letter in each city
 
+    # ISOLATING TARGET CITY
+    city_list = plot_df["city"].values.tolist()
+    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
+    colors = [pri_color,] * len(cities)
+    colors[city_index] = fund_ter
+
     fig = px.bar(
         plot_df,
         x="city",
@@ -108,12 +140,11 @@ async def total_household_income(
         title_font_color="black",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="City",
         yaxis_title="Total Household Income",
         font_size=18,
     )
 
-    fig.update_traces(marker_color=pri_color)
+    fig.update_traces(marker_color=colors, textposition='outside', width=0.5)
 
     if save_path is not None:
         fig.write_image(
@@ -139,6 +170,7 @@ async def median_household_income(
         "palm springs, ca",
         "rancho mirage, ca",
     ],
+    target_city: str = "desert hot springs ca",
     year: str = "2019",
     save_path: str = None,
     img_height: int = 1080,
@@ -181,6 +213,12 @@ async def median_household_income(
     plot_df = pd.DataFrame({"Type": categ, "Value": value})
     plot_df.Type = plot_df.Type.str.title()  # Capitalize first letter in each city
 
+    # ISOLATING TARGET CITY
+    city_list = plot_df["Type"].values.tolist()
+    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
+    colors = [pri_color,] * len(cities)
+    colors[city_index] = fund_ter
+
     fig = px.bar(
         plot_df,
         x="Type",
@@ -201,7 +239,7 @@ async def median_household_income(
         font_size=18,
     )
 
-    fig.update_traces(marker_color=pri_color)
+    fig.update_traces(marker_color=colors, textposition='outside', width=0.5)
 
     if save_path is not None:
         fig.write_image(
@@ -266,6 +304,7 @@ async def household_income_by_class(
     # Following is unique to each section
 
     categ = resp.columns[0:10].astype(str)
+    categ = _axis_line_breaks(categ, 10)
     bar_value = resp.iloc[1][0:10].astype(str).astype(float)
     line_value = resp.iloc[0][0:10].astype(str).astype(float)
 
@@ -299,7 +338,7 @@ async def household_income_by_class(
         font_size=18,
     )
 
-    fig.update_traces(marker_color=pri_color)
+    fig.update_traces(marker_color=pri_color, line=dict(width=3))
 
     if save_path is not None:
         fig.write_image(
