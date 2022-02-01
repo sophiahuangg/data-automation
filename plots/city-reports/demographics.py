@@ -1,6 +1,7 @@
 # Code written by Aaron Xie and Abhi Uppal, modified for script format by Abhi Uppal
 
 import asyncio
+from ipywidgets.widgets import widget
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -32,6 +33,10 @@ acc_pri = "#965119"
 acc_sec = "#c57a49"
 acc_ter = "#e7c8ae"
 
+# todo:
+# fix target city
+# check FIGURE OUT %
+
 # ------------------------------
 # Helper Functions
 # ------------------------------
@@ -61,6 +66,26 @@ def _growth_rate(initial, final):
     """Calculates the growth rate between the initial and final values.
     NOTE: This does NOT produce a percentage"""
     return (final - initial) / initial
+
+def _axis_line_breaks_elem(elem: str, max_chars: int = 15):
+    """Adds line breaks to axis values so they can be plotted horizontally"""
+    splt = elem.split(" ")
+    res = ""
+    tmp = ""
+    for word in splt:
+        res += f"{word} "
+        tmp += f"{word} "
+        charcount = len(tmp.strip())
+        if charcount >= max_chars:
+            res += "<br>"
+            tmp = ""
+            charcount = 0
+
+    return res.strip()
+
+
+def _axis_line_breaks(elems: list, max_chars: int = 15):
+    return [*map(lambda x: _axis_line_breaks_elem(x, max_chars), elems)]
 
 
 # ------------------------------
@@ -107,7 +132,7 @@ def city_population_cv_present(
 
     colors = [pri_color] * 9
     idx = list(plot_df.City).index(target_city.title())
-    colors[idx] = sec_color
+    colors[idx] = fund_ter
 
     fig = go.Figure()
 
@@ -129,8 +154,9 @@ def city_population_cv_present(
         yaxis_title="Population",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="City",
     )
+
+    fig.update_traces(width=0.5, textposition="outside")
 
     if save_path is not None:
         fig.write_image(
@@ -139,9 +165,7 @@ def city_population_cv_present(
 
     return fig
 
-
 # Fig 2: City Population, CV, 1990-Present -- APPROVED
-
 
 def city_population_cv_time_series(
     save_path: str = None, img_height: int = 1080, img_width: int = 1920, scale: int = 2
@@ -166,7 +190,9 @@ def city_population_cv_time_series(
 
     # Plot!
 
-    fig = px.line(plot_df, x=plot_df.index, y="Population", color="City")
+    colors = ["#961a30", "#e7c8ae", "#e6aeb7", "#c5485f", "#965119", "#c57a49", "#d05064", "#504f4d", "#b3a9a2" ]
+
+    fig = px.line(plot_df, x=plot_df.index, y="Population", color="City", color_discrete_sequence=colors)
 
     fig.update_layout(
         font_family="Glacial Indifference",
@@ -177,6 +203,8 @@ def city_population_cv_time_series(
         template="plotly_white",
         xaxis_title="Year",
     )
+    
+    fig.update_traces(line=dict(width=3), textposition="bottom right")
 
     if save_path is not None:
         fig.write_image(
@@ -260,9 +288,10 @@ def pop_growth_rates(
         yaxis_title="Population Growth Rate",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="Year",
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
+
+    fig.update_traces(textposition='outside')
 
     if save_path is not None:
         fig.write_image(
@@ -327,8 +356,9 @@ def pop_growth_rates_year_groups(
         yaxis_title="Population Growth Rate",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="City",
     )
+
+    fig.update_traces(textposition='outside')
 
     if save_path is not None:
         fig.write_image(
@@ -511,8 +541,8 @@ async def age_distribution(
 
     x_axis = [
         city_name,
-        f"Riverside County ex {city_name}",
-        f"Coachella Valley ex {city_name}",
+        f"Riverside County excluding {city_name}",
+        f"Coachella Valley excluding {city_name}",
     ]
 
     y1 = pd.Series(
@@ -566,6 +596,7 @@ async def age_distribution(
                 y=y1,
                 text=y1.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=pri_color,
             ),
             go.Bar(
                 name="15-24 Years",
@@ -573,6 +604,7 @@ async def age_distribution(
                 y=y2,
                 text=y2.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=fund_sec,
             ),
             go.Bar(
                 name="25-34 Years",
@@ -580,6 +612,7 @@ async def age_distribution(
                 y=y3,
                 text=y3.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=fund_ter,
             ),
             go.Bar(
                 name="35-44 Years",
@@ -587,6 +620,7 @@ async def age_distribution(
                 y=y4,
                 text=y4.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=sec_color,
             ),
             go.Bar(
                 name="45-64 Years",
@@ -594,6 +628,7 @@ async def age_distribution(
                 y=y5,
                 text=y5.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=acc_sec,
             ),
             go.Bar(
                 name="65+ Years",
@@ -601,6 +636,7 @@ async def age_distribution(
                 y=y6,
                 text=y6.apply(lambda x: "{0:1.1f}%".format(x)),
                 textposition="outside",
+                marker_color=acc_pri,
             ),
         ]
     )
@@ -672,6 +708,8 @@ async def race_group_distribution(
     categ = resp.columns[0:8]
     value = resp.iloc[0][0:8].astype(str).astype(float)
 
+    categ = _axis_line_breaks(categ, 10)
+
     plot_df = pd.DataFrame({"Race": categ, "Percentage": value})
     plot_df = plot_df.sort_values(by="Percentage", ascending=False)
 
@@ -690,11 +728,12 @@ async def race_group_distribution(
         yaxis_title="Percent of Population",
         legend_title_font_color="black",
         template="simple_white",
+        yaxis=dict(ticksuffix="%")
     )
 
-    fig.update_xaxes(tickangle=20)
+    fig.update_xaxes(tickangle=0)
 
-    fig.update_traces(marker_color=pri_color)
+    fig.update_traces(marker_color=pri_color, width=0.5, textposition='outside')
 
     if save_path is not None:
         fig.write_image(
@@ -721,10 +760,12 @@ async def households_with_internet(
         "rancho mirage, ca",
     ],
     year: str = "2019",
+    target_city: str = "desert hot springs ca",
     save_path: str = None,
     img_height: int = 1080,
     img_width: int = 1920,
     scale: int = 2,
+    
 ) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -760,6 +801,12 @@ async def households_with_internet(
     plot_df["Type"] = plot_df["Type"].str.title()
     plot_df = plot_df.sort_values(by="Value", ascending=False)
 
+    # ISOLATING TARGET CITY
+    city_list = plot_df["Type"].values.tolist()
+    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
+    colors = [pri_color,] * len(cities)
+    colors[city_index] = fund_ter
+
     fig = px.bar(
         plot_df,
         x="Type",
@@ -767,6 +814,7 @@ async def households_with_internet(
         text=plot_df["Value"].apply(lambda x: "{0:,.1f}%".format(x)),
     )
     fig.update_xaxes(type="category")
+
 
     fig.update_layout(
         font_family="Glacial Indifference",
@@ -778,9 +826,11 @@ async def households_with_internet(
         template="simple_white",
         xaxis_title="City",
         yaxis_title="Percent of Households",
+        yaxis=dict(ticksuffix="%"),
     )
 
-    fig.update_traces(marker_color=pri_color)
+
+    fig.update_traces(marker_color=colors, textposition="outside", width=0.5)
 
     if save_path is not None:
         fig.write_image(
@@ -835,7 +885,7 @@ async def residence_and_work_loc(
     resp = resp.rename(columns=cols)
 
     ans = [
-        ["Living/Working", resp.iloc[0]["city"]],
+        ["Living/Working", resp.iloc[0]["city"].title()],
         [resp.columns[1], resp.iloc[0][1]],
         [resp.columns[2], resp.iloc[0][2]],
         [resp.columns[3], resp.iloc[0][3]],
@@ -863,10 +913,12 @@ async def main():
     client = ACSClient()
     try:
         await client.initialize()
-        test = await age_distribution(client=client)
+        test = await residence_and_work_loc(client=client)
     finally:
         await client.close()
     test.show()
+
+    # pop_growth_rates_year_groups().show()
 
 
 if __name__ == "__main__":
