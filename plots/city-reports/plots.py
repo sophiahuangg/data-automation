@@ -188,6 +188,9 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
     await household_income_by_class(
         client=client,
         cities=cities_comma,
+        target_city=target_city_acs_comma.split(",")[
+            0
+        ],  # This function searches on location_key, which removes the comma
         save_path=f"outputs/{target_city}/Household Income By Class.png",
     )
 
@@ -276,7 +279,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
     cities = [
         "Coachella",
         "Cathedral City",
-        # "Desert Hot Springs",
+        "Desert Hot Springs",
         "Indian Wells",
         "Indio",
         "La Quinta",
@@ -291,6 +294,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
     try:
         for city in cities:
             print(f"Generating plots for {city.title()}")
+            print("---------------------" + "-" * len(city) + "\n")
             await demographics_plots(
                 target_city=city,
                 dof_year=dof_year,
@@ -311,6 +315,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
             await health_insurance_plots(
                 client=acs_client, target_city=city, acs_year=acs_year
             )
+            print("\n")
     finally:
         await acs_client.close()
 
