@@ -390,6 +390,11 @@ async def household_income_by_class(
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
 
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
