@@ -40,14 +40,50 @@ class BLSClient(object):
         catalog: bool = False,
         calculations: bool = False,
         aspects: bool = False,
-    ):
+        valuename: Union[str, List[str]] = "value",
+    ) -> pd.DataFrame:
+        """get_bls Gets data from the BLS API.
+
+        Parameters
+        ----------
+        seriesid : Union[str, List[str]]
+            Series id(s) to get data from
+        startyear : str, optional
+            Year to start getting data from, by default "2011"
+        endyear : str, optional
+            Year to stop getting data from, by default "2014"
+        annualaverage : bool, optional
+            Calculate annual averages, by default False
+        catalog : bool, optional
+            [description], by default False
+        calculations : bool, optional
+            [description], by default False
+        aspects : bool, optional
+            [description], by default False
+        valuename : str, optional
+            Name to give the 'value' column in the result, by default 'value'
+
+        Returns
+        -------
+        pd.DataFrame
+            [description]
+        """
         args = locals()
+        valid_args = [
+            "seriesid",
+            "startyear",
+            "endyear",
+            "annualaverage",
+            "catalog",
+            "calculations",
+            "aspects",
+        ]
         payload = {}
 
         for k, v in args.items():
             if isinstance(v, bool):
                 v = str(v).lower()
-            if v is not None and k != "self" and v != "false":
+            if v is not None and k in valid_args and v != "false":
                 payload[k] = v
 
         payload["registrationkey"] = self.API_KEY
@@ -64,17 +100,21 @@ class BLSClient(object):
 
         dfs = []
 
-        for series in seriesnames:
-            print(series)
-            raw = data_json["Results"]["series"]
+        for i, series in enumerate(seriesnames):
+            raw = data_json["Results"]["series"][i]
             df = pd.json_normalize(raw, record_path="data")
-            print(df)
 
             df["time"] = df["periodName"] + " " + df["year"]
             df["time"] = pd.to_datetime(df["time"])
             df = df.sort_values(by="time", ascending=True)
 
-            df = df.drop(columns = ["footnotes", "period", "periodName"])
+            df = df.drop(columns=["footnotes", "period", "periodName"])
+
+            if valuename != "value":
+                if isinstance(valuename, str):
+                    df.rename(columns={"value": valuename}, inplace=True)
+                elif isinstance(valuename, list):
+                    df.rename(columns={"value": valuename[i]}, inplace=True)
 
             dfs.append(df)
 
@@ -84,9 +124,8 @@ class BLSClient(object):
 def main():
     client = BLSClient()
     test = client.get_bls(
-        ["CUUR0000SA0", "SUUR0000SA0"],
+        ["CUUR0000SA0", "SUUR0000SA0"], valuename=["test series 1", "test series 2"]
     )
-    print(test[0])
 
 
 if __name__ == "__main__":
