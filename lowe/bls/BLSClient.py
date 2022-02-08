@@ -1,5 +1,3 @@
-import aiohttp
-import datetime
 import json
 import os
 import pandas as pd
@@ -126,6 +124,7 @@ def main():
     test = client.get_bls(
         ["CUUR0000SA0", "SUUR0000SA0"], valuename=["test series 1", "test series 2"]
     )
+    print(test)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,6 @@
 # Code written by Aaron Xie and Abhi Uppal, modified for script format by Abhi Uppal
 
 import asyncio
-from ipywidgets.widgets import widget
 import numpy as np
 import pandas as pd
 import plotly.express as px

@@ -28,6 +28,8 @@ acc_ter = "#e7c8ae"
 # ------------------------------
 
 # Fig 27: Health Insurance -- APPROVED
+
+
 async def health_insurance(
     client: ACSClient,
     city: str = "indian wells, ca",

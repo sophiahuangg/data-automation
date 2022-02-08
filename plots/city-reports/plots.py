@@ -4,9 +4,6 @@ import os
 import time
 
 from functools import wraps
-from multiprocessing import Pool, cpu_count
-
-from numpy import save
 
 from demographics import (
     city_population_cv_present,
