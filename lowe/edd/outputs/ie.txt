@@ -1,0 +1,47 @@
+CPS STATISTICS - ALL NOT SEASONALY ADJUSTED 
+--------------------------------------- 
+UNEMPLOYMENT RATE for Dec-21: 5.1% 
+UNEMPLOYMENT RATE for Nov-21: 5.4% 
+UNEMPLOYMENT RATE for Dec-20: 8.7% 
+MAX UNEMPLOYMENT RATE: (Apr-20, 15.2%) 
+ 
+LABOR FORCE FOR Dec-21: 2,121,300 
+LABOR FORCE FOR Nov-21: 2,123,000 
+CHANGE IN LABOR FORCE FROM Nov-21 to Dec-21: -1,700 
+ 
+ CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
+--------------------------------------- 
+TOTAL NONFARM FOR Dec-21: 1,579,200 
+TOTAL NONFARM FOR Nov-21: 1,576,900 
+TOTAL NONFARM FOR Dec-20: 1,513,200 
+TOTAL NONFARM AS PERCENT OF FEB 2020: -0.5% 
+CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 2,300 
+TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 0.1% 
+TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 96.0% 
+NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 11 
+NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 8 
+ 
+Industries sorted by MTM gains: 
+                                              TITLE     MTM      YTY  Max Drawdown
+23                        Private Service Providing  4800.0  65800.0     -208100.0
+22                                Service Providing  4600.0  65200.0     -192800.0
+37          Transportation, Warehousing & Utilities  3400.0  10200.0      -55800.0
+24                Trade, Transportation & Utilities  2900.0  16900.0      -97200.0
+7                                     Total Private  2500.0  66600.0     -226600.0
+72                            Leisure & Hospitality  2000.0  27400.0      -75400.0
+18                                    Manufacturing   900.0   3900.0      -11200.0
+21                                 Nondurable Goods   600.0    100.0       -4100.0
+56                 Professional & Business Services   500.0   3700.0      -24400.0
+47                             Financial Activities   300.0    200.0       -3700.0
+19                                    Durable Goods   300.0   3800.0       -7100.0
+10                               Mining and Logging     0.0    100.0        -100.0
+5                                        Total Farm     0.0   -200.0       -6400.0
+44                                      Information     0.0    500.0       -2700.0
+64                    Educational & Health Services  -100.0  10000.0      -26100.0
+25                                  Wholesale Trade  -100.0   1800.0       -5700.0
+83                                       Government  -200.0   -600.0      -40900.0
+28                                     Retail Trade  -400.0   4900.0      -38100.0
+80                                   Other Services  -800.0   7100.0      -15800.0
+8                                   Goods Producing -2300.0    800.0      -26400.0
+11                                     Construction -3200.0  -3200.0      -19000.0
+9                 Mining, Logging, and Construction -3200.0  -3100.0      -19100.0

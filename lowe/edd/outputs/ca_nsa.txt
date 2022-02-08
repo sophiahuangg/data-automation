@@ -1,0 +1,47 @@
+CPS STATISTICS - ALL NOT SEASONALY ADJUSTED 
+--------------------------------------- 
+UNEMPLOYMENT RATE for Dec-21: 5.0% 
+UNEMPLOYMENT RATE for Nov-21: 5.4% 
+UNEMPLOYMENT RATE for Dec-20: 9.1% 
+MAX UNEMPLOYMENT RATE: (Apr-20, 16.0%) 
+ 
+LABOR FORCE FOR Dec-21: 19,065,800 
+LABOR FORCE FOR Nov-21: 19,174,500 
+CHANGE IN LABOR FORCE FROM Nov-21 to Dec-21: -108,700 
+ 
+ CES STATISTICS - ALL NOT SEASONALLY ADJUSTED 
+--------------------------------------- 
+TOTAL NONFARM FOR Dec-21: 17,064,600 
+TOTAL NONFARM FOR Nov-21: 17,032,200 
+TOTAL NONFARM FOR Dec-20: 16,092,300 
+TOTAL NONFARM AS PERCENT OF FEB 2020: -3.1% 
+CHANGE IN TOTAL NONFARM FROM PREVIOUS MONTH: 32,400 
+TOTAL NONFARM GROWTH RATE OVER THE LAST MONTH: 0.2% 
+TOTAL NONFARM RECOVERY SINCE PANDEMIC DROP: 80.0% 
+NUMBER OF INDUSTRIES GAINING EMPLOYMENT MONTH TO MONTH: 14 
+NUMBER OF INDUSTRIES LOSING EMPLOYMENT MONTH TO MONTH: 8 
+ 
+Industries sorted by MTM gains: 
+                                              TITLE      MTM       YTY  Max Drawdown
+85                        Private Service Providing  58000.0  880800.0    -2310000.0
+7                                     Total Private  45600.0  921800.0    -2587200.0
+84                                Service Providing  44800.0  931300.0    -2383800.0
+86                Trade, Transportation & Utilities  32000.0   87100.0     -548800.0
+135         Transportation, Warehousing & Utilities  16300.0   37400.0     -161700.0
+103                                    Retail Trade  13600.0   34100.0     -344200.0
+240                           Leisure & Hospitality  11500.0  417800.0     -949500.0
+188                Professional & Business Services   5200.0  167000.0     -334600.0
+211                   Educational & Health Services   4100.0   95500.0     -294600.0
+166                            Financial Activities   3700.0    5200.0      -49500.0
+31                                    Durable Goods   2900.0   17800.0      -59400.0
+152                                     Information   2300.0   40200.0      -94000.0
+87                                  Wholesale Trade   2100.0   15600.0      -74600.0
+30                                    Manufacturing    400.0   29900.0     -120600.0
+10                               Mining and Logging   -200.0     400.0       -3300.0
+258                                  Other Services   -800.0   68000.0     -191500.0
+63                                 Nondurable Goods  -2500.0   12100.0      -61300.0
+8                                   Goods Producing -12400.0   41000.0     -277200.0
+16                                     Construction -12600.0   10700.0     -170100.0
+9                  Mining, Logging and Construction -12800.0   11100.0     -169300.0
+273                                      Government -13200.0   50500.0     -361100.0
+5                                        Total Farm -48300.0   11900.0     -137100.0
