@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import os
 import time
 
@@ -27,6 +28,7 @@ from income import (
 from employment import (
     avg_monthly_employment,
     employment_composition_pandemic_now,
+    unemployment_rates,
     # change_employment_composition, NOT USING
     # employment_composition, NOT USING
     peak_to_trough_empl,
@@ -196,13 +198,26 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
 
 
 @timer
-def employment_plots(target_city: str, data_path: str = "data/CV_EMPL.csv"):
+def employment_plots(
+    target_city: str, data_path: str = "data/CV_EMPL.csv", bls_year: int = 2022
+):
     # Figure 14
     avg_monthly_employment(
         city=target_city,
         data_path=data_path,
         save_path=f"outputs/{target_city}/Average Monthly Total Employment Per Year",
     )
+
+    # Figure 15 -- Unemployment Rates US, CA, IE, City
+    if target_city not in [
+        "Indian Wells",
+        "Rancho Mirage",
+    ]:  # These cities don't have unemployment rates in BLS due to population < 25,000
+        unemployment_rates(
+            city=target_city,
+            year=str(bls_year),
+            save_path=f"outputs/{target_city}/Unemployment Rates Time Series",
+        )
 
     # Figure 16 -- Employment composition (new plot)
     employment_composition_pandemic_now(
@@ -273,7 +288,7 @@ async def health_insurance_plots(client: ACSClient, target_city: str, acs_year: 
 # ------------------------------
 
 
-async def main(dof_year: int = 2021, acs_year: int = 2019):
+async def main(dof_year: int = 2021, acs_year: int = 2019, bls_year: int = None):
     _make_dirs()
 
     cities = [
@@ -287,7 +302,7 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
         "Palm Springs",
         "Rancho Mirage",
     ]
-
+    bls_year = datetime.datetime.now().year if bls_year is None else bls_year
     acs_client = ACSClient()
     await acs_client.initialize()
 
@@ -304,7 +319,9 @@ async def main(dof_year: int = 2021, acs_year: int = 2019):
 
             await income_plots(target_city=city, acs_year=acs_year, client=acs_client)
 
-            employment_plots(target_city=city, data_path="data/CV_EMPL.csv")
+            employment_plots(
+                target_city=city, data_path="data/CV_EMPL.csv", bls_year=bls_year
+            )
 
             taxable_sales_plots(target_city=city)
 

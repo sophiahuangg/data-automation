@@ -1,9 +1,17 @@
 # Code written by Karan Goel, modifications for production made by Abhi Uppal
 import datetime
+import json
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+
+from lowe.bls.BLSClient import BLSClient
+
+try:
+    import importlib.resources as pkg_resources
+except ImportError:
+    import importlib_resources as pkg_resources
 
 # Primary, secondary, and tertiary colors
 pri_color = "#961a30"
@@ -282,6 +290,123 @@ def employment_composition_pandemic_now(
         fig.write_image(
             save_path, height=img_height, width=img_width, scale=scale, format="png"
         )
+    return fig
+
+
+# Figure 15: Unemployment rates US, CA, IE, City
+# Not available for Indian Wells and Rancho Mirage (< 25,000 population)
+
+
+def unemployment_rates(
+    city: str,
+    year: str = None,
+    save_path: str = None,
+    img_height: int = 1080,
+    img_width: int = 1920,
+    scale: int = 2,
+):
+    def plots(df: pd.DataFrame) -> go.Figure:
+        fig = go.Figure()
+
+        df["time"] = pd.to_datetime(df["time"])
+
+        fig.add_trace(
+            go.Scatter(
+                x=df["time"],
+                y=df["ur_us"],
+                name="United States",
+                mode="lines",
+                marker_color=fund_pri,
+                line=dict(width=2),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=df["time"],
+                y=df["ur_ca"],
+                name="California",
+                mode="lines",
+                marker_color="green",
+                line=dict(width=2),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=df["time"],
+                y=df["ur_ie"],
+                name="Inland Empire",
+                mode="lines",
+                marker_color="blue",
+                line=dict(width=2),
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter(
+                x=df["time"],
+                y=df[f"ur_{city.title()}"],
+                name=city.title(),
+                mode="lines",
+                marker_color=acc_sec,
+                line=dict(width=2),
+            )
+        )
+
+        fig.update_layout(
+            template="plotly_white",
+            font=dict(family="Glacial Indifference", size=18, color="Black"),
+            yaxis_title="Unemployment Rate",
+            xaxis_title="",
+            xaxis_tickangle=0,
+        )
+
+        return fig
+
+    year = datetime.datetime.now().year if year is None else year
+
+    # Get the codes for BLS
+    with pkg_resources.open_text("lowe.bls", "bls_series.json") as f:
+        bls_series = json.load(f)
+
+    ur_codes = bls_series["Unemployment Rate"]
+
+    codes = [ur_codes["US"], ur_codes["CA"], ur_codes["IE"], ur_codes[city.title()]]
+    names = ["ur_us", "ur_ca", "ur_ie", f"ur_{city.title()}"]
+
+    # Initialize a BLS client and get the data
+    client = BLSClient()
+
+    data_raw = client.get_bls(
+        seriesid=codes,
+        startyear="2005",
+        endyear=year,
+        valuename=names,
+    )
+
+    # Clean the data and join the datasets together
+    df = data_raw[0].drop(columns=["year", "latest"])
+    df["time"] = df["time"].apply(lambda x: datetime.datetime.strftime(x, "%b %Y"))
+
+    for new_df in data_raw[1:]:
+        new_df.drop(columns=["year", "latest"], inplace=True)
+        new_df["time"] = new_df["time"].apply(
+            lambda x: datetime.datetime.strftime(x, "%b %Y")
+        )
+        df = df.merge(new_df, on="time")
+
+    for col in df.columns:
+        if "ur" in col:
+            df[col] = df[col].astype(float)
+
+    fig = plots(df)
+
+    if save_path is not None:
+        fig.write_image(
+            save_path, height=img_height, width=img_width, scale=scale, format="png"
+        )
+
     return fig
 
 
@@ -717,8 +842,8 @@ def peak_to_trough_empl(
 
 
 def main():
-    test = employment_composition_pandemic_now(
-        city="Cathedral City", data_path="data/CV_EMPL.csv"
+    test = unemployment_rates(
+        city="Cathedral City",
     )
     if not isinstance(test, pd.DataFrame):
         test.show()
