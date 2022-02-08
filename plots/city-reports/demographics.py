@@ -67,6 +67,7 @@ def _growth_rate(initial, final):
     NOTE: This does NOT produce a percentage"""
     return (final - initial) / initial
 
+
 def _axis_line_breaks_elem(elem: str, max_chars: int = 15):
     """Adds line breaks to axis values so they can be plotted horizontally"""
     splt = elem.split(" ")
@@ -165,7 +166,9 @@ def city_population_cv_present(
 
     return fig
 
+
 # Fig 2: City Population, CV, 1990-Present -- APPROVED
+
 
 def city_population_cv_time_series(
     save_path: str = None, img_height: int = 1080, img_width: int = 1920, scale: int = 2
@@ -190,9 +193,25 @@ def city_population_cv_time_series(
 
     # Plot!
 
-    colors = ["#961a30", "#e7c8ae", "#e6aeb7", "#c5485f", "#965119", "#c57a49", "#d05064", "#504f4d", "#b3a9a2" ]
+    colors = [
+        "#961a30",
+        "#e7c8ae",
+        "#e6aeb7",
+        "#c5485f",
+        "#965119",
+        "#c57a49",
+        "#d05064",
+        "#504f4d",
+        "#b3a9a2",
+    ]
 
-    fig = px.line(plot_df, x=plot_df.index, y="Population", color="City", color_discrete_sequence=colors)
+    fig = px.line(
+        plot_df,
+        x=plot_df.index,
+        y="Population",
+        color="City",
+        color_discrete_sequence=colors,
+    )
 
     fig.update_layout(
         font_family="Glacial Indifference",
@@ -203,7 +222,7 @@ def city_population_cv_time_series(
         template="plotly_white",
         xaxis_title="Year",
     )
-    
+
     fig.update_traces(line=dict(width=3), textposition="bottom right")
 
     if save_path is not None:
@@ -291,7 +310,7 @@ def pop_growth_rates(
         legend=dict(x=0.5, orientation="h", xanchor="center"),
     )
 
-    fig.update_traces(textposition='outside')
+    fig.update_traces(textposition="outside")
 
     if save_path is not None:
         fig.write_image(
@@ -358,7 +377,7 @@ def pop_growth_rates_year_groups(
         template="plotly_white",
     )
 
-    fig.update_traces(textposition='outside')
+    fig.update_traces(textposition="outside")
 
     if save_path is not None:
         fig.write_image(
@@ -432,26 +451,26 @@ async def age_distribution(
         + resp["5 to 9 years"].astype(float)
         + resp["10 to 14 years"].astype(float)
     )
-    
+
     resp["15-24 years perc"] = resp["15 to 19 years"].astype(float) + resp[
         "20 to 24 years"
     ].astype(float)
-    
+
     resp["25-34 years perc"] = resp["25 to 29 years"].astype(float) + resp[
         "30 to 34 years"
     ].astype(float)
-    
+
     resp["35-44 years perc"] = resp["35 to 39 years"].astype(float) + resp[
         "40 to 44 years"
     ].astype(float)
-    
+
     resp["45-64 years perc"] = (
         resp["45 to 49 years"].astype(float)
         + resp["50 to 54 years"].astype(float)
         + resp["55 to 59 years"].astype(float)
         + resp["60 to 64 years"].astype(float)
     )
-    
+
     resp["65+ years perc"] = (
         resp["65 to 69 years"].astype(float)
         + resp["70 to 74 years"].astype(float)
@@ -497,9 +516,7 @@ async def age_distribution(
     cv = cv.groupby(["year"]).sum()
 
     for i, colname in enumerate(perc_cols):
-        cv[perc_cols[i]] = (
-            cv[raw_cols[i]] / cv["Total population"]
-        )
+        cv[perc_cols[i]] = cv[raw_cols[i]] / cv["Total population"]
 
     cv["location_key"] = "Coachella Valley"
 
@@ -541,8 +558,8 @@ async def age_distribution(
 
     x_axis = [
         city_name,
-        f"Riverside County excluding {city_name}",
-        f"Coachella Valley excluding {city_name}",
+        f"Riverside County Excluding {city_name}",
+        f"Coachella Valley Excluding {city_name}",
     ]
 
     y1 = pd.Series(
@@ -728,12 +745,12 @@ async def race_group_distribution(
         yaxis_title="Percent of Population",
         legend_title_font_color="black",
         template="simple_white",
-        yaxis=dict(ticksuffix="%")
+        yaxis=dict(ticksuffix="%"),
     )
 
     fig.update_xaxes(tickangle=0)
 
-    fig.update_traces(marker_color=pri_color, width=0.5, textposition='outside')
+    fig.update_traces(marker_color=pri_color, width=0.5, textposition="outside")
 
     if save_path is not None:
         fig.write_image(
@@ -765,7 +782,6 @@ async def households_with_internet(
     img_height: int = 1080,
     img_width: int = 1920,
     scale: int = 2,
-    
 ) -> go.Figure:
     """
     DO NOT PASS CITIES PARAM (is a list of them); if one city just pass as list of 1
@@ -803,8 +819,10 @@ async def households_with_internet(
 
     # ISOLATING TARGET CITY
     city_list = plot_df["Type"].values.tolist()
-    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
-    colors = [pri_color,] * len(cities)
+    city_index = city_list.index(target_city.split(",")[0].title())
+    colors = [
+        pri_color,
+    ] * len(cities)
     colors[city_index] = fund_ter
 
     fig = px.bar(
@@ -814,7 +832,6 @@ async def households_with_internet(
         text=plot_df["Value"].apply(lambda x: "{0:,.1f}%".format(x)),
     )
     fig.update_xaxes(type="category")
-
 
     fig.update_layout(
         font_family="Glacial Indifference",
@@ -828,7 +845,6 @@ async def households_with_internet(
         yaxis_title="Percent of Households",
         yaxis=dict(ticksuffix="%"),
     )
-
 
     fig.update_traces(marker_color=colors, textposition="outside", width=0.5)
 
@@ -913,7 +929,9 @@ async def main():
     client = ACSClient()
     try:
         await client.initialize()
-        test = await residence_and_work_loc(client=client)
+        test = await households_with_internet(
+            client=client, target_city="rancho mirage, ca"
+        )
     finally:
         await client.close()
     test.show()

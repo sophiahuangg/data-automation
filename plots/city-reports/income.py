@@ -124,7 +124,7 @@ async def total_household_income(
 
     # ISOLATING TARGET CITY
     city_list = plot_df["city"].values.tolist()
-    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
+    city_index = city_list.index(target_city.split(",")[0].title())
     colors = [
         pri_color,
     ] * len(cities)
@@ -220,7 +220,7 @@ async def median_household_income(
 
     # ISOLATING TARGET CITY
     city_list = plot_df["Type"].values.tolist()
-    city_index = city_list.index(target_city[0 : (len(target_city)) - 3].title())
+    city_index = city_list.index(target_city.split(",")[0].title())
     colors = [
         pri_color,
     ] * len(cities)

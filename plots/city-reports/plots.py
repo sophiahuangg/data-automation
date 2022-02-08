@@ -135,6 +135,7 @@ async def demographics_plots(
     # Figure 6
     await race_group_distribution(
         client=client,
+        cities=[target_city_acs_comma],
         year=str(acs_year),
         save_path=f"outputs/{target_city}/Racial Group Distribution.png",
     )
@@ -142,6 +143,7 @@ async def demographics_plots(
     # Figure 7
     await households_with_internet(
         client=client,
+        target_city=target_city,  # Doesn't need the ACS formatting
         year=str(acs_year),
         save_path=f"outputs/{target_city}/Households With Internet.png",
     )
@@ -175,6 +177,7 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
     # Figure 8
     await total_household_income(
         client=client,
+        target_city=target_city_acs_comma.split(",")[0],
         year=str(acs_year),
         save_path=f"outputs/{target_city}/Total Household Income.png",
     )
@@ -182,6 +185,7 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
     # Figure 9
     await median_household_income(
         client=client,
+        target_city=target_city_acs_comma.split(",")[0],
         year=str(acs_year),
         save_path=f"outputs/{target_city}/Median Household Income.png",
     )
