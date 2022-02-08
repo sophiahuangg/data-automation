@@ -1,0 +1,50 @@
+{
+    "Employment": {
+        "Cathedral City": "LAUCT061204800000005",
+        "Coachella": "LAUCT061426000000005",
+        "Desert Hot Springs": "LAUCT061899600000005",
+        "Indio": "LAUCT063644800000005",
+        "La Quinta": "LAUCT064035400000005",
+        "Palm Desert": "LAUCT065518400000005",
+        "Palm Springs": "LAUCT065525400000005",
+        "IE": "LAUMT064014000000005",
+        "CA": "LAUST060000000000005",
+        "US": "LNU02000000"
+    },
+    "Unemployment": {
+        "Cathedral City": "LAUCT061204800000004",
+        "Coachella": "LAUCT061426000000004",
+        "Desert Hot Springs": "LAUCT061899600000004",
+        "Indio": "LAUCT063644800000004",
+        "La Quinta": "LAUCT064035400000004",
+        "Palm Desert": "LAUCT065518400000004",
+        "Palm Springs": "LAUCT065525400000004",
+        "IE": "LAUMT064014000000004",
+        "CA": "LAUST060000000000004",
+        "US": "LNU03000000"
+    },
+    "Labor Force": {
+        "Cathedral City": "LAUCT061204800000006",
+        "Coachella": "LAUCT061426000000006",
+        "Desert Hot Springs": "LAUCT061899600000006",
+        "Indio": "LAUCT063644800000006",
+        "La Quinta": "LAUCT064035400000006",
+        "Palm Desert": "LAUCT065518400000006",
+        "Palm Springs": "LAUCT065525400000006",
+        "IE": "LAUMT064014000000006",
+        "CA": "LAUST060000000000006",
+        "US": "LNU01000000"
+    },
+    "Unemployment Rate": {
+        "Cathedral City": "LAUCT061204800000003",
+        "Coachella": "LAUCT061426000000003",
+        "Desert Hot Springs": "LAUCT061899600000003",
+        "Indio": "LAUCT063644800000003",
+        "La Quinta": "LAUCT064035400000003",
+        "Palm Desert": "LAUCT065518400000003",
+        "Palm Springs": "LAUCT065525400000003",
+        "IE": "LAUMT064014000000003",
+        "CA": "LAUST060000000000003",
+        "US": "LNU04000000"
+    }
+}
