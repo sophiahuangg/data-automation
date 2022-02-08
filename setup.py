@@ -60,5 +60,6 @@ setup(
         "python-dotenv",
         "pytz",
         "ratelimit",
+        "statsmodels",
     ],
 )
