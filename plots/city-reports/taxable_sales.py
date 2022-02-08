@@ -222,7 +222,7 @@ def real_nominal_sales_pc_time_series(
             name=f"Real Taxable Sales Per Capita ({dateList[0]} Dollars)",
             marker_color=acc_ter,
             marker_size=8,
-            line=dict(width=3, color=acc_ter)
+            line=dict(width=3, color=acc_ter),
         )
     )
 

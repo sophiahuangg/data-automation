@@ -135,7 +135,9 @@ async def human_capital_index_cv(
     )
 
     # Change the bar mode
-    fig.update_traces(texttemplate="", textposition="outside", width=0.6, textfont_size=16)
+    fig.update_traces(
+        texttemplate="", textposition="outside", width=0.6, textfont_size=16
+    )
     fig.update_layout(
         yaxis_title=f"Human Capital Index, {year}",
         template="plotly_white",

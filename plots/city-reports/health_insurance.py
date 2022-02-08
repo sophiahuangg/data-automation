@@ -131,11 +131,11 @@ async def health_insurance(
             y=df_final["California"] / 100,
             name="California",
             line=dict(color=acc_pri, width=4),
-            text= df_final['California'].apply(lambda x: '{0:1.1f}%'.format(x)),
+            text=df_final["California"].apply(lambda x: "{0:1.1f}%".format(x)),
             mode="lines+markers+text",
-            textposition = 'top center',
+            textposition="top center",
             legendrank=2,
-            textfont=dict(family="Glacial Indifference", size=14, color=acc_pri)
+            textfont=dict(family="Glacial Indifference", size=14, color=acc_pri),
         )
     )
 
@@ -145,11 +145,11 @@ async def health_insurance(
             y=df_final["United States"] / 100,
             name="United States",
             line=dict(color=fund_ter, width=4),
-            text= df_final['United States'].apply(lambda x: '{0:1.1f}%'.format(x)),
-            textposition = 'bottom center',
+            text=df_final["United States"].apply(lambda x: "{0:1.1f}%".format(x)),
+            textposition="bottom center",
             mode="lines+markers+text",
             legendrank=1,
-            textfont=dict(family="Glacial Indifference", size=14, color=fund_ter)
+            textfont=dict(family="Glacial Indifference", size=14, color=fund_ter),
         )
     )
 
