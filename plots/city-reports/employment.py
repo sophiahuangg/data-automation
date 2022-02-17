@@ -208,10 +208,14 @@ def employment_composition_pandemic_now(
 ):
     def plots(df):
         df = df.set_index("DATE", drop=True)
+        pre_pandemic_shares = [df.loc[pre_pandemic_date, x] for x in share_cols]
         pandemic_shares = [df.loc[pandemic_date, x] for x in share_cols]
         recent_shares = [df.loc[most_recent_date, x] for x in share_cols]
         industry_names_to_plot = [*map(lambda x: x.split("_")[0], share_cols)]
-        industry_names_to_plot = _axis_line_breaks(industry_names_to_plot, 10)
+        industry_names_to_plot = _axis_line_breaks(industry_names_to_plot, 8)
+
+        dt_pre_pandemic = datetime.datetime.strptime(pre_pandemic_date, "%Y-%m-%d")
+        dt_pre_pandemic_str = dt_pre_pandemic.strftime("%B %Y")
 
         dt_recent = datetime.datetime.strptime(most_recent_date, "%Y-%m-%d")
         dt_recent_str = dt_recent.strftime("%B %Y")
@@ -222,11 +226,18 @@ def employment_composition_pandemic_now(
         fig = go.Figure(
             [
                 go.Bar(
+                    name=dt_pre_pandemic_str,
+                    x=industry_names_to_plot,
+                    y=pre_pandemic_shares,
+                    text=[*map(lambda x: f"{x * 100:.1f}%", pre_pandemic_shares)],
+                    marker_color=fund_pri,
+                ),
+                go.Bar(
                     name=dt_pandemic_str,
                     x=industry_names_to_plot,
                     y=pandemic_shares,
                     text=[*map(lambda x: f"{x * 100:.1f}%", pandemic_shares)],
-                    marker_color=fund_pri,
+                    marker_color=fund_sec,
                 ),
                 go.Bar(
                     name=dt_recent_str,
@@ -246,16 +257,16 @@ def employment_composition_pandemic_now(
             xaxis_tickangle=0,
         )
 
-        fig.update_traces(textposition="outside", textfont_size=14)
+        fig.update_traces(textposition="outside", textfont_size=12)
 
-        fig.update_xaxes(tickfont_size=16)
+        fig.update_xaxes(tickfont_size=13)
 
         return fig
 
     empl_data = preprocess_data(path=data_path)
     empl_data = filter_df(city, empl_data)
     empl_data = consolidate_industries(empl_data)
-    empl_data = empl_data[empl_data["DATE"].dt.year >= 2020]
+    empl_data = empl_data[(empl_data["DATE"].dt.year >= 2019)]
 
     empl_data["Total Employment"] = empl_data.iloc[:, 2:].sum(axis=1)
 
@@ -276,13 +287,15 @@ def employment_composition_pandemic_now(
 
     # Filter for the dates of interest
     empl_data["DATE"] = empl_data["DATE"].astype(str)
+    pre_pandemic_date = "2019-12-01"
     pandemic_date = "2020-04-01"
     most_recent_date = empl_data.iloc[-1, :].loc["DATE"]
 
+    pre_pandemic_df = empl_data[empl_data["DATE"] == pre_pandemic_date]
     pandemic_df = empl_data[empl_data["DATE"] == pandemic_date]
     recent_df = empl_data[empl_data["DATE"] == most_recent_date]
 
-    empl_data = pd.concat([pandemic_df, recent_df])
+    empl_data = pd.concat([pre_pandemic_df, pandemic_df, recent_df])
 
     fig = plots(empl_data)
 
@@ -842,8 +855,8 @@ def peak_to_trough_empl(
 
 
 def main():
-    test = unemployment_rates(
-        city="Cathedral City",
+    test = employment_composition_pandemic_now(
+        city="Cathedral City", data_path="data/CV_EMPL.csv"
     )
     if not isinstance(test, pd.DataFrame):
         test.show()

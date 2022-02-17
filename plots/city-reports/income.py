@@ -241,7 +241,7 @@ async def median_household_income(
         title_font_color="black",
         legend_title_font_color="black",
         template="plotly_white",
-        xaxis_title="City",
+        xaxis_title="",
         yaxis_title="Median Household Income",
         font_size=18,
     )
