@@ -1,24 +1,20 @@
 # Automation of Plots for Reports
 This is the main repository for the Lowe Institute's Automation of data processing and plot creation. The goal is to be able to pull data automatically, process it, and create plots at the beginning of each report-writing cycle. This will make our lives a lot easier and free up time to do fun stuff!
 
-Note that this README is heavily biased towards Ubuntu and Mac operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
+Note that this README is heavily biased towards UNIX-based operating systems. If you are running windows and want to add separate instructions for it to the README, please do :)
 
 ## Prerequisites
 
 - Late model Python 3
-- Late model R and RStudio
+- Homebrew package manager (MacOS only)
+- Choco package manager (Windows only)
 - Git
 - [Anaconda](https://repo.anaconda.com/archive/Anaconda3-2020.11-Windows-x86_64.exe)
 - Late model [Docker](https://www.docker.com/get-started)
 
-## Which Prerequisites do I Care About?
+## Do I really need Docker?
 
-If you are unfamiliar with either Python or R (or both), you are welcome to learn it (resources are listed at the bottom of the README). However, if you do not want to learn them, that's okay as well. You are still required to learn how to use Git and GitHub, since all files (including non-code files) will be placed here. You will need the following languages for the following tasks:
-
-- Python: Pulling data from APIs, preliminary processing of data (getting rid of stuff we obviously don't want), preliminary data cleaning, creating CSV files that can be pulled and processed in R.
-- R: Plot-specific data processing (i.e., rearranging a dataframe to get what you want), plotting in ```ggplot2```.
-
-If you don't learn how to use one of these languages, you won't be able to contribute for those particular tasks. But, there will still be plenty more you can do!
+Not really. It's mostly useful if you're on a Windows machine and want to run WSL, or if you have an ARM64 processor (Apple Silicon / M1 chip) and don't want to go through the hassle of working around that.
 
 ## Conda Environment
 
@@ -73,7 +69,7 @@ TODO: Migrate the package to [poetry](https://python-poetry.org/) to make the pr
 
 ## Docker
 
-Docker is a software that allows developers to create a lightweight virtual machine (but not really a virtual machine) called an **image**, which is a snapshot of a operating system and its constitutent files. You can build and run this image on your local machine, during which it is called a **container**. The container allows you to develop software in the environment of the image instead of your local machine. This allows you to avoid any problems of the project building on one operating system and not another. 
+Docker is a software that allows developers to create a lightweight **image**, which is a snapshot of an operating system and its constitutent files. You can build and run this image on your local machine, during which it is called a **container**. The container allows you to develop software in the environment of the image instead of your local machine. This allows you to avoid any problems of the project building on one operating system and not another. 
 
 We will be using docker as an alternative to the conda environment in the case that your code doesn't build on the conda environment, or if you have any other issues.
 
@@ -91,6 +87,8 @@ Once installed, you will see the remote explorer icon on the left sidecar of of 
 
 In essence, a Docker container is a lot like a lightweight virtual machine. They are very different (as you can see in [this thread](https://stackoverflow.com/questions/16047306/how-is-docker-different-from-a-virtual-machine)). If you're curious for rigorous definitions and the actual differences between containers and VMs, check out the thread :)
 
+You can also run Docker containers from a terminal window, if you'd rather not use it in VS Code.
+
 ## Data Version Control (DVC)
 
 We want to be able to version our datasets and store them remotely (not in the git repository) so as to not violate any of github's file size limits. Luckily, this is what DVC allows us to do. First, install DVC using the instructions for your relevant OS [here](https://dvc.org/doc/install) -- install the version that integrates into your command line (i.e. not the pip one; that will already be installed when you set up your environment). On Mac OSX, this is as simple as running `brew install dvc`. On Ubuntu, use `snap install --classic dvc`. On Windows, if you have the `choco` package manager installed, just use `choco install dvc` in `Cmder` (won't work in a non-elevated environment). You can download `Cmder` if you don't have it. If you don't have `choco` installed, install it.
@@ -99,7 +97,7 @@ More Specific Directions for DVC Installation with Windows:
 - https://dvc.org/doc/install/windows
 - https://dvc.org/doc/user-guide/running-dvc-on-windows
 
-**ALL** datasets we scrape, and those that we clean, will go inside DVC. We do not want to store datasets in the git repository if we can avoid it, except for those directly relevant to our packages.
+**ALL** proprietary / paid data we use will go inside DVC in order to avoid data licensing violations. 
 
 For more information on how DVC works and a basic tutorial, check out their [docs](https://dvc.org/doc/start/data-and-model-versioning) -- not necessary, but useful if knowing how things works helps you use them.
 
@@ -139,7 +137,7 @@ dvc push
 We define some basic conventions to streamline our workflow and make things easier to organize. If you take issue with any of these, please let us know! We're more than willing to change things that don't work for you all :)
 
 #### Main Branch
-The main branch for this repository is called ```master```. This is where we will store our files after they have been developed and tested on different branches.
+The main branch for this repository is called `master`. This is where we will store our files after they have been developed and tested on different branches.
 
 #### Work Tickets and Branches
 We will be using GitHub Issues (the issues tab on the repository) to track work and give assignments. All work must be done on branches (commits to `master` are blocked).
@@ -169,6 +167,12 @@ Note that a branch will **not** be visible to others until you make a commit and
 #### VSCode Live Share
 
 If you're working with someone concurrently on the same script, it's sometimes helpful to work together on it. Luckily, Visual Studio Code (the text editor / IDE you should use) has a Live Share extension pack. TO install it, search for extensions (there should be an icon on the left-had-side bar). Search "liveshare" and install the Live Share Extension Pack. 
+
+## Fonts
+
+The main font we will use for plots is [Glacial Indifference](https://www.fontsquirrel.com/fonts/glacial-indifference). We have the files necessary for it available in the `fonts/` directory, and you can install that font on your operating system (exact instructions vary by operating system).
+
+If you are on MacOS, you can follow [these instructions](https://support.apple.com/en-us/HT201749) to install the font.
 
 ## Coding Conventions
 
@@ -210,6 +214,11 @@ git push
 ```
 
 If done correctly, checks should pass on your pull requests now. If not, let an admin / manager know and we will help you fix the issues.
+
+### Capitalization
+
+Please use `snake_case` for variables and functions, and reserve `UpperCamelCase` for class definitions only. Please do not use `camelCase` if you can avoid it. Some of our older code uses `lowerCamelCase`, and some of it uses `snake_case`, which is more Pythonic. It's a nightmare of inconsistencies. So let's try to be as consistent as possible moving forward. 
+
 ### Docstrings and Function Definitions
 
 #### Function Definitions
@@ -252,12 +261,57 @@ def get_nicknames(name: str) -> List[str]:
     pass
 ```
 
+Sometimes you want to specify multiple types for an argument or return value. In this case, you can use `typing.Union`:
+
+```python
+from typing import Union
+
+def parse_four_digit_year(year: Union[str, int]) -> str:
+    """Parses a 4 digit year into the last two digits"""
+    year = str(year) if isinstance(year, int) else year
+    return year[-2:]
+```
+
+### Ternary Operators, `isinstance`, and other tips
+
+In the code exampe above, you may have noticed the line
+
+```python
+year = str(year) if isinstance(year, int) else year
+```
+
+This is a **ternary operator**, which is [(sometimes slightly slower)](https://stackoverflow.com/questions/44599860/performance-of-ternary-operator-vs-if-else-statement) syntactic sugar that can be used instead of an if-else block. Why would we use it? It's *way* more readable for short statements than using 4 lines for an if-else block. Compare the readability of the above line to its equivalent:
+
+```python
+if isinstance(year, int):
+    year = str(year)
+else: 
+    year = year
+```
+
+The `else` block is redundant in this case, but in most cases it won't be.
+
+You may have also noticed I used `isintance(year, int)` instead of `type(year) == int`. It's generally considered more Pythonic to use `isinstance` instead of direct comparison of types. The output of the two expressions are the same, but we try to avoid using the `type()` function when possible.
+
+Finally, if you want to check if a value is `None`, use the `is None` keyword for more readability:
+
+```python
+if value == None:
+    print("This is 💩")
+elif value is None:
+    print("This is ✅")
+```
+
+For a more detailed explanation of why we do this, check [this stackoverflow thread](https://stackoverflow.com/questions/14247373/python-none-comparison-should-i-use-is-or).
+
 #### Docstrings
 Docstrings are a convenient way of documenting the functions we write. Docstrings inclue a description of your function, the arguments it needs, and the output of the function. Docstrings appear right after the function definition and you can create one by using triple quotes ``` """ [docstring here] """ ``` or ``` ''' [docstring here] ''' ```. 
 
 Here is an example docstring from the ```lowe/acs/acs_async.py``` file.
 
 ```Python
+from typing import Union
+
 def _base_uri(
     self,
     year: Union[int, str],
@@ -289,7 +343,7 @@ def _base_uri(
         Base URL for querying ACS API
     """
 ```
-Docstrings are **required** for all major functions that will be used by others. This is currently our only way of documenting how to use different parts of our packages, and so we have to be as detailed as possible.
+Docstrings are **required** for all **major functions** that will be used by others. This is currently our only way of documenting how to use different parts of our packages, and so we have to be as detailed as possible. Helper functions may have smaller docstrings that simply detail the objective of the function (or no docstring if they are straightforward enough). Type annotations are still great, when possible!
 
 In order to generate docstrings in this format, we use the [VS code docstring generator](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring). Once you install the extension, you will need to tweak the settings to use the `numpy` format. To access your settings, use the VS code extensions tab and type `@ext:autodocstring` in the search bar. Click on the extension, and near the top there will be a settings button (you can also click the wheel in the search results and navigate to `Extension Settings`). Here are the complete settings you will need:
 
@@ -306,15 +360,18 @@ If there is something important about the function that you want to convey to re
 
 ### Comments
 
-Besides docstrings, comments should be written throughout your functions for others to understand your code. Similar to a step-by-step guide you created a function. Addtionally, comments should be written on any code that can be ambiguous to readers. A good way to know when to comment is if you had to think for a while to write the code. However, you do not need to comment everything. For example, variable initialization does not need to be commented since it is pretty straightforward. You can add a comment by using the hash sign ```#```.
+Besides docstrings, comments should be written throughout your functions for others to understand your code. Similar to a step-by-step guide you created a function. Addtionally, comments should be written on any code that can be ambiguous to readers. A good way to know when to comment is if you had to think for a while to write the code. However, you do not need to comment everything. For example, variable initialization does not need to be commented since it is pretty straightforward. You can add a comment by using the hash sign `#`.
+
+Remember: the *worst* comments simply restate the code. The *best* comments explain *why* your code does what it does. 
 
 If you write code that does not define functions, make sure you write a comment at the top of the code block of what it does. For example:
 
 ``` python
-#--------
+# --------
 # Script that cleans the geocode csv file to split the city geoid and the state geoid
 # And makes it to a new csv file.
-#--------
+# Necessary component of some of our API wrappers
+# --------
 ```
 
 Furthermore, if you are unable to finish the code you are working on, make sure to write a ```#TODO:``` comment in the area you need to finish with a description of what needs to be done. This ensures that if other people work on the code, they know what still needs to be done with the code. If there are overall todos, you can leave the code block
@@ -351,18 +408,6 @@ Also, if your code can be partitioned into different sections, please leave comm
 # [insert code here]
 # ...
 ```
-
-### Medallion Tables
-
-We refer to datasets in three tiers:
-
-- **Bronze Tables** (lowest tier): Raw data, pulled directly from APIs with no or minimal transformations applied. Essentially, the easiest but messiest possible dataframes we can construct from the API data.
-
-- **Silver Tables** (middle tier): Data that has been processed to a decent degree. This table is not ready for use in production but is significantly more usable than the bronze tables.
-
-- **Gold Tables** (highest tier): The data has been fully processed for some purpose and is ready to be imported and used. For example, a gold table could be the data we use (and perfectly formatted for) a plot that will go in our final reports.
-
-It is possible in some cases to go straight from bronze --> gold. Though I've personally never seen it happen, it might happen in our case since some of the plots will likely be very simple.
 
 ## Helpful Information for Some APIs
 
