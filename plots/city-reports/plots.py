@@ -13,7 +13,7 @@ from demographics import (
     age_distribution,
     race_group_distribution,
     households_with_internet,
-    residence_and_work_loc,
+    # residence_and_work_loc,
 )
 
 from income import (
