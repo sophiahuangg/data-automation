@@ -271,7 +271,7 @@ async def education_human_capital_plots(
     await educational_attainment_cv(
         client=client,
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/High School and College Attainment Rage, Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/High School and College Attainment Rate, Coachella Valley, {acs_year}",
     )
 
 
