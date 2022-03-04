@@ -44,6 +44,7 @@ setup(
         "datetime",
         "dvc[gdrive,gs]",
         "flake8==3.9.2",
+        "ipykernel",
         "kaleido",
         "matplotlib",
         "nbclient",
