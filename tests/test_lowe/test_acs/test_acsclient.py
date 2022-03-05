@@ -2,13 +2,8 @@ import pytest
 from lowe.acs.ACSClient import ACSClient
 from lowe.locations.lookup import search, name2fips, fips2name
 
-
 def test_add():
     assert 1+1 == 2
-
-def test_subtract():
-    assert 1-1 == 0
-
 
 @pytest.mark.asyncio
 async def test_overall():
