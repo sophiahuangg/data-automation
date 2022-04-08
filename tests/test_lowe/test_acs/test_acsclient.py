@@ -16,6 +16,7 @@ class TestSearch_and_Get:
     async def test_add(self):
         assert 1+1 == 2
 
+    # ! S2801 + 5 year
     async def test_5year_s2801_1(self):
         # Initialize client
         client = ACSClient()
@@ -116,6 +117,7 @@ class TestSearch_and_Get:
 
         assert value == 8138
 
+    # ! DP05 + 5 year
     async def test_5year_DP05_1(self):
         client = ACSClient()
         await client.initialize()
@@ -187,3 +189,221 @@ class TestSearch_and_Get:
         value = float(resp[col_sub][col_name].iloc[0])
 
         assert value == 15033
+    
+    #! S1901
+    async def test_5year_S1901_1(self):
+        client = ACSClient()
+        await client.initialize()
+        # fip_code = search('cathedral city, ca', codetype="city", search_on="name").iloc[0][1]
+
+        fip_code2 = search('coachella, ca', codetype="city", search_on="name").iloc[0][1]
+
+        locs = [{'city': fip_code2}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2020',
+                        end_year='2020',
+                        location=locs,
+                        estimate="5")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Families Total $75,000 to $99,999"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 15.6
+
+    async def test_5year_S1901_2(self):
+        client = ACSClient()
+        await client.initialize()
+        # fip_code = search('cathedral city, ca', codetype="city", search_on="name").iloc[0][1]
+
+        fip_code2 = search('coachella, ca', codetype="city", search_on="name").iloc[0][1]
+
+        locs = [{'city': fip_code2}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2020',
+                        end_year='2020',
+                        location=locs,
+                        estimate="5")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Nonfamily households PERCENT ALLOCATED Nonfamily income in the past 12 months"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 55.4
+
+    async def test_5year_S1901_3(self):
+        client = ACSClient()
+        await client.initialize()
+         # fip_code = search('cathedral city, ca', codetype="city", search_on="name").iloc[0][1] 
+
+        # fip_code2 = search('coachella, ca', codetype="city", search_on="name").iloc[0][1]
+
+        fip_code3 = search('desert hot springs, ca', codetype="city", search_on="name").iloc[0][1]
+
+        locs = [{'city': fip_code3}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="5")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Nonfamily households Total $100,000 to $149,999"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 3.5
+
+    #! 1 Year - S1901
+    async def test_1year_S1901_1(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Nonfamily households Total $10,000 to $14,999"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 7.2
+
+    async def test_1year_S1901_2(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Families PERCENT ALLOCATED Family income in the past 12 months"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 41.2
+
+    async def test_1year_S1901_3(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1901'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "INCOME IN THE PAST 12 MONTHS (IN 2019 INFLATION-ADJUSTED DOLLARS) Estimate Households Total $150,000 to $199,999"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 11.4
+
+    #! 1 Year - S1501
+    async def test_1year_S1501_1(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1501'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "EDUCATIONAL ATTAINMENT Estimate Percent Male POVERTY RATE FOR THE POPULATION 25 YEARS AND OVER FOR WHOM POVERTY STATUS IS DETERMINED BY EDUCATIONAL ATTAINMENT LEVEL Less than high school graduate"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 10.4
+    
+    async def test_1year_S1501_2(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1501'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "EDUCATIONAL ATTAINMENT Estimate Percent RACE AND HISPANIC OR LATINO ORIGIN BY EDUCATIONAL ATTAINMENT Hispanic or Latino Origin High school graduate or higher"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 72.7
+
+    async def test_1year_S1501_3(self):
+        client = ACSClient()
+        await client.initialize()
+
+        fip_code = search('indio, ca', codetype="city", search_on="name").iloc[0][1] 
+
+        locs = [{'city': fip_code}]
+        
+        resp = await client.get_acs(vars = ['S1501'],
+                        start_year='2019',
+                        end_year='2019',
+                        location=locs,
+                        estimate="1")
+
+        col_name = "EDUCATIONAL ATTAINMENT Estimate Male AGE BY EDUCATIONAL ATTAINMENT Population 25 years and over Associate's degree"
+        col_sub = [col_name, 'state', 'city']
+        if len(resp[col_sub]) != 1:
+            assert False
+
+        value = float(resp[col_sub][col_name].iloc[0])
+
+        assert value == 1879
