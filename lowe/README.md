@@ -214,18 +214,10 @@ These functions can be imported with
 from lowe.locations.lookups import name2fips, fips2name, search
 ```
 
-There are a **lot** of wrinkles to iron out with this package, so please keep in contact with the managers as development continues and we will add new features and bug fixes as we go.
-
-## lowe.edd
-
-This package contains utilities for automating EDD news release analysis. As we continue, we will add automated employment graphs to this package as well.
-
-## Features to Come
-
-We want to eventually add a `lowe.cli` package that contains command line utilities. An example of a useful function would be an integration of `lowe.locations.lookups.search` so that we can quickly search for FIPS codes of different geographies. This can be done easily through [`Click`](https://click.palletsprojects.com/en/8.0.x/), and will likely be assigned to someone 
+When the conda environment is activated (`conda activate lowe`), you can search for FIPS codes (or city names that correspond to FIPS codes) using the command line:
 
 ```bash
-$ search fips city palm
+$ search city palm
 
                      name     fips
 831            palmer, ak  0258660
@@ -241,4 +233,15 @@ $ search fips city palm
 31607          palmer, pr  7258666
 ```
 
-We also want to add a `lowe.utils` package that includes small utilities that we can use. These don't have to be complicated, just convenient things we may want to use a lot
+You can search either on the FIPS code or a string match for the name. You can search for states, MSAs, county, or cities. The format is
+
+```bash
+search city <name>
+search county <name>
+search msa <name>
+search state <name>
+```
+
+## lowe.edd
+
+This package contains utilities for automating EDD news release analysis. Specific instructions are noted in the readme in the `edd` folder for how to handle release.
