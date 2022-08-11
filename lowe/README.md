@@ -4,8 +4,12 @@ This is an importable Python package we have developed with the goal of making a
 
 - **locations**: Location decoding for FIPS codes. Allows for translation between names and codes -- especially useful for ACS utilities
 - **acs**: API wrapper and resources for the American Community Survey
-- **fred**: API wrapper and resources for FRED data
+- **fred**: API wrapper and resources for FRED data. This needs to be reworked to be cleaner, but it's still functional (but clunky).
 - **edd**: Resources for automating EDD analysis for news release data. In the future, this may contain utilities for analyzing our employment data
+- **dof**: Scraping population data and estimates from the CA Department of Finance.
+- **bls**: API wrapper for employment data from BLS. Most of this data is also in FRED.
+
+NOTE: Most of the API wrappers are object-oriented and generally work similarly, but with some small tweaks based on the idiosyncracies of the APIs themselves. Once you learn how to use one, the rest should be pretty simple to understand if you check out both the source code and the actual API documentation.
 
 Since we install this package as an editable module (through `setup.py` in the root directory, which is activated in the setup step `pip install -e .`), you can import these packages within **any** script so long as you are using a conda environment that has it installed.
 
