@@ -214,7 +214,7 @@ These functions can be imported with
 from lowe.locations.lookups import name2fips, fips2name, search
 ```
 
-When the conda environment is activated, you can search for FIPS codes  (or city names that correspond to FIPS codes) using the command line:
+When the conda environment is activated (`conda activate lowe`), you can search for FIPS codes (or city names that correspond to FIPS codes) using the command line:
 
 ```bash
 $ search city palm
@@ -233,6 +233,15 @@ $ search city palm
 31607          palmer, pr  7258666
 ```
 
+You can search either on the FIPS code or a string match for the name. You can search for states, MSAs, county, or cities. The format is
+
+```bash
+search city <name>
+search county <name>
+search msa <name>
+search state <name>
+```
+
 ## lowe.edd
 
-This package contains utilities for automating EDD news release analysis.
+This package contains utilities for automating EDD news release analysis. Specific instructions are noted in the readme in the `edd` folder for how to handle release.
