@@ -139,6 +139,8 @@ We define some basic conventions to streamline our workflow and make things easi
 #### Main Branch
 The main branch for this repository is called `master`. This is where we will store our files after they have been developed and tested on different branches.
 
+**IMPORTANT**: Before merging any pull requests, make sure to run `pytest` in the root directory to make sure all checks pass. Since these checks rely on API keys, they're not straightforward to automate with GitHub actions.
+
 #### Work Tickets and Branches
 We will be using GitHub Issues (the issues tab on the repository) to track work and give assignments. All work must be done on branches (commits to `master` are blocked).
 
@@ -457,8 +459,6 @@ American Community Survey API documentation for 5-year estimates: https://www.ce
 
 Geographic codes for ACS: https://api.census.gov/data/2019/acs/acs5/subject/examples.html
 
-Check out the ```notes.md``` file for some more details and useful links!
-
 ## Learning Resources
 
 If you are interested in learning how to use the prerequisite software, we provide some resources here.
@@ -473,9 +473,3 @@ The first 5 videos on this playlist are probably all that you will need. There w
 
 #### Python 
 Corey Schafer has a great introduction to Python on [this](https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7) YouTube playlist. For our purposes, you'll need to know the contents of about the first 9 videos (basic data types and control flow that we'll work with a lot, as well as functions and modules). We'll teach you the basics of how to use the packages we'll be working with in workshops and all (I want to eventually commit to recording a mini-lecture series, but no promises). Here's the link to the playlist: https://www.youtube.com/watch?v=YYXdXT2l-Gg&list=PL-osiE80TeTskrapNbzXhwoFUiLCjGgY7
-
-#### R
-
-CodeCademy has a free course: https://www.codecademy.com/learn/learn-r
-
-The first 4 modules will be essential to what we do, and going through the rest may be useful for learning some of the data processing. But you can go through that stuff as you need it.
