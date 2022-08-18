@@ -193,15 +193,15 @@ def city_population_cv_time_series(
     # Plot!
 
     colors = [
-        "#961a30",
-        "#e7c8ae",
-        "#e6aeb7",
-        "#c5485f",
-        "#965119",
-        "#c57a49",
-        "#d05064",
-        "#504f4d",
-        "#b3a9a2",
+        "#ff0000",
+        "#ffa500",
+        "#ffff00",
+        "#008000",
+        "#0000ff",
+        "#4b0082",
+        "#ee82ee",
+        "#00FFFF",
+        "#000000",
     ]
 
     fig = px.line(
@@ -215,7 +215,7 @@ def city_population_cv_time_series(
     fig.update_layout(
         font_family="Glacial Indifference",
         font_color="black",
-        font_size=18,
+        font_size=22,
         yaxis_title="Population",
         legend_title_font_color="black",
         template="plotly_white",
