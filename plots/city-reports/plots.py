@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import os
 import time
+import sys
 
 from functools import wraps
 
@@ -97,24 +98,24 @@ async def demographics_plots(
     city_population_cv_present(
         year=dof_year,
         target_city=target_city,
-        save_path=f"outputs/{target_city}/City Population, {target_city}, Rest of Coachella Valley, {dof_year}",
+        save_path=f"outputs/{target_city}/City Population, {target_city}, Rest of Coachella Valley, {dof_year}.png",
     )
 
     # Figure 2
     city_population_cv_time_series(
-        save_path=f"outputs/{target_city}/City Population, Coachella Valley, 1990-{dof_year}"
+        save_path=f"outputs/{target_city}/City Population, Coachella Valley, 1990-{dof_year}.png"
     )
 
     # Figure 3
     pop_growth_rates(
         target_city=target_city,
-        save_path=f"outputs/{target_city}/Population Growth Rates, {target_city}, Rest of Coachella Valley, 1990-{dof_year}",
+        save_path=f"outputs/{target_city}/Population Growth Rates, {target_city}, Rest of Coachella Valley, 1990-{dof_year}.png",
     )
 
     # Figure 4
     pop_growth_rates_year_groups(
         year=dof_year,
-        save_path=f"outputs/{target_city}/City Population Percentage Gain, Coachella Valley, 1990-{dof_year}",
+        save_path=f"outputs/{target_city}/City Population Percentage Gain, Coachella Valley, 1990-{dof_year}.png",
     )
 
     # Generate target city in format for ACS
@@ -126,7 +127,7 @@ async def demographics_plots(
         client=client,
         year=str(acs_year),
         target_city=target_city_acs,
-        save_path=f"outputs/{target_city}/Age Distribution, {target_city}, Rest of Coachella Valley, Rest of Riverside County, {acs_year}",
+        save_path=f"outputs/{target_city}/Age Distribution, {target_city}, Rest of Coachella Valley, Rest of Riverside County, {acs_year}.png",
     )
 
     # Figure 6
@@ -134,7 +135,7 @@ async def demographics_plots(
         client=client,
         cities=[target_city_acs_comma],
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/Racial Group Distribution, {target_city}, {acs_year}",
+        save_path=f"outputs/{target_city}/Racial Group Distribution, {target_city}, {acs_year}.png",
     )
 
     # Figure 7
@@ -142,7 +143,7 @@ async def demographics_plots(
         client=client,
         target_city=target_city,  # Doesn't need the ACS formatting
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/Percentage of Households with Internet, Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/Percentage of Households with Internet, Coachella Valley, {acs_year}.png",
     )
 
     # # Table 1
@@ -176,7 +177,7 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
         client=client,
         target_city=target_city_acs_comma.split(",")[0],
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/Total Household Income, Annual, {target_city}, Rest of Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/Total Household Income, Annual, {target_city}, Rest of Coachella Valley, {acs_year}.png",
     )
 
     # Figure 9
@@ -184,7 +185,7 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
         client=client,
         target_city=target_city_acs_comma.split(",")[0],
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/Median Household Income, {target_city}, Rest of Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/Median Household Income, {target_city}, Rest of Coachella Valley, {acs_year}.png",
     )
 
     # Figure 10
@@ -194,7 +195,7 @@ async def income_plots(target_city: str, acs_year: int, client: ACSClient):
         target_city=target_city_acs_comma.split(",")[
             0
         ],  # This function searches on location_key, which removes the comma
-        save_path=f"outputs/{target_city}/Household Income By Class, {acs_year}",
+        save_path=f"outputs/{target_city}/Household Income By Class, {acs_year}.png",
     )
 
 
@@ -209,7 +210,7 @@ def employment_plots(
     avg_monthly_employment(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Average Monthly Total Employment, {target_city}, 2005-{edd_year}",
+        save_path=f"outputs/{target_city}/Average Monthly Total Employment, {target_city}, 2005-{edd_year}.png",
     )
 
     # Figure 15 -- Unemployment Rates US, CA, IE, City
@@ -220,22 +221,22 @@ def employment_plots(
         unemployment_rates(
             city=target_city,
             year=str(bls_year),
-            save_path=f"outputs/{target_city}/Unemployment Rate, {target_city}, Inland Empire, California, United States, 2000-{bls_year}",
+            save_path=f"outputs/{target_city}/Unemployment Rate, {target_city}, Inland Empire, California, United States, 2000-{bls_year}.png",
         )
 
     # Figure 16 -- Employment composition (new plot)
     employment_composition_pandemic_now(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Employment Composition, {target_city}, Pandemic Drop to Now",
+        save_path=f"outputs/{target_city}/Employment Composition, {target_city}, Pandemic Drop to Now.png",
     )
 
     # Former Figure 19 & Figure 20 ??
     peak_to_trough_empl(
         city=target_city,
         data_path=data_path,
-        save_path_abs=f"outputs/{target_city}/Change in Employment Share, Peak to Trough, {target_city}, {edd_year}",
-        save_path_perc=f"outputs/{target_city}/Percent Change in Employment Share, Peak to Trough, {target_city}, {edd_year}",
+        save_path_abs=f"outputs/{target_city}/Change in Employment Share, Peak to Trough, {target_city}, {edd_year}.png",
+        save_path_perc=f"outputs/{target_city}/Percent Change in Employment Share, Peak to Trough, {target_city}, {edd_year}.png",
     )
 
 
@@ -245,13 +246,13 @@ def taxable_sales_plots(target_city: str, data_path: str = "data/taxable_sales.c
     real_nominal_sales_pc_time_series(
         city=target_city,
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Real and Nominal Retail Sales per Capita, {target_city}",
+        save_path=f"outputs/{target_city}/Real and Nominal Retail Sales per Capita, {target_city}.png",
     )
 
     # Figure 22
     taxable_sales_per_capita_quarters_cv(
         data_path=data_path,
-        save_path=f"outputs/{target_city}/Quarterly Taxable Sales per Capita, Coachella Valley",
+        save_path=f"outputs/{target_city}/Quarterly Taxable Sales per Capita, Coachella Valley.png",
     )
 
 
@@ -264,14 +265,14 @@ async def education_human_capital_plots(
         client=client,
         year=str(acs_year),
         target_city=target_city.lower(),
-        save_path=f"outputs/{target_city}/Human Capital Index, {target_city}, Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/Human Capital Index, {target_city}, Coachella Valley, {acs_year}.png",
     )
 
     # Figure 26
     await educational_attainment_cv(
         client=client,
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/High School and College Attainment Rate, Coachella Valley, {acs_year}",
+        save_path=f"outputs/{target_city}/High School and College Attainment Rate, Coachella Valley, {acs_year}.png",
     )
 
 
@@ -283,7 +284,7 @@ async def health_insurance_plots(client: ACSClient, target_city: str, acs_year: 
         client=client,
         city=target_city_acs_comma,
         year=str(acs_year),
-        save_path=f"outputs/{target_city}/Percentage of Population with Health Insurance, {target_city}, California, United States, 2010-{acs_year}",
+        save_path=f"outputs/{target_city}/Percentage of Population with Health Insurance, {target_city}, California, United States, 2010-{acs_year}.png",
     )
 
 
@@ -363,4 +364,6 @@ async def main(
 
 
 if __name__ == "__main__":
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     asyncio.run(main())
